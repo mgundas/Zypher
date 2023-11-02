@@ -123,10 +123,11 @@ function App() {
         </div>
       ) : (
         /* if the user isn't logged in */
-        <div className=" fixed h-full w-full z-10 bg-rtca-200 dark:bg-rtca-900 dark:text-white flex items-center justify-center">
-          <div className="flex flex-col gap-5 items-center justify-center">
-            <h1 className="text-lg">Login</h1>
+        <div className="z-10 dark:text-white grid gap-10 mb-10 mt-20 items-center">
+          <h1 className="row-span-2 text-2xl text-center font-medium">Chat App</h1>
+          <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
             <form className="flex flex-col gap-2" onSubmit={handleConnect}>
+              <h1 className="text-lg text-center">Login</h1>
               <input
                 maxLength={15}
                 ref={unameInputRef}
@@ -145,13 +146,37 @@ function App() {
                 Join
               </button>
             </form>
-            <div
+            <form className="flex flex-col gap-2" onSubmit={handleConnect}>
+              <h1 className="text-lg text-center">Register</h1>
+              <input
+                maxLength={15}
+                className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
+                placeholder="E-mail"
+              />
+              <input
+                maxLength={15}
+                className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
+                placeholder="Username"
+              />
+              <input
+                maxLength={15}
+                className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
+                placeholder="Password"
+              />
+              <button
+                onClick={handleConnect}
+                className="bg-green-700 text-white p-2 rounded-md hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all"
+              >
+                Join
+              </button>
+            </form>
+          </div>
+          <div
               ref={infoBoxRef}
-              className="bg-red-900 border border-red-800 text-rtca-50 flex w-full p-3 rounded-md transition-all hidden"
+              className="bg-red-900 border justify-self-center border-red-800 text-rtca-50 p-3 rounded-md transition-all hidden"
             >
               Username cannot be empty.
             </div>
-          </div>
         </div>
       )}
     </div>
