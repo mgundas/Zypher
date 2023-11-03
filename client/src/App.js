@@ -2,52 +2,64 @@ import { useRef, useEffect, useState } from "react";
 import ToggleDarkMode from "./modules/ToggleDarkMode";
 import Message from "./modules/Message";
 import ChatInput from "./modules/ChatInput";
-import { useSocket } from './contexts/SocketContext';
+import { useSocket } from "./contexts/SocketContext";
 
 function App() {
-  const {socket, setAuth} = useSocket();
+  const { socket, setAuth } = useSocket();
   const [loggedIn, setLoggedIn] = useState(false);
   const unameRef = useRef(null);
   const unameInputRef = useRef(null);
   const infoBoxRef = useRef(null);
   const typingTimeoutRef = useRef(null);
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
   const chatContainerRef = useRef(null);
-  const titleTimeoutRef = useRef(null)
+  const titleTimeoutRef = useRef(null);
 
   useEffect(() => {
     document.title = "Chat App";
   }, []);
 
   useEffect(() => {
-    if(socket) {
+    if (socket) {
       socket.on("receiveId", (data) => {
         unameRef.current.innerHTML = data.username;
         console.log(data);
       });
-    
+
       socket.on("receiveMessage", (data) => {
         console.log("triggered", data);
-        setMessages((prev) => [...prev, data])
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        setMessages((prev) => [...prev, data]);
+        chatContainerRef.current.scrollTop =
+          chatContainerRef.current.scrollHeight;
         console.log(messages);
-        if(data.sender !== socket.auth.username) {
-          document.title = "New message!"
+        if (data.sender !== socket.auth.username) {
+          document.title = "New message!";
         }
         clearTimeout(titleTimeoutRef.current);
         titleTimeoutRef.current = setTimeout(() => {
-          document.title = "Chat App"
+          document.title = "Chat App";
         }, 2000); // Adjust the timeout duration as needed
-
       });
     }
-    return() => {
-      if(socket) {
-        socket.off("receiveId")
-        socket.off("receiveMessage")
+    return () => {
+      if (socket) {
+        socket.off("receiveId");
+        socket.off("receiveMessage");
       }
-    }
-  }, [socket, messages])
+    };
+  }, [socket, messages]);
+
+  const sendErrorMessage = (message) => {
+    setErrorMsg(message);
+    infoBoxRef.current.classList.remove("hidden");
+
+    // Clear the previous timeout and set a new one
+    clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      infoBoxRef.current.classList.add("hidden");
+    }, 2000); // Adjust the timeout duration as needed
+  };
 
   const handleConnect = async (e) => {
     e.preventDefault();
@@ -62,25 +74,33 @@ function App() {
         },
         body: JSON.stringify({ username: username, password: "your-password" }),
       })
-        .then((response) => {
-          if (response.status === 200) {
-            // User registered successfully
-            setAuth({ username: username })
-            setLoggedIn(true);
+        .then(async (response) => {
+          const data = await response.json();
+          const statusCode = response.status;
+          
+          if(!response.ok){
+            switch (statusCode) {
+              case 400:
+                sendErrorMessage(data.message);
+                break;
+              case 500:
+                sendErrorMessage(data.message);
+                break;
+              default:
+                sendErrorMessage("An unknown error occured.");
+                break;
+            }
           } else {
-            infoBoxRef.current.classList.toggle("hidden");
+
           }
+
+          console.log(data);
         })
         .catch((err) => {
           console.error("Error:", err);
         });
     } else {
-      infoBoxRef.current.classList.remove("hidden");
-      // Clear the previous timeout and set a new one
-      clearTimeout(typingTimeoutRef.current);
-      typingTimeoutRef.current = setTimeout(() => {
-        infoBoxRef.current.classList.add("hidden");
-      }, 2000); // Adjust the timeout duration as needed
+      sendErrorMessage("Something went wrong brotha.");
     }
   };
 
@@ -100,22 +120,31 @@ function App() {
             </div>
           </nav>
           <div className="flex m-6 rounded-lg dark:text-rtca-200 gap-2 justify-between">
-          <button className="dark:bg-rtca-600 bg-rtca-400 p-3 rounded-lg grow">Room 1</button>
-          <button className="dark:bg-rtca-700 bg-rtca-300 p-3 rounded-lg grow">Room 2</button>
+            <button className="dark:bg-rtca-600 bg-rtca-400 p-3 rounded-lg grow">
+              Room 1
+            </button>
+            <button className="dark:bg-rtca-700 bg-rtca-300 p-3 rounded-lg grow">
+              Room 2
+            </button>
           </div>
           <div className="p-4 pb-6 m-6 rounded-md bg-rtca-300 dark:bg-rtca-700 dark:text-rtca-200 flex flex-col gap-3">
             <div className="font-medium p-2 bg-rtca-200 dark:bg-rtca-600 rounded-md flex justify-between">
-            <span>You're currently in: Room 1</span>
-            <span>People online in this room: 1</span>
+              <span>You're currently in: Room 1</span>
+              <span>People online in this room: 1</span>
             </div>
-            <div className="flex flex-col gap-1 max-h-[600px] overflow-auto overflow-x-hidden" ref={chatContainerRef}>
+            <div
+              className="flex flex-col gap-1 max-h-[600px] overflow-auto overflow-x-hidden"
+              ref={chatContainerRef}
+            >
               {messages.map((message, key) => {
-                return (<Message
-                  key={key}
-                  username={message.sender}
-                  message={message.message}
-                  timestamp="31.10.2023 6:27PM"
-                />)
+                return (
+                  <Message
+                    key={key}
+                    username={message.sender}
+                    message={message.message}
+                    timestamp="31.10.2023 6:27PM"
+                  />
+                );
               })}
             </div>
             <ChatInput />
@@ -124,7 +153,9 @@ function App() {
       ) : (
         /* if the user isn't logged in */
         <div className="z-10 dark:text-white grid gap-10 mb-10 mt-20 items-center">
-          <h1 className="row-span-2 text-2xl text-center font-medium">Chat App</h1>
+          <h1 className="row-span-2 text-2xl text-center font-medium">
+            Chat App
+          </h1>
           <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
             <form className="flex flex-col gap-2" onSubmit={handleConnect}>
               <h1 className="text-lg text-center">Login</h1>
@@ -172,11 +203,11 @@ function App() {
             </form>
           </div>
           <div
-              ref={infoBoxRef}
-              className="bg-red-900 border justify-self-center border-red-800 text-rtca-50 p-3 rounded-md transition-all hidden"
-            >
-              Username cannot be empty.
-            </div>
+            ref={infoBoxRef}
+            className="bg-red-900 border justify-self-center border-red-800 text-rtca-50 p-3 rounded-md transition-all hidden"
+          >
+            {errorMsg}
+          </div>
         </div>
       )}
     </div>
