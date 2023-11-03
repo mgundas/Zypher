@@ -3,12 +3,13 @@ import ToggleDarkMode from "./modules/ToggleDarkMode";
 import Message from "./modules/Message";
 import ChatInput from "./modules/ChatInput";
 import { useSocket } from "./contexts/SocketContext";
+import Login from "./modules/Login";
+import Register from "./modules/Register";
 
 function App() {
   const { socket, setAuth } = useSocket();
   const [loggedIn, setLoggedIn] = useState(false);
   const unameRef = useRef(null);
-  const unameInputRef = useRef(null);
   const infoBoxRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const [messages, setMessages] = useState([]);
@@ -59,49 +60,6 @@ function App() {
     typingTimeoutRef.current = setTimeout(() => {
       infoBoxRef.current.classList.add("hidden");
     }, 2000); // Adjust the timeout duration as needed
-  };
-
-  const handleConnect = async (e) => {
-    e.preventDefault();
-    if (unameInputRef.current.value !== "") {
-      const username = unameInputRef.current.value;
-
-      // Simulate user registration by making a POST request to your server
-      await fetch("http://10.15.2.200:81/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username: username, password: "your-password" }),
-      })
-        .then(async (response) => {
-          const data = await response.json();
-          const statusCode = response.status;
-          
-          if(!response.ok){
-            switch (statusCode) {
-              case 400:
-                sendErrorMessage(data.message);
-                break;
-              case 500:
-                sendErrorMessage(data.message);
-                break;
-              default:
-                sendErrorMessage("An unknown error occured.");
-                break;
-            }
-          } else {
-
-          }
-
-          console.log(data);
-        })
-        .catch((err) => {
-          console.error("Error:", err);
-        });
-    } else {
-      sendErrorMessage("Something went wrong brotha.");
-    }
   };
 
   return (
@@ -157,50 +115,8 @@ function App() {
             Chat App
           </h1>
           <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
-            <form className="flex flex-col gap-2" onSubmit={handleConnect}>
-              <h1 className="text-lg text-center">Login</h1>
-              <input
-                maxLength={15}
-                ref={unameInputRef}
-                className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
-                placeholder="Username"
-              />
-              <input
-                maxLength={15}
-                className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
-                placeholder="Password"
-              />
-              <button
-                onClick={handleConnect}
-                className="bg-green-700 text-white p-2 rounded-md hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all"
-              >
-                Join
-              </button>
-            </form>
-            <form className="flex flex-col gap-2" onSubmit={handleConnect}>
-              <h1 className="text-lg text-center">Register</h1>
-              <input
-                maxLength={15}
-                className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
-                placeholder="E-mail"
-              />
-              <input
-                maxLength={15}
-                className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
-                placeholder="Username"
-              />
-              <input
-                maxLength={15}
-                className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
-                placeholder="Password"
-              />
-              <button
-                onClick={handleConnect}
-                className="bg-green-700 text-white p-2 rounded-md hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all"
-              >
-                Join
-              </button>
-            </form>
+            <Login sendErrorMessage={sendErrorMessage} setLoggedIn={setLoggedIn} />
+            <Register sendErrorMessage={sendErrorMessage} />
           </div>
           <div
             ref={infoBoxRef}

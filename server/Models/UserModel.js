@@ -21,21 +21,28 @@ const userSchema = new Schema({
   // Store the salt for each user
   salt: String,
   password: String,
+  createdAt: {
+    type: Date,
+    default: Date.now, // Set the default value to the current date and time
+  },
 });
 
 // Hash the password before saving to the database
-userSchema.pre("save", function (next) {
+userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
-  // Generate a unique salt for this user
-  this.salt = crypto.randomBytes(16).toString("hex");
+  try {
+    // Generate a unique salt for this user
+    this.salt = await bcrypt.genSalt(10);
 
-  // Hash the password with the salt
-  bcrypt.hash(this.password, this.salt, (err, hash) => {
-    if (err) return next(err);
+    // Hash the password with the salt
+    const hash = await bcrypt.hash(this.password, this.salt);
+
     this.password = hash;
-    return next();
-  });
+    next();
+  } catch (err) {
+    return next(err);
+  }
 });
 
 // Compare stored hashed password with provided password

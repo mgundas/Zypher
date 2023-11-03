@@ -1,54 +1,70 @@
 const express = require("express");
-const path = require("path");
 const User = require("../Models/UserModel");
 
 const router = express.Router();
 
+// Regular expression for email validation
+const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
 router.get("/", (req, res) => {
-  res.json({ message: "Hello there handsome!" });
+  res.json({ message: "Hello there, handsome!" });
 });
 
-router.post("/register", (req, res) => {
-  if (!req.body || !req.body.username || !req.body.email || !req.body.password) {
-    return res.status(400).json({ success: true, message: 'Missing username, email, or password fields.' });
-  }
+router.post("/register", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
 
-  const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing username, email, or password fields.",
+      });
+    }
 
-  if (
-    username.trim() !== "" &&
-    email.trim() !== "" &&
-    password.trim() !== ""
-  ) {
-    // Query for a user with the given email
-    User.findOne({ $or: [{ username: username }, { email: email }], }, (err, user) => {
-      if (err) {
-        console.error("Error:", err);
-        res.status(500).json({ success: false, message: "An error occured." });
-      } else if (user) {
-        console.log("User with the email exists:", user);
-        res.status(200).json({ success: true, message: "A user with the username or email exists." });
-        // Handle the case where a user with the given email exists
-      } else {
-        const newUser = new User({
-          username: username,
-          email: email,
-          password: password
-        });
+    if (username.trim() === "" || password.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Empty username or password is not allowed.",
+      });
+    }
 
-        newUser.save((err) => {
-          if (err) {
-            console.error('Error:', err);
-            res.status(500).json({ success: false, message: "An error occured." });
-            // Handle the error, such as validation errors or database connection issues.
-          } else {
-            res.status(200).json({ success: true, message: "User registeration succeeded." });
-            // The new user has been saved to the database.
-          }
-        });
-      }
+    if (!email.match(emailRegex)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format.",
+      });
+    }
+
+    const existingUser = await User.findOne({ $or: [{ username: username }, { email: email }] });
+
+    if (existingUser) {
+      console.log("User with the email exists:", existingUser);
+      return res.status(200).json({
+        success: true,
+        message: "A user with the username or email exists.",
+      });
+    }
+
+    const newUser = new User({
+      username: username,
+      email: email,
+      password: password,
     });
+
+    await newUser.save();
+    console.log("User registered:", newUser);
+    res.status(200).json({
+      success: true,
+      message: "User registration succeeded.",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "An error occurred." });
   }
+});
+
+router.post("/login", (req, res) => {
+  res.json({ message: "OK" });
 });
 
 module.exports = router;
