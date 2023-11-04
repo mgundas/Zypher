@@ -45,7 +45,7 @@ router.post("/register", async (req, res) => {
     if (existingUser) {
       console.log("User with the email exists:", existingUser);
       return res.status(200).json({
-        success: true,
+        success: false,
         message: "user.exists",
       });
     }
@@ -75,21 +75,21 @@ router.post("/login", async (req, res) => {
     if (!username || !password) {
       return res.status(400).json({
         success: false,
-        message: "missing.username.email.password",
+        message: "missing.username.password",
       });
     }
 
     if (username.trim() === "" || password.trim() === "") {
       return res.status(400).json({
         success: false,
-        message: "empty.username.email.password",
+        message: "empty.username.password",
       });
     }
 
     if (!username.match(usernameRegex) || !password.match(passwordRegex)) {
       return res.status(400).json({
         success: false,
-        message: "invalid.email.username.password.format",
+        message: "invalid.username.password.format",
       });
     }
 
@@ -98,7 +98,7 @@ router.post("/login", async (req, res) => {
     if(!user){
       console.error("user does not exist");
       return res.status(200).json({
-        success: true,
+        success: false,
         message: "user.does.not.exist",
       }); 
     }
@@ -107,7 +107,7 @@ router.post("/login", async (req, res) => {
       if(err){
         console.error("Error:", err);
         return res.status(500).json({
-          success: true,
+          success: false,
           message: "server.error",
         });
       }
@@ -115,7 +115,7 @@ router.post("/login", async (req, res) => {
       if(!isMatch){
         console.error("invalid password");
         return res.status(200).json({
-          success: true,
+          success: false,
           message: "incorrect.password",
         }); 
       }
@@ -134,7 +134,10 @@ router.post("/login", async (req, res) => {
     
   } catch (error) {
     console.error("An error occured.", error)
-    res.status(500).json("An error occured.")
+    res.status(500).json({
+      success: false,
+      message: "server.error"
+    })
   }
 });
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Register = ({ sendErrorMessage }) => {
+const Register = ({ sendInfoMessage }) => {
   const [emailInput, setEmailInput] = useState("");
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
@@ -17,7 +17,7 @@ const Register = ({ sendErrorMessage }) => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (usernameInput !== "" && passwordInput !== "" && emailInput !== "") {
+    if (usernameInput.trim() !== "" && passwordInput.trim() !== "" && emailInput.trim() !== "") {
       try {
         const response = await fetch("http://10.15.2.200:81/register", {
           method: "POST",
@@ -30,32 +30,26 @@ const Register = ({ sendErrorMessage }) => {
         const data = await response.json();
 
         if (!response.ok) {
-          switch (response.status) {
-            case 400:
-            case 500:
-              sendErrorMessage(responses.get(data.message)[0], responses.get(data.message)[1]);
-              break;
-            default:
-              sendErrorMessage("An unknown error occurred. Please try again.", "failure");
-              break;
-          }
+          const responseMessage = responses.get(data.message) || ["An unknown error occurred. Please try again.", "failure"];
+          sendInfoMessage(responseMessage[0], responseMessage[1]);
         } else {
-          sendErrorMessage(responses.get(data.message)[0], responses.get(data.message)[1]);
-          setEmailInput("")
-          setPasswordInput("")
-          setUsernameInput("")
+          const [message, messageType] = responses.get(data.message) || ["An unknown error occurred. Please try again.", "failure"];
+          sendInfoMessage(message, messageType);
+          setEmailInput("");
+          setPasswordInput("");
+          setUsernameInput("");
         }
       } catch (err) {
-        sendErrorMessage("An error occurred. Please try again.", "failure");
+        sendInfoMessage("An error occurred. Please try again.", "failure");
       }
     } else {
-      sendErrorMessage("Please enter your username and password.", "warning");
+      sendInfoMessage("Please fill all the fields.", "warning");
     }
   };
 
   return (
     <form className="flex flex-col gap-2" onSubmit={handleRegister}>
-      <h1 className="text-lg text-center">Register</h1>
+      <h1 className="text-lg text-center">Sign up</h1>
       <input
         maxLength={30}
         value={emailInput}
@@ -83,7 +77,7 @@ const Register = ({ sendErrorMessage }) => {
         type="submit"
         className="bg-green-700 text-white p-2 rounded-md hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all"
       >
-        Join
+        Sign up
       </button>
     </form>
   );

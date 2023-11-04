@@ -1,49 +1,58 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSocket } from "../contexts/SocketContext";
 
-const Login = ({ sendErrorMessage }) => {
+const Login = ({ sendInfoMessage }) => {
+  const timeoutRef = useRef(null)
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const { socket, setAuth } = useSocket();
 
+  const responses = new Map([
+    ["missing.username.password", ["Username or password field is missing.", "failure"]],
+    ["empty.username.password", ["Username and password cannot be empty.", "failure"]],
+    ["invalid.username.password.format", ["Invalid username or password format.", "failure"]],
+    ["user.does.not.exist", ["User does not exist.", "failure"]],
+    ["server.error", ["", "Server error."]],
+    ["incorrect.password", ["Incorrect password.", "failure"]],
+  ]);
+
   const handleConnect = async (e) => {
     e.preventDefault();
-    if (usernameInput !== "" && passwordInput !== "") {
-      const username = usernameInput;
 
-      // Simulate user registration by making a POST request to your server
+    if (usernameInput.trim() !== "" && passwordInput.trim() !== "") {
+
       await fetch("http://10.15.2.200:81/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username: username, password: passwordInput }),
+        body: JSON.stringify({ username: usernameInput, password: passwordInput }),
       })
         .then(async (response) => {
           const data = await response.json();
-          const statusCode = response.status;
 
           if (!response.ok) {
-            switch (statusCode) {
-              case 400:
-                sendErrorMessage(data.message);
-                break;
-              case 500:
-                sendErrorMessage(data.message);
-                break;
-              default:
-                sendErrorMessage("An unknown error occured.");
-                break;
-            }
+            const responseMessage = responses.get(data.message) || ["An unknown error occurred. Please try again.", "failure"];
+            sendInfoMessage(responseMessage[0], responseMessage[1]);
           } else {
+            if(!data.success){
+              const [message, messageType] = responses.get(data.message) || ["An unknown error occurred. Please try again.", "failure"];
+              return sendInfoMessage(message, messageType);
+            }
+            sendInfoMessage("Login successful. Redirecting...", "success");
+            
+            clearTimeout(timeoutRef.current)
+            timeoutRef.current = setTimeout(() => {
+
+            }, 2000)
+
           }
-          console.log(data);
         })
         .catch((err) => {
-          console.error("Error:", err);
+          sendInfoMessage("An error occurred. Please try again.", "failure");
         });
     } else {
-      sendErrorMessage("Please enter your username and password.");
+      sendInfoMessage("Please enter your username and password.", "warning");
     }
   };
 
@@ -62,10 +71,11 @@ const Login = ({ sendErrorMessage }) => {
       <input
         maxLength={15}
         value={passwordInput}
+        type="password"
         onChange={(e) => {
           setPasswordInput(e.target.value);
         }}
-        className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
+        className="flex border-none grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
         placeholder="Password"
       />
       <button

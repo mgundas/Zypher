@@ -1,21 +1,22 @@
 import { useRef, useEffect, useState } from "react";
+import { useSocket } from "./contexts/SocketContext";
 import ToggleDarkMode from "./modules/ToggleDarkMode";
 import Message from "./modules/Message";
 import ChatInput from "./modules/ChatInput";
-import { useSocket } from "./contexts/SocketContext";
 import Login from "./modules/Login";
 import Register from "./modules/Register";
 
 function App() {
-  const { socket, setAuth } = useSocket();
-  const [loggedIn, setLoggedIn] = useState(false);
+  const { socket } = useSocket();
   const unameRef = useRef(null);
   const infoBoxRef = useRef(null);
-  const typingTimeoutRef = useRef(null);
+  const notificationTimeoutRef = useRef(null);
+  const infoTimeoutRef = useRef(null);
+  const chatContainerRef = useRef(null);
+
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
-  const chatContainerRef = useRef(null);
-  const titleTimeoutRef = useRef(null);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     document.title = "Chat App";
@@ -23,76 +24,58 @@ function App() {
 
   useEffect(() => {
     if (socket) {
-      socket.on("receiveId", (data) => {
+      const handleReceiveId = (data) => {
         unameRef.current.innerHTML = data.username;
         console.log(data);
-      });
+      };
 
-      socket.on("receiveMessage", (data) => {
+      const handleReceiveMessage = (data) => {
         console.log("triggered", data);
-        setMessages((prev) => [...prev, data]);
-        chatContainerRef.current.scrollTop =
-          chatContainerRef.current.scrollHeight;
+        setMessages((prevMessages) => [...prevMessages, data]);
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         console.log(messages);
         if (data.sender !== socket.auth.username) {
           document.title = "New message!";
         }
-        clearTimeout(titleTimeoutRef.current);
-        titleTimeoutRef.current = setTimeout(() => {
+        clearTimeout(notificationTimeoutRef.current);
+        notificationTimeoutRef.current = setTimeout(() => {
           document.title = "Chat App";
-        }, 2000); // Adjust the timeout duration as needed
-      });
+        }, 2000);
+      };
+
+      socket.on("receiveId", handleReceiveId);
+      socket.on("receiveMessage", handleReceiveMessage);
+
+      return () => {
+        socket.off("receiveId", handleReceiveId);
+        socket.off("receiveMessage", handleReceiveMessage);
+      };
     }
-    return () => {
-      if (socket) {
-        socket.off("receiveId");
-        socket.off("receiveMessage");
-      }
-    };
   }, [socket, messages]);
 
-  const sendErrorMessage = (message, type) => {
-    switch (type) {
-      case "success":
-        infoBoxRef.current.classList.add("bg-green-900")
-        infoBoxRef.current.classList.remove("bg-red-900")
-        infoBoxRef.current.classList.remove("bg-orange-800")
-        infoBoxRef.current.classList.remove("bg-gray-700")
-        break;
-      case "failure":
-        infoBoxRef.current.classList.remove("bg-green-900")
-        infoBoxRef.current.classList.add("bg-red-900")
-        infoBoxRef.current.classList.remove("bg-orange-800")
-        infoBoxRef.current.classList.remove("bg-gray-700")
-        break;
-      case "warning":
-        infoBoxRef.current.classList.remove("bg-green-900")
-        infoBoxRef.current.classList.remove("bg-red-900")
-        infoBoxRef.current.classList.add("bg-orange-800")
-        infoBoxRef.current.classList.remove("bg-gray-700")
-        break;
-      default:
-        infoBoxRef.current.classList.remove("bg-green-900")
-        infoBoxRef.current.classList.remove("bg-red-900")
-        infoBoxRef.current.classList.remove("bg-orange-800")
-        infoBoxRef.current.classList.add("bg-gray-700")
-        break;
-    }
+  const sendInfoMessage = (message, type) => {
+    const types = {
+      success: "bg-green-900",
+      failure: "bg-red-900",
+      warning: "bg-yellow-600",
+      default: "bg-gray-700",
+    };
+
+    infoBoxRef.current.className = `justify-self-center text-rtca-50 p-3 transition-all rounded-md ${types[type]}`;
     setErrorMsg(message);
     infoBoxRef.current.classList.remove("hidden");
 
-    // Clear the previous timeout and set a new one
-    clearTimeout(typingTimeoutRef.current);
-    typingTimeoutRef.current = setTimeout(() => {
-    infoBoxRef.current.classList.add("hidden");
-    }, 2000); // Adjust the timeout duration as needed
+    clearTimeout(infoTimeoutRef.current);
+    infoTimeoutRef.current = setTimeout(() => {
+      infoBoxRef.current.classList.add("hidden");
+    }, 2000);
   };
 
-  return (
-    <div>
-      {loggedIn && socket ? (
-        <div className="">
-          <nav className=" bg-rtca-300 dark:bg-rtca-900 dark:text-rtca-300 flex p-2 px-5 justify-between items-center h-16">
+  const renderContent = () => {
+    if (loggedIn && socket) {
+      return (
+        <div>
+          <nav className="bg-rtca-300 dark:bg-rtca-900 dark:text-rtca-300 flex p-2 px-5 justify-between items-center h-16">
             <div className="flex font-medium">Chat App</div>
             <div className="flex gap-4 items-center">
               <ul className="flex gap-3 font-medium items-center">
@@ -120,41 +103,42 @@ function App() {
               className="flex flex-col gap-1 max-h-[600px] overflow-auto overflow-x-hidden"
               ref={chatContainerRef}
             >
-              {messages.map((message, key) => {
-                return (
-                  <Message
-                    key={key}
-                    username={message.sender}
-                    message={message.message}
-                    timestamp="31.10.2023 6:27PM"
-                  />
-                );
-              })}
+              {messages.map((message, key) => (
+                <Message
+                  key={key}
+                  username={message.sender}
+                  message={message.message}
+                  timestamp="31.10.2023 6:27PM"
+                />
+              ))}
             </div>
             <ChatInput />
           </div>
         </div>
-      ) : (
-        /* if the user isn't logged in */
+      );
+    } else {
+      return (
         <div className="z-10 dark:text-white grid gap-10 mb-10 mt-20 items-center">
           <h1 className="row-span-2 text-2xl text-center font-medium">
             Chat App
           </h1>
           <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
-            <Login sendErrorMessage={sendErrorMessage} setLoggedIn={setLoggedIn} />
+            <Login sendInfoMessage={sendInfoMessage} setLoggedIn={setLoggedIn} />
             <div className="hidden sm:flex">or</div>
-            <Register sendErrorMessage={sendErrorMessage} />
+            <Register sendInfoMessage={sendInfoMessage} />
           </div>
           <div
             ref={infoBoxRef}
-            className="justify-self-center text-rtca-50 p-3 rounded-md transition-all hidden"
+            className="hidden"
           >
             {errorMsg}
           </div>
         </div>
-      )}
-    </div>
-  );
+      );
+    }
+  };
+
+  return <div>{renderContent()}</div>;
 }
 
 export default App;
