@@ -1,11 +1,13 @@
 import { useRef, useState } from "react";
 import { useSocket } from "../contexts/SocketContext";
+import { useConfig } from "../contexts/ConfigContext";
 
-const Login = ({ sendInfoMessage }) => {
+const Login = ({ sendInfoMessage, setLoggedIn }) => {
   const timeoutRef = useRef(null)
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
-  const { socket, setAuth } = useSocket();
+  const { setAuth } = useSocket();
+  const config = useConfig();
 
   const responses = new Map([
     ["missing.username.password", ["Username or password field is missing.", "failure"]],
@@ -21,7 +23,7 @@ const Login = ({ sendInfoMessage }) => {
 
     if (usernameInput.trim() !== "" && passwordInput.trim() !== "") {
 
-      await fetch("http://10.15.2.200:81/login", {
+      await fetch(`${config.apiUri}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,13 +41,18 @@ const Login = ({ sendInfoMessage }) => {
               const [message, messageType] = responses.get(data.message) || ["An unknown error occurred. Please try again.", "failure"];
               return sendInfoMessage(message, messageType);
             }
+            localStorage.setItem("accessToken", data.accessToken);
+            localStorage.setItem("refreshToken", data.refreshToken);
             sendInfoMessage("Login successful. Redirecting...", "success");
-            
+
             clearTimeout(timeoutRef.current)
             timeoutRef.current = setTimeout(() => {
-
+              setAuth({
+                username: "dfgdfg",
+                accessToken: data.accessToken
+              })
+              setLoggedIn(true)
             }, 2000)
-
           }
         })
         .catch((err) => {

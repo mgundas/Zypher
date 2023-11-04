@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+import { useConfig } from "../contexts/ConfigContext";
 
 const Register = ({ sendInfoMessage }) => {
   const [emailInput, setEmailInput] = useState("");
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
+
+  const config = useConfig();
 
   const responses = new Map([
     ["missing.username.email.password", ["Username, email, or password field is missing.", "failure"]],
@@ -19,7 +22,7 @@ const Register = ({ sendInfoMessage }) => {
 
     if (usernameInput.trim() !== "" && passwordInput.trim() !== "" && emailInput.trim() !== "") {
       try {
-        const response = await fetch("http://10.15.2.200:81/register", {
+        const response = await fetch(`${config.apiUri}/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -43,7 +46,7 @@ const Register = ({ sendInfoMessage }) => {
         sendInfoMessage("An error occurred. Please try again.", "failure");
       }
     } else {
-      sendInfoMessage("Please fill all the fields.", "warning");
+      sendInfoMessage("Please enter the required information.", "warning");
     }
   };
 

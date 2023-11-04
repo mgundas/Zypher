@@ -5,9 +5,12 @@ import Message from "./modules/Message";
 import ChatInput from "./modules/ChatInput";
 import Login from "./modules/Login";
 import Register from "./modules/Register";
+import { useConfig } from "./contexts/ConfigContext";
 
 function App() {
   const { socket } = useSocket();
+  const config = useConfig();
+
   const unameRef = useRef(null);
   const infoBoxRef = useRef(null);
   const notificationTimeoutRef = useRef(null);
@@ -19,7 +22,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    document.title = "Chat App";
+    document.title = config.appName;
   }, []);
 
   useEffect(() => {
@@ -39,7 +42,7 @@ function App() {
         }
         clearTimeout(notificationTimeoutRef.current);
         notificationTimeoutRef.current = setTimeout(() => {
-          document.title = "Chat App";
+          document.title = config.appName;
         }, 2000);
       };
 
@@ -120,7 +123,7 @@ function App() {
       return (
         <div className="z-10 dark:text-white grid gap-10 mb-10 mt-20 items-center">
           <h1 className="row-span-2 text-2xl text-center font-medium">
-            Chat App
+            {config.appName}
           </h1>
           <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
             <Login sendInfoMessage={sendInfoMessage} setLoggedIn={setLoggedIn} />
