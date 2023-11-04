@@ -6,6 +6,9 @@ const router = express.Router();
 // Regular expression for email validation
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
+// Define a regular expression pattern for a valid username
+const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/; // Allow letters, numbers, and underscores
+
 router.get("/", (req, res) => {
   res.json({ message: "Hello there, handsome!" });
 });
@@ -17,21 +20,21 @@ router.post("/register", async (req, res) => {
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Missing username, email, or password fields.",
+        message: "missing.username.email.password",
       });
     }
 
-    if (username.trim() === "" || password.trim() === "") {
+    if (email.trim() === "" || username.trim() === "" || password.trim() === "") {
       return res.status(400).json({
         success: false,
-        message: "Empty username or password is not allowed.",
+        message: "empty.username.email.password",
       });
     }
 
-    if (!email.match(emailRegex)) {
+    if (!email.match(emailRegex) || !username.match(usernameRegex)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid email format.",
+        message: "invalid.email.username.format",
       });
     }
 
@@ -41,7 +44,7 @@ router.post("/register", async (req, res) => {
       console.log("User with the email exists:", existingUser);
       return res.status(200).json({
         success: true,
-        message: "A user with the username or email exists.",
+        message: "user.exists",
       });
     }
 
@@ -55,16 +58,38 @@ router.post("/register", async (req, res) => {
     console.log("User registered:", newUser);
     res.status(200).json({
       success: true,
-      message: "User registration succeeded.",
+      message: "reg.successful",
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ success: false, message: "An error occurred." });
+    res.status(500).json({ success: false, message: "err.occured" });
   }
 });
 
 router.post("/login", (req, res) => {
-  res.json({ message: "OK" });
+  try {
+    const {username, password} = req.body
+
+    if(!username || !password){
+      return res.status(400).json(
+        {
+          success: false,
+          message: "Username or password is missing."
+        }
+      )
+    }
+
+    if (username.trim() === "" || password.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Empty username or password is not allowed.",
+      });
+    }
+    
+  } catch (error) {
+    console.error("An error occured.", error)
+    res.status(500).json("An error occured.")
+  }
 });
 
 module.exports = router;

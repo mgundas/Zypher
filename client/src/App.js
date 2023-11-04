@@ -51,14 +51,40 @@ function App() {
     };
   }, [socket, messages]);
 
-  const sendErrorMessage = (message) => {
+  const sendErrorMessage = (message, type) => {
+    switch (type) {
+      case "success":
+        infoBoxRef.current.classList.add("bg-green-900")
+        infoBoxRef.current.classList.remove("bg-red-900")
+        infoBoxRef.current.classList.remove("bg-orange-800")
+        infoBoxRef.current.classList.remove("bg-gray-700")
+        break;
+      case "failure":
+        infoBoxRef.current.classList.remove("bg-green-900")
+        infoBoxRef.current.classList.add("bg-red-900")
+        infoBoxRef.current.classList.remove("bg-orange-800")
+        infoBoxRef.current.classList.remove("bg-gray-700")
+        break;
+      case "warning":
+        infoBoxRef.current.classList.remove("bg-green-900")
+        infoBoxRef.current.classList.remove("bg-red-900")
+        infoBoxRef.current.classList.add("bg-orange-800")
+        infoBoxRef.current.classList.remove("bg-gray-700")
+        break;
+      default:
+        infoBoxRef.current.classList.remove("bg-green-900")
+        infoBoxRef.current.classList.remove("bg-red-900")
+        infoBoxRef.current.classList.remove("bg-orange-800")
+        infoBoxRef.current.classList.add("bg-gray-700")
+        break;
+    }
     setErrorMsg(message);
     infoBoxRef.current.classList.remove("hidden");
 
     // Clear the previous timeout and set a new one
     clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
-      infoBoxRef.current.classList.add("hidden");
+    infoBoxRef.current.classList.add("hidden");
     }, 2000); // Adjust the timeout duration as needed
   };
 
@@ -120,7 +146,7 @@ function App() {
           </div>
           <div
             ref={infoBoxRef}
-            className="bg-red-900 border justify-self-center border-red-800 text-rtca-50 p-3 rounded-md transition-all hidden"
+            className="justify-self-center text-rtca-50 p-3 rounded-md transition-all hidden"
           >
             {errorMsg}
           </div>
