@@ -1,13 +1,15 @@
+require("dotenv").config()
 const express = require("express");
+const jwt = require("jsonwebtoken")
 const User = require("../Models/UserModel");
 
 const router = express.Router();
 
-// Regular expression for email validation
+// Regular expression patterns for fields
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-
-// Define a regular expression pattern for a valid username
-const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/; // Allow letters, numbers, and underscores
+const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,16}$/;
+// (?=.*[@$!%*?&])
 
 router.get("/", (req, res) => {
   res.json({ message: "Hello there, handsome!" });
@@ -31,10 +33,10 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    if (!email.match(emailRegex) || !username.match(usernameRegex)) {
+    if (!email.match(emailRegex) || !username.match(usernameRegex) || !password.match(passwordRegex)) {
       return res.status(400).json({
         success: false,
-        message: "invalid.email.username.format",
+        message: "invalid.email.username.password.format",
       });
     }
 
@@ -66,25 +68,69 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const {username, password} = req.body
 
-    if(!username || !password){
-      return res.status(400).json(
-        {
-          success: false,
-          message: "Username or password is missing."
-        }
-      )
+    if (!username || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "missing.username.email.password",
+      });
     }
 
     if (username.trim() === "" || password.trim() === "") {
       return res.status(400).json({
         success: false,
-        message: "Empty username or password is not allowed.",
+        message: "empty.username.email.password",
       });
     }
+
+    if (!username.match(usernameRegex) || !password.match(passwordRegex)) {
+      return res.status(400).json({
+        success: false,
+        message: "invalid.email.username.password.format",
+      });
+    }
+
+    const user = await User.findOne({ username: username });
+
+    if(!user){
+      console.error("user does not exist");
+      return res.status(200).json({
+        success: true,
+        message: "user.does.not.exist",
+      }); 
+    }
+
+    user.comparePassword(password, (err, isMatch) => {
+      if(err){
+        console.error("Error:", err);
+        return res.status(500).json({
+          success: true,
+          message: "server.error",
+        });
+      }
+
+      if(!isMatch){
+        console.error("invalid password");
+        return res.status(200).json({
+          success: true,
+          message: "incorrect.password",
+        }); 
+      }
+
+      const accessToken = jwt.sign({ username }, process.env.ACCESSTOKEN_SECRET, { expiresIn: '1h' });
+      const refreshToken = jwt.sign({ username }, process.env.REFRESHTOKEN_SECRET, { expiresIn: '30d' });
+
+      console.log(accessToken, refreshToken);
+
+      return res.status(200).json({
+        success: true, 
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      })
+    })
     
   } catch (error) {
     console.error("An error occured.", error)

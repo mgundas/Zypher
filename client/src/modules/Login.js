@@ -17,7 +17,7 @@ const Login = ({ sendErrorMessage }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username: username, password: "your-password" }),
+        body: JSON.stringify({ username: username, password: passwordInput }),
       })
         .then(async (response) => {
           const data = await response.json();

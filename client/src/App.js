@@ -142,6 +142,7 @@ function App() {
           </h1>
           <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
             <Login sendErrorMessage={sendErrorMessage} setLoggedIn={setLoggedIn} />
+            <div className="hidden sm:flex">or</div>
             <Register sendErrorMessage={sendErrorMessage} />
           </div>
           <div

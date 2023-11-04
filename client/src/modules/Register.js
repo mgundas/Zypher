@@ -8,7 +8,7 @@ const Register = ({ sendErrorMessage }) => {
   const responses = new Map([
     ["missing.username.email.password", ["Username, email, or password field is missing.", "failure"]],
     ["empty.username.email.password", ["Username, email, or password cannot be empty.", "failure"]],
-    ["invalid.email.username.format", ["Invalid email or username format.", "failure"]],
+    ["invalid.email.username.password.format", ["Invalid email or username format.", "failure"]],
     ["user.exists", ["A user with the email or username already exists.", "failure"]],
     ["reg.successful", ["Registration successful.", "success"]],
     ["err.occurred", ["An error occurred.", "failure"]],
@@ -41,6 +41,9 @@ const Register = ({ sendErrorMessage }) => {
           }
         } else {
           sendErrorMessage(responses.get(data.message)[0], responses.get(data.message)[1]);
+          setEmailInput("")
+          setPasswordInput("")
+          setUsernameInput("")
         }
       } catch (err) {
         sendErrorMessage("An error occurred. Please try again.", "failure");
@@ -56,8 +59,9 @@ const Register = ({ sendErrorMessage }) => {
       <input
         maxLength={30}
         value={emailInput}
+        type="email"
         onChange={(e) => setEmailInput(e.target.value)}
-        className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
+        className="flex border-0 grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
         placeholder="E-mail"
       />
       <input
@@ -70,8 +74,9 @@ const Register = ({ sendErrorMessage }) => {
       <input
         maxLength={15}
         value={passwordInput}
+        type="password"
         onChange={(e) => setPasswordInput(e.target.value)}
-        className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
+        className="flex border-0 grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
         placeholder="Password"
       />
       <button
