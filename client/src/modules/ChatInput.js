@@ -62,9 +62,9 @@ function ChatInput() {
 
   return (
     <>
-      <form className="flex gap-2" onSubmit={handleSubmit}>
+      <form className="p-2 bottom-0 md:relative flex gap-2 w-screen" onSubmit={handleSubmit}>
         <input
-          className="flex grow p-2 rounded-md z-[1] border-none bg-rtca-200 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
+          className="flex grow p-2 rounded-md z-[1] border-none bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
           type="text"
           placeholder="Type a message..."
           value={message}

@@ -15,7 +15,6 @@ function App() {
   const infoBoxRef = useRef(null);
   const notificationTimeoutRef = useRef(null);
   const infoTimeoutRef = useRef(null);
-  const chatContainerRef = useRef(null);
 
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
@@ -35,8 +34,6 @@ function App() {
       const handleReceiveMessage = (data) => {
         console.log("triggered", data);
         setMessages((prevMessages) => [...prevMessages, data]);
-        chatContainerRef.current.scrollTop =
-          chatContainerRef.current.scrollHeight;
         console.log(messages);
         if (data.sender !== socket.auth.username) {
           document.title = "New message!";
@@ -78,35 +75,19 @@ function App() {
   const renderContent = () => {
     if (loggedIn && socket) {
       return (
-        <div>
-          <nav className="bg-rtca-300 dark:bg-rtca-900 dark:text-rtca-300 flex p-2 px-5 justify-between items-center h-16">
+        <div className="h-screen flex flex-col bg-rtca-200 dark:bg-rtca-700">
+          <nav className="bg-rtca-300 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 px-5 justify-between items-center h-16">
             <div className="flex font-medium">Chat App</div>
             <div className="flex gap-4 items-center">
               <ul className="flex gap-3 font-medium items-center">
-                <li className="flex">
+                <li className="hidden md:flex">
                   Welcome,&nbsp;<p ref={unameRef}></p>
                 </li>
                 <ToggleDarkMode />
               </ul>
             </div>
           </nav>
-          <div className="flex m-6 rounded-lg dark:text-rtca-200 gap-2 justify-between">
-            <button className="dark:bg-rtca-600 bg-rtca-400 p-3 rounded-lg grow">
-              Room 1
-            </button>
-            <button className="dark:bg-rtca-700 bg-rtca-300 p-3 rounded-lg grow">
-              Room 2
-            </button>
-          </div>
-          <div className="p-4 pb-6 m-6 rounded-md bg-rtca-300 dark:bg-rtca-700 dark:text-rtca-200 flex flex-col gap-3">
-            <div className="font-medium p-2 bg-rtca-200 dark:bg-rtca-600 rounded-md flex justify-between">
-              <span>You're currently in: Room 1</span>
-              <span>People online in this room: 1</span>
-            </div>
-            <div
-              className="flex flex-col gap-1 max-h-[600px] overflow-auto overflow-x-hidden"
-              ref={chatContainerRef}
-            >
+          <div className="flex-1 flex flex-col gap-1 overflow-y-auto p-2 dark:text-white">
               {messages.map((message, key) => (
                 <Message
                   key={key}
@@ -115,9 +96,8 @@ function App() {
                   timestamp="31.10.2023 6:27PM"
                 />
               ))}
-            </div>
-            <ChatInput />
           </div>
+          <ChatInput />
         </div>
       );
     } else {
@@ -128,7 +108,8 @@ function App() {
           </h1>
           {config.notice.visible ? (
             <div className="justify-self-center border-l-4 border-teal-900 dark:border-teal-600 text-white dark:text-rtca-50 p-3 transition-all rounded-md bg-teal-700 dark:bg-teal-900 flex">
-              <h1 className="font-medium">{config.notice.title}</h1>&nbsp;{config.notice.message}
+              <h1 className="font-medium">{config.notice.title}</h1>&nbsp;
+              {config.notice.message}
             </div>
           ) : (
             <></>
