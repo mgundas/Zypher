@@ -1,9 +1,11 @@
+require("dotenv").config()
 const main = require("./routes/main");
 const express = require("express");
 const mongoose = require('mongoose');
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const jwt = require("jsonwebtoken")
 
 const idRoom = "564406c549227afebf301d720161596c";
 
@@ -43,6 +45,26 @@ app.use((err, req, res, next) => {
   }
 });
 
+const socketAuthMiddleware = (socket, next) => {
+  // Extract the access token from the socket request
+  const accessToken = socket.handshake.auth.accessToken;
+
+  // Verify the access token
+  try {
+    const isValid = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET)
+    if(!isValid){
+      console.log("Authentication failed.");
+      return socket.disconnect(); //Authentication failed
+    }
+    return next(); // Authentication successful
+  } catch (error) {
+    console.log("Something went wrong.", error);
+    return socket.disconnect();
+  }
+};
+
+io.use(socketAuthMiddleware);
+
 io.on("connection", (socket) => {
   console.log(socket.id, "joined.");
   socket.join(idRoom);
@@ -70,7 +92,6 @@ io.on("connection", (socket) => {
   });
 });
 
-const ioPort = 81;
-httpServer.listen(ioPort, () => {
-  console.log(`Socket is listening on port ${ioPort}`);
+httpServer.listen(process.env.PORT, () => {
+  console.log(`Server is running on port ${process.env.PORT}`);
 });
