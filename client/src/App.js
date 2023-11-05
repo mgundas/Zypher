@@ -44,6 +44,22 @@ function App() {
         }, 2000);
       };
 
+      socket.on("user typing", (data) => {
+        if (data.username === socket.auth.username) {
+          return;
+        } else {
+          //typingRef.current.classList.add("translate-y-[2.6rem]");
+        }
+      });
+  
+      socket.on("user stopped typing", (data) => {
+        if (data.username === socket.auth.username) {
+          return;
+        } else {
+          //typingRef.current.classList.remove("translate-y-[2.6rem]");
+        }
+      });
+
       socket.on("receiveId", handleReceiveId);
       socket.on("receiveMessage", handleReceiveMessage);
 
@@ -76,8 +92,17 @@ function App() {
     if (loggedIn && socket) {
       return (
         <div className="h-screen flex flex-col bg-rtca-200 dark:bg-rtca-700">
-          <nav className="bg-rtca-300 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 px-5 justify-between items-center h-16">
-            <div className="flex font-medium">Chat App</div>
+          <nav className="bg-rtca-300 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 justify-between items-center h-16">
+            <div className="p-4 flex gap-2 items-center">
+              <img
+                src="https://via.placeholder.com/512x512"
+                className="h-10 w-10 rounded-full"
+              />
+              <div className="flex flex-col text-sm">
+                <div className="font-medium">Mehmet</div>
+                <span className="text-green-500">Online</span>
+              </div>
+            </div>
             <div className="flex gap-4 items-center">
               <ul className="flex gap-3 font-medium items-center">
                 <li className="hidden md:flex">
@@ -88,14 +113,14 @@ function App() {
             </div>
           </nav>
           <div className="flex-1 flex flex-col gap-1 overflow-y-auto p-2 dark:text-white">
-              {messages.map((message, key) => (
-                <Message
-                  key={key}
-                  username={message.sender}
-                  message={message.message}
-                  timestamp="31.10.2023 6:27PM"
-                />
-              ))}
+            {messages.map((message, key) => (
+              <Message
+                key={key}
+                username={message.sender}
+                message={message.message}
+                timestamp="31.10.2023 6:27PM"
+              />
+            ))}
           </div>
           <ChatInput />
         </div>
