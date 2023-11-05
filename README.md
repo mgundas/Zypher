@@ -1,7 +1,7 @@
 
 # Real Time Chat App
 
-This app is still in the making.
+This app is nowhere near finished. I still actively work on this project and learn a ton while developing it.
 
 ## Scripts you can run:
 To start the frontend:
