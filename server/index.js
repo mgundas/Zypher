@@ -12,7 +12,7 @@ const idRoom = "564406c549227afebf301d720161596c";
 const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
-  cors: { origin: "http://10.15.2.200:3000" },
+  cors: { origin: "http://localhost:3000" },
 });
 
 class CustomError extends Error {
