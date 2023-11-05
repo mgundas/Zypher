@@ -8,8 +8,13 @@ export const useConfig = () => {
 
 export const ConfigProvider = ({ children }) => {
   const config = {
-    appName: "Chat App",
-    apiUri: "http://10.15.2.200:81",
+    appName: "Comuconnect",
+    apiUri: "http://10.15.2.200:81/api/v1",
+    notice: {
+        visible: true,
+        title: "Welcome aboard!",
+        message: "Comuconnect is finally online!"
+    }
   };
 
   return (

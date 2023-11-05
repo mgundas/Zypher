@@ -35,7 +35,8 @@ function App() {
       const handleReceiveMessage = (data) => {
         console.log("triggered", data);
         setMessages((prevMessages) => [...prevMessages, data]);
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        chatContainerRef.current.scrollTop =
+          chatContainerRef.current.scrollHeight;
         console.log(messages);
         if (data.sender !== socket.auth.username) {
           document.title = "New message!";
@@ -58,13 +59,13 @@ function App() {
 
   const sendInfoMessage = (message, type) => {
     const types = {
-      success: "bg-green-900",
-      failure: "bg-red-900",
-      warning: "bg-yellow-600",
-      default: "bg-gray-700",
+      success: "dark:bg-green-900 bg-green-700",
+      failure: "dark:bg-red-900 bg-rt-800",
+      warning: "dark:bg-yellow-600 bg-yellow-500",
+      info: "dark:bg-teal-900 bg-teal-700",
     };
 
-    infoBoxRef.current.className = `justify-self-center text-rtca-50 p-3 transition-all rounded-md ${types[type]}`;
+    infoBoxRef.current.className = `justify-self-center text-white dark:text-rtca-50 p-3 transition-all rounded-md ${types[type]}`;
     setErrorMsg(message);
     infoBoxRef.current.classList.remove("hidden");
 
@@ -121,19 +122,26 @@ function App() {
       );
     } else {
       return (
-        <div className="z-10 dark:text-white grid gap-10 mb-10 mt-20 items-center">
+        <div className="z-10 dark:text-white grid gap-5 mb-10 mt-20 items-center">
           <h1 className="row-span-2 text-2xl text-center font-medium">
             {config.appName}
           </h1>
+          {config.notice.visible ? (
+            <div className="justify-self-center border-l-4 border-teal-900 dark:border-teal-600 text-white dark:text-rtca-50 p-3 transition-all rounded-md bg-teal-700 dark:bg-teal-900 flex">
+              <h1 className="font-medium">{config.notice.title}</h1>&nbsp;{config.notice.message}
+            </div>
+          ) : (
+            <></>
+          )}
           <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
-            <Login sendInfoMessage={sendInfoMessage} setLoggedIn={setLoggedIn} />
+            <Login
+              sendInfoMessage={sendInfoMessage}
+              setLoggedIn={setLoggedIn}
+            />
             <div className="hidden sm:flex">or</div>
             <Register sendInfoMessage={sendInfoMessage} />
           </div>
-          <div
-            ref={infoBoxRef}
-            className="hidden"
-          >
+          <div ref={infoBoxRef} className="hidden">
             {errorMsg}
           </div>
         </div>
