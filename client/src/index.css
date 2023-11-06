@@ -4,6 +4,29 @@
 
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css");
 
+::-webkit-scrollbar {
+    @apply w-2
+    /* Customize the scrollbar width */
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-rtca-400 dark:bg-rtca-600
+    /* Customize the scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-rtca-500 dark:bg-rtca-500 rounded-full
+    /* Customize the scrollbar thumb */
+}
+
 body{
     @apply bg-rtca-200 dark:bg-rtca-900
+}
+
+.chat-input{
+    @apply flex grow p-2 rounded-full px-5 z-[1] border-none bg-rtca-300 dark:text-rtca-100 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all
+}
+
+.chat-send-button{
+    @apply bg-green-700 p-2 px-4 text-white rounded-full hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all
 }

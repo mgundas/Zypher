@@ -48,7 +48,7 @@ const Login = ({ sendInfoMessage, setLoggedIn }) => {
             clearTimeout(timeoutRef.current)
             timeoutRef.current = setTimeout(() => {
               setAuth({
-                username: "dfgdfg",
+                username: data.username,
                 accessToken: data.accessToken
               })
               setLoggedIn(true)

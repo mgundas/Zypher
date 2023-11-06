@@ -15,10 +15,16 @@ function App() {
   const infoBoxRef = useRef(null);
   const notificationTimeoutRef = useRef(null);
   const infoTimeoutRef = useRef(null);
+  const bottomRef = useRef(null)
 
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
+  const [status, setStatus] = useState("Online");
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({behavior: 'smooth'});
+  }, [messages]);
 
   useEffect(() => {
     document.title = config.appName;
@@ -44,29 +50,32 @@ function App() {
         }, 2000);
       };
 
-      socket.on("user typing", (data) => {
+      const handleUserTyping = (data) => {
         if (data.username === socket.auth.username) {
           return;
         } else {
-          //typingRef.current.classList.add("translate-y-[2.6rem]");
+          setStatus("Typing...")
         }
-      });
-  
-      socket.on("user stopped typing", (data) => {
-        if (data.username === socket.auth.username) {
-          return;
-        } else {
-          //typingRef.current.classList.remove("translate-y-[2.6rem]");
-        }
-      });
+      }
 
+      const handleUserStoppedTyping = (data) => {
+        if (data.username === socket.auth.username) {
+          return;
+        } else {
+          setStatus("Online")
+        }
+      }
+
+      socket.on("user typing", handleUserTyping);
+      socket.on("user stopped typing", handleUserStoppedTyping);
       socket.on("receiveId", handleReceiveId);
       socket.on("receiveMessage", handleReceiveMessage);
 
       return () => {
+        socket.off("user typing", handleUserTyping);
+        socket.off("user stopped typing", handleUserStoppedTyping);
         socket.off("receiveId", handleReceiveId);
-        socket.off("receiveMessage", handleReceiveMessage);
-      };
+        socket.off("receiveMessage", handleReceiveMessage);      };
     }
   }, [socket, messages]);
 
@@ -93,6 +102,8 @@ function App() {
       return (
         <div className="h-screen flex flex-col bg-rtca-200 dark:bg-rtca-700">
           <nav className="bg-rtca-300 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 justify-between items-center h-16">
+          <div className="flex items-center">
+          <button className="rounded-full h-10 w-10 hover:bg-rtca-600/50 transition-all"><i class="bi bi-list"></i></button>
             <div className="p-4 flex gap-2 items-center">
               <img
                 src="https://via.placeholder.com/512x512"
@@ -100,9 +111,10 @@ function App() {
               />
               <div className="flex flex-col text-sm">
                 <div className="font-medium">Mehmet</div>
-                <span className="text-green-500">Online</span>
+                <span className="text-green-500">{status}</span>
               </div>
             </div>
+          </div>
             <div className="flex gap-4 items-center">
               <ul className="flex gap-3 font-medium items-center">
                 <li className="hidden md:flex">
@@ -112,7 +124,7 @@ function App() {
               </ul>
             </div>
           </nav>
-          <div className="flex-1 flex flex-col gap-1 overflow-y-auto p-2 dark:text-white">
+          <div className="flex-1 flex flex-col gap-1 items-start overflow-y-auto p-2 dark:text-white">
             {messages.map((message, key) => (
               <Message
                 key={key}
@@ -121,20 +133,21 @@ function App() {
                 timestamp="31.10.2023 6:27PM"
               />
             ))}
+            <div ref={bottomRef} className="opacity-0 content-none"></div>
           </div>
           <ChatInput />
         </div>
       );
     } else {
       return (
-        <div className="z-10 dark:text-white grid gap-5 mb-10 mt-20 items-center">
+        <div className="z-10 dark:text-white grid gap-5 mb-10 mt-10 md:mt-20 items-center">
           <h1 className="row-span-2 text-2xl text-center font-medium">
             {config.appName}
           </h1>
           {config.notice.visible ? (
-            <div className="justify-self-center border-l-4 border-teal-900 dark:border-teal-600 text-white dark:text-rtca-50 p-3 transition-all rounded-md bg-teal-700 dark:bg-teal-900 flex">
-              <h1 className="font-medium">{config.notice.title}</h1>&nbsp;
-              {config.notice.message}
+            <div className="justify-self-center border-l-4 mx-5 md:mx-0 flex-wrap gap-1 border-teal-900 dark:border-teal-600 text-white dark:text-rtca-50 p-3 transition-all rounded-md bg-teal-700 dark:bg-teal-900 flex">
+              <h1 className="font-medium">{config.notice.title}</h1>
+              <h2>{config.notice.message}</h2>
             </div>
           ) : (
             <></>

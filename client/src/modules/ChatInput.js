@@ -45,7 +45,7 @@ function ChatInput() {
     <>
       <form className="p-2 bottom-0 md:relative flex gap-2 w-screen" onSubmit={handleSubmit}>
         <input
-          className="flex grow p-2 rounded-full px-5 z-[1] border-none bg-rtca-300 dark:text-rtca-100 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
+          className="chat-input"
           type="text"
           placeholder="Type a message..."
           value={message}
@@ -54,7 +54,7 @@ function ChatInput() {
         <button
           onClick={handleSubmit}
           type="submit"
-          className="bg-green-700 p-2 px-4 text-white rounded-full hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all"
+          className="chat-send-button"
         >
           <i class="bi bi-send"></i>
         </button>

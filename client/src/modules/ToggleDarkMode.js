@@ -51,7 +51,7 @@ function ToggleDarkMode() {
     <button
       ref={themeToggle}
       type="button"
-      className="text-rtca-500 dark:text-rtca-400 hover:bg-rtca-100 dark:hover:bg-rtca-700 focus:outline-none focus:ring-4 focus:ring-rtca-200 dark:focus:ring-rtca-700 rounded-lg text-sm p-2.5"
+      className="text-rtca-500 dark:text-rtca-400 hover:bg-rtca-100 dark:hover:bg-rtca-700 focus:outline-0  rounded-full text-sm p-2.5 transition-all"
     >
       <svg
         ref={darkIcon}
