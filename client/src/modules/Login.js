@@ -56,7 +56,7 @@ const Login = ({ sendInfoMessage, setLoggedIn }) => {
           }
         })
         .catch((err) => {
-          sendInfoMessage("An error occurred. Please try again.", "failure");
+          sendInfoMessage("An error occurred. Please try again. " + err, "failure");
         });
     } else {
       sendInfoMessage("Please enter your username and password.", "warning");

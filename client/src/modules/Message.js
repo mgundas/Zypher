@@ -51,7 +51,7 @@ const Message = ({ username, message, timestamp }) => {
       </div>
       <span
         ref={timeRef}
-        className="font-medium text-rtca-400 transition-all opacity-0 absolute bottom-1 text-xs right-1 p-1 rounded-lg bg-rtca-900/25"
+        className="font-medium text-rtca-400 transition-all opacity-0 absolute top-1 text-xs right-1 p-1 rounded-lg bg-rtca-900/25"
       >
         10:30AM
       </span>

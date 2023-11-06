@@ -106,7 +106,7 @@ function App() {
         <>
           <div
             ref={sidebarRef}
-            className="absolute flex flex-col text-white h-screen -translate-x-60 w-60 bg-rtca-800 z-20 overflow-auto transition-all"
+            className="absolute flex flex-col dark:text-white h-screen -translate-x-60 w-60 dark:bg-rtca-800 text-rtca-600 bg-rtca-300 z-20 overflow-auto transition-all"
           >
             <div className="p-5 font-medium text-center">Conversations</div>
             <div className="flex flex-col">
@@ -158,8 +158,8 @@ function App() {
                     className="h-10 w-10 rounded-full"
                   />
                   <div className="flex flex-col text-sm">
-                    <div className="font-medium">Mehmet</div>
-                    <span className="text-green-500">{status}</span>
+                    <button className="font-medium">Mehmet</button>
+                    <span className="text-green-500 select-none">{status}</span>
                   </div>
                 </div>
               </div>
@@ -172,7 +172,8 @@ function App() {
                 </ul>
               </div>
             </nav>
-            <div className="flex-1 flex flex-col gap-1 items-start overflow-y-auto p-2 dark:text-white">
+            <div className="flex-1 flex flex-col gap-1 items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white">
+              <div className="flex w-full h-2 items-center justify-center p-2 text-sm text-rtca-300 before:bg-rtca-500 before:w-full before:h-0.5 after:bg-rtca-500 after:w-full after:h-0.5 after:mx-2 before:mx-2 select-none">Today</div>
               {messages.map((message, key) => (
                 <Message
                   key={key}
@@ -201,6 +202,9 @@ function App() {
           ) : (
             <></>
           )}
+          <div ref={infoBoxRef} className="hidden">
+            {errorMsg}
+          </div>
           <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
             <Login
               sendInfoMessage={sendInfoMessage}
@@ -208,9 +212,6 @@ function App() {
             />
             <div className="hidden sm:flex">or</div>
             <Register sendInfoMessage={sendInfoMessage} />
-          </div>
-          <div ref={infoBoxRef} className="hidden">
-            {errorMsg}
           </div>
         </div>
       );

@@ -10,6 +10,12 @@ const jwt = require("jsonwebtoken")
 const idRoom = "564406c549227afebf301d720161596c";
 
 const app = express();
+
+app.use(cors({
+  origin: ["http://localhost:3000", "http://10.15.2.200:3000"]
+}))
+app.use(express.json());
+
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: { origin: ["http://localhost:3000", "http://10.15.2.200:3000"] },
@@ -26,9 +32,6 @@ class CustomError extends Error {
 mongoose.connect('mongodb://127.0.0.1:27017/registration-demo')
 .then(data => {console.log("DB connection successful")})
 .catch(err => {console.error("Something went wrong", err)})
-
-app.use(cors())
-app.use(express.json());
 
 app.use("/api/v1/", main);
 

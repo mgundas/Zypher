@@ -5,12 +5,12 @@
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css");
 
 ::-webkit-scrollbar {
-    @apply w-2
+    @apply w-2 rounded-full
     /* Customize the scrollbar width */
 }
 
 ::-webkit-scrollbar-track {
-    @apply bg-rtca-400 dark:bg-rtca-600
+    @apply bg-rtca-400 dark:bg-rtca-600 rounded-full
     /* Customize the scrollbar track */
 }
 
@@ -20,7 +20,7 @@
 }
 
 body{
-    @apply bg-rtca-200 dark:bg-rtca-900
+    @apply bg-rtca-200 dark:bg-rtca-900 
 }
 
 .chat-input{
@@ -32,9 +32,9 @@ body{
 }
 
 .message-self{
-    @apply mr-2 flex relative items-center relative bg-rtca-600 p-2 rounded-lg self-end after:border-8 after:border-r-black/0 after:border-t-black/0 after:border-b-black/0 after:-right-3.5 after:top-1 after:absolute after:border-rtca-600 after:h-[1px] after:w-[1px]
+    @apply mr-2 flex relative items-center bg-rtca-300 dark:bg-rtca-600 p-2 rounded-lg self-end after:border-8 after:border-r-black/0 after:border-t-black/0 after:border-b-black/0 after:-right-3.5 after:top-1 after:absolute dark:after:border-l-rtca-600 after:border-l-rtca-300 after:h-[1px] after:w-[1px]
 }
 
 .message-interlocutor{
-    @apply ml-2 flex relative items-center relative bg-rtca-600 p-2 rounded-lg self-start after:border-8 after:border-l-black/0 after:border-t-black/0 after:border-b-black/0 after:-left-3.5 after:top-1 after:absolute after:border-rtca-600 after:h-[1px] after:w-[1px]
+    @apply ml-2 flex relative items-center bg-rtca-300 dark:bg-rtca-600 p-2 rounded-lg self-start after:border-8 after:border-l-black/0 after:border-t-black/0 after:border-b-black/0 after:-left-3.5 after:top-1 after:absolute dark:after:border-r-rtca-600 after:border-r-rtca-300 after:h-[1px] after:w-[1px]
 }
