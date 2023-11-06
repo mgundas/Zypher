@@ -15,7 +15,9 @@ function App() {
   const infoBoxRef = useRef(null);
   const notificationTimeoutRef = useRef(null);
   const infoTimeoutRef = useRef(null);
-  const bottomRef = useRef(null)
+  const bottomRef = useRef(null);
+  const sidebarRef = useRef(null);
+  const overlayRef = useRef(null);
 
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
@@ -23,7 +25,7 @@ function App() {
   const [status, setStatus] = useState("Online");
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({behavior: 'smooth'});
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   useEffect(() => {
@@ -54,17 +56,17 @@ function App() {
         if (data.username === socket.auth.username) {
           return;
         } else {
-          setStatus("Typing...")
+          setStatus("Typing...");
         }
-      }
+      };
 
       const handleUserStoppedTyping = (data) => {
         if (data.username === socket.auth.username) {
           return;
         } else {
-          setStatus("Online")
+          setStatus("Online");
         }
-      }
+      };
 
       socket.on("user typing", handleUserTyping);
       socket.on("user stopped typing", handleUserStoppedTyping);
@@ -75,7 +77,8 @@ function App() {
         socket.off("user typing", handleUserTyping);
         socket.off("user stopped typing", handleUserStoppedTyping);
         socket.off("receiveId", handleReceiveId);
-        socket.off("receiveMessage", handleReceiveMessage);      };
+        socket.off("receiveMessage", handleReceiveMessage);
+      };
     }
   }, [socket, messages]);
 
@@ -100,43 +103,89 @@ function App() {
   const renderContent = () => {
     if (loggedIn && socket) {
       return (
-        <div className="h-screen flex flex-col bg-rtca-200 dark:bg-rtca-700">
-          <nav className="bg-rtca-300 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 justify-between items-center h-16">
-          <div className="flex items-center">
-          <button className="rounded-full h-10 w-10 hover:bg-rtca-600/50 transition-all"><i class="bi bi-list"></i></button>
-            <div className="p-4 flex gap-2 items-center">
-              <img
-                src="https://via.placeholder.com/512x512"
-                className="h-10 w-10 rounded-full"
-              />
-              <div className="flex flex-col text-sm">
-                <div className="font-medium">Mehmet</div>
-                <span className="text-green-500">{status}</span>
+        <>
+          <div
+            ref={sidebarRef}
+            className="absolute flex flex-col text-white h-screen -translate-x-60 w-60 bg-rtca-800 z-20 overflow-auto transition-all"
+          >
+            <div className="p-5 font-medium text-center">Conversations</div>
+            <div className="flex flex-col">
+              <button className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all">
+                <img
+                  src="https://via.placeholder.com/512x512"
+                  className="h-10 w-10 rounded-full"
+                />
+                <div className="grid grid-rows-2 text-sm">
+                  <div className="font-medium text-left">Mehmet</div>
+                  <span className="">How have things been...</span>
+                </div>
+              </button>
+              <button className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all">
+                <img
+                  src="https://via.placeholder.com/512x512"
+                  className="h-10 w-10 rounded-full"
+                />
+                <div className="grid grid-rows-2 text-sm">
+                  <div className="font-medium text-left">Mehmet</div>
+                  <span className="">How have things been...</span>
+                </div>
+              </button>
+            </div>
+          </div>
+          <div
+            ref={overlayRef}
+            onClick={() => {
+              sidebarRef.current.classList.add("-translate-x-60");
+              overlayRef.current.classList.add("hidden");
+            }}
+            className="h-screen w-screen absolute bg-rtca-800/50 z-10 hidden"
+          ></div>
+          <div className="h-screen flex flex-col bg-rtca-200 dark:bg-rtca-700">
+            <nav className="bg-rtca-300 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 justify-between items-center h-16">
+              <div className="flex items-center">
+                <button
+                  onClick={() => {
+                    sidebarRef.current.classList.remove("-translate-x-60");
+                    overlayRef.current.classList.remove("hidden");
+                  }}
+                  className="rounded-full h-10 w-10 hover:bg-rtca-600/50 transition-all"
+                >
+                  <i class="bi bi-list"></i>
+                </button>
+                <div className="p-4 flex gap-2 items-center">
+                  <img
+                    src="https://via.placeholder.com/512x512"
+                    className="h-10 w-10 rounded-full"
+                  />
+                  <div className="flex flex-col text-sm">
+                    <div className="font-medium">Mehmet</div>
+                    <span className="text-green-500">{status}</span>
+                  </div>
+                </div>
               </div>
+              <div className="flex gap-4 items-center">
+                <ul className="flex gap-3 font-medium items-center">
+                  <li className="hidden md:flex">
+                    Welcome,&nbsp;<p ref={unameRef}></p>
+                  </li>
+                  <ToggleDarkMode />
+                </ul>
+              </div>
+            </nav>
+            <div className="flex-1 flex flex-col gap-1 items-start overflow-y-auto p-2 dark:text-white">
+              {messages.map((message, key) => (
+                <Message
+                  key={key}
+                  username={message.sender}
+                  message={message.message}
+                  timestamp="31.10.2023 6:27PM"
+                />
+              ))}
+              <div ref={bottomRef} className="opacity-0 content-none"></div>
             </div>
+            <ChatInput />
           </div>
-            <div className="flex gap-4 items-center">
-              <ul className="flex gap-3 font-medium items-center">
-                <li className="hidden md:flex">
-                  Welcome,&nbsp;<p ref={unameRef}></p>
-                </li>
-                <ToggleDarkMode />
-              </ul>
-            </div>
-          </nav>
-          <div className="flex-1 flex flex-col gap-1 items-start overflow-y-auto p-2 dark:text-white">
-            {messages.map((message, key) => (
-              <Message
-                key={key}
-                username={message.sender}
-                message={message.message}
-                timestamp="31.10.2023 6:27PM"
-              />
-            ))}
-            <div ref={bottomRef} className="opacity-0 content-none"></div>
-          </div>
-          <ChatInput />
-        </div>
+        </>
       );
     } else {
       return (

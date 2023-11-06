@@ -30,3 +30,11 @@ body{
 .chat-send-button{
     @apply bg-green-700 p-2 px-4 text-white rounded-full hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all
 }
+
+.message-self{
+    @apply mr-2 flex relative items-center relative bg-rtca-600 p-2 rounded-lg self-end after:border-8 after:border-r-black/0 after:border-t-black/0 after:border-b-black/0 after:-right-3.5 after:top-1 after:absolute after:border-rtca-600 after:h-[1px] after:w-[1px]
+}
+
+.message-interlocutor{
+    @apply ml-2 flex relative items-center relative bg-rtca-600 p-2 rounded-lg self-start after:border-8 after:border-l-black/0 after:border-t-black/0 after:border-b-black/0 after:-left-3.5 after:top-1 after:absolute after:border-rtca-600 after:h-[1px] after:w-[1px]
+}

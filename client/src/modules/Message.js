@@ -18,9 +18,9 @@ const Message = ({ username, message, timestamp }) => {
   
   useEffect(() => {
     if(username === socket.auth.username){
-      messageRef.current.classList = "flex items-center relative bg-rtca-600 p-2 rounded-lg self-end"
+      messageRef.current.classList = "message-self"
     } else{
-      messageRef.current.classList = "flex items-center relative bg-rtca-600 p-2 rounded-lg self-start"
+      messageRef.current.classList = "message-interlocutor"
     }
   })
 
