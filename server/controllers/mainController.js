@@ -1,3 +1,4 @@
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../Models/UserModel");
 
@@ -149,10 +150,45 @@ const handleRegister = async (req, res) => {
   }
 };
 
-const handleVerifyAccessToken = (req, res) => {}
+const handleVerifyAccessToken = (req, res) => {
+  try {
+    const accessToken = req.headers.authorization.slice(7);
+
+    if (!accessToken) {
+      return res.status(200).json({
+        success: false,
+        message: "no.access.token.provided",
+      });
+    }
+
+    const isValid = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET);
+
+    if (!isValid) {
+      return res.status(200).json({
+        success: false,
+        message: "access.token.not.valid",
+      });
+    }
+    return res.status(200).json({
+        success: true,
+    })
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(200).json({
+        success: false,
+        message: "access.token.expired",
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: "server.error",
+      });
+    }
+  }
+};
 
 module.exports = {
   handleLogin,
   handleRegister,
-  handleVerifyAccessToken
+  handleVerifyAccessToken,
 };

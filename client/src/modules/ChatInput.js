@@ -56,7 +56,7 @@ function ChatInput() {
           type="submit"
           className="chat-send-button"
         >
-          <i class="bi bi-send"></i>
+          <i className="bi bi-send"></i>
         </button>
       </form>
     </>

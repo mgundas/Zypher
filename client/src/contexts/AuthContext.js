@@ -16,17 +16,6 @@ export function AuthProvider({ children }) {
         // Token is missing
         return false;
       }
-    
-      // Step 1: Decode the JWT
-      const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decodes base64 URL-encoded string
-    
-      // Step 2: Verify the expiration time
-      const currentTimestamp = Math.floor(Date.now() / 1000); // Convert to seconds
-      if (decodedToken.exp && decodedToken.exp < currentTimestamp) {
-        // Token has expired
-        return false;
-      }
-    
       // Step 3: Verify the signature (if necessary)
       // You may need a library like `jsonwebtoken` to verify the signature with a public key or secret.
     
@@ -38,7 +27,7 @@ export function AuthProvider({ children }) {
     // You can make an API call with the access token to check its validity
     try {
       // Make an API call with the access token to validate it
-      const response = await fetch('/api/verify-access-token', {
+      const response = await fetch(`${config.apiUri}/verify-access-token`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${authToken}`,

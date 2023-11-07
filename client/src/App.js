@@ -11,7 +11,6 @@ function App() {
   const { socket } = useSocket();
   const config = useConfig();
 
-  const unameRef = useRef(null);
   const infoBoxRef = useRef(null);
   const notificationTimeoutRef = useRef(null);
   const infoTimeoutRef = useRef(null);
@@ -34,15 +33,8 @@ function App() {
 
   useEffect(() => {
     if (socket) {
-      const handleReceiveId = (data) => {
-        unameRef.current.innerHTML = data.username;
-        console.log(data);
-      };
-
       const handleReceiveMessage = (data) => {
-        console.log("triggered", data);
         setMessages((prevMessages) => [...prevMessages, data]);
-        console.log(messages);
         if (data.sender !== socket.auth.username) {
           document.title = "New message!";
         }
@@ -70,13 +62,11 @@ function App() {
 
       socket.on("user typing", handleUserTyping);
       socket.on("user stopped typing", handleUserStoppedTyping);
-      socket.on("receiveId", handleReceiveId);
       socket.on("receiveMessage", handleReceiveMessage);
 
       return () => {
         socket.off("user typing", handleUserTyping);
         socket.off("user stopped typing", handleUserStoppedTyping);
-        socket.off("receiveId", handleReceiveId);
         socket.off("receiveMessage", handleReceiveMessage);
       };
     }
@@ -90,7 +80,7 @@ function App() {
       info: "dark:bg-teal-900 bg-teal-700",
     };
 
-    infoBoxRef.current.className = `justify-self-center text-white dark:text-rtca-50 p-3 transition-all rounded-md ${types[type]}`;
+    infoBoxRef.current.className = `info-box ${types[type]}`;
     setErrorMsg(message);
     infoBoxRef.current.classList.remove("hidden");
 
@@ -106,7 +96,7 @@ function App() {
         <>
           <div
             ref={sidebarRef}
-            className="absolute flex flex-col dark:text-white h-screen -translate-x-60 w-60 dark:bg-rtca-800 text-rtca-600 bg-rtca-300 z-20 overflow-auto transition-all"
+            className="sidebar -translate-x-60 w-60"
           >
             <div className="p-5 font-medium text-center">Conversations</div>
             <div className="flex flex-col">
@@ -140,8 +130,8 @@ function App() {
             }}
             className="h-screen w-screen absolute bg-rtca-800/50 z-10 hidden"
           ></div>
-          <div className="h-screen flex flex-col bg-rtca-200 dark:bg-rtca-700">
-            <nav className="bg-rtca-300 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 justify-between items-center h-16">
+          <div className="chat-screen">
+            <nav className="navbar">
               <div className="flex items-center">
                 <button
                   onClick={() => {
@@ -150,7 +140,7 @@ function App() {
                   }}
                   className="rounded-full h-10 w-10 hover:bg-rtca-600/50 transition-all"
                 >
-                  <i class="bi bi-list"></i>
+                  <i className="bi bi-list"></i>
                 </button>
                 <div className="p-4 flex gap-2 items-center">
                   <img
@@ -165,15 +155,14 @@ function App() {
               </div>
               <div className="flex gap-4 items-center">
                 <ul className="flex gap-3 font-medium items-center">
-                  <li className="hidden md:flex">
-                    Welcome,&nbsp;<p ref={unameRef}></p>
-                  </li>
                   <ToggleDarkMode />
                 </ul>
               </div>
             </nav>
             <div className="flex-1 flex flex-col gap-1 items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white">
-              <div className="flex w-full h-2 items-center justify-center p-2 text-sm text-rtca-300 before:bg-rtca-500 before:w-full before:h-0.5 after:bg-rtca-500 after:w-full after:h-0.5 after:mx-2 before:mx-2 select-none">Today</div>
+              <div className="time-divider">
+                Today
+              </div>
               {messages.map((message, key) => (
                 <Message
                   key={key}

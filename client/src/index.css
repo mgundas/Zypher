@@ -23,6 +23,26 @@ body{
     @apply bg-rtca-200 dark:bg-rtca-900 
 }
 
+.info-box{
+    @apply justify-self-center text-white dark:text-rtca-50 p-3 transition-all rounded-md
+}
+
+.sidebar{
+    @apply absolute flex flex-col dark:text-white h-screen dark:bg-rtca-800 text-rtca-600 bg-rtca-300 z-20 overflow-auto transition-all
+}
+
+.chat-screen{
+    @apply h-screen flex flex-col bg-rtca-200 dark:bg-rtca-700
+}
+
+.time-divider{
+    @apply flex w-full h-2 items-center justify-center p-2 text-sm text-rtca-300 before:bg-rtca-500 before:w-full before:h-0.5 after:bg-rtca-500 after:w-full after:h-0.5 after:mx-2 before:mx-2 select-none
+}
+
+.navbar{
+    @apply bg-rtca-300 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 justify-between items-center h-16
+}
+
 .chat-input{
     @apply flex grow p-2 rounded-full px-5 z-[1] border-none bg-rtca-300 dark:text-rtca-100 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all
 }

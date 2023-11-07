@@ -1,19 +1,21 @@
-require("dotenv").config()
+require("dotenv").config();
 const main = require("./routes/main");
 const express = require("express");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 
 const idRoom = "564406c549227afebf301d720161596c";
 
 const app = express();
 
-app.use(cors({
-  origin: ["http://localhost:3000", "http://10.15.2.200:3000"]
-}))
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://10.15.2.200:3000"],
+  })
+);
 app.use(express.json());
 
 const httpServer = http.createServer(app);
@@ -29,22 +31,27 @@ class CustomError extends Error {
   }
 }
 
-mongoose.connect('mongodb://127.0.0.1:27017/registration-demo')
-.then(data => {console.log("DB connection successful")})
-.catch(err => {console.error("Something went wrong", err)})
+mongoose
+  .connect("mongodb://127.0.0.1:27017/registration-demo")
+  .then((data) => {
+    console.log("DB connection successful");
+  })
+  .catch((err) => {
+    console.error("Something went wrong", err);
+  });
 
 app.use("/api/v1/", main);
 
 // 404 Not Found Middleware
 app.use((req, res, next) => {
-  res.status(404).send('404 - Not Found');
+  res.status(404).send("404 - Not Found");
 });
 
 app.use((err, req, res, next) => {
   if (err instanceof CustomError) {
     res.status(err.status).json({ message: err.message });
   } else {
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -54,14 +61,18 @@ const socketAuthMiddleware = (socket, next) => {
 
   // Verify the access token
   try {
-    const isValid = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET)
-    if(!isValid){
+    const isValid = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET);
+    if (!isValid) {
       console.log("Authentication failed.");
-      return socket.disconnect(); //Authentication failed
+      return socket.disconnect(); // Authentication failed
     }
     return next(); // Authentication successful
   } catch (error) {
-    console.log("Something went wrong.", error);
+    /*     if (error.name === 'TokenExpiredError') {
+      console.log("Authentication failed: Token has expired.");
+    } else {
+      console.log("Something went wrong.", error);
+    } */
     return socket.disconnect();
   }
 };
@@ -71,10 +82,6 @@ io.use(socketAuthMiddleware);
 io.on("connection", (socket) => {
   console.log(socket.id, "joined.");
   socket.join(idRoom);
-  socket.emit("receiveId", {
-    username: socket.handshake.auth.username,
-    id: socket.id,
-  });
 
   socket.on("sendMessage", (data) => {
     io.to(idRoom).emit("receiveMessage", data);

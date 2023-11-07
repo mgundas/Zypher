@@ -4,7 +4,7 @@ const { body } = require('express-validator');
 const messageSchema = new mongoose.Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Assuming you have a User model
+    ref: 'User',
     required: true,
   },
   recipient: {
@@ -17,9 +17,8 @@ const messageSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: function (value) {
-        // You can add custom validation logic here to filter or sanitize the message text.
-        // For example, you can check for unwanted characters or patterns.
-        return true; // Adjust this validation logic as needed.
+        
+        return true;
       },
       message: 'Invalid message text.',
     },
