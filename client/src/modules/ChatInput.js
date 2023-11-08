@@ -33,7 +33,7 @@ function ChatInput() {
     if (message.trim() !== "") {
       socket.emit("sendMessage", {
         message: message.trim(),
-        recipient: "dfgfdg"
+        recipient: "mgundas"
       });
       // clearTimeout(typingTimeoutRef.current);
       // socket.emit("stopped typing", { username: socket.auth.username });

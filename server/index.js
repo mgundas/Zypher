@@ -7,19 +7,8 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const User = require("./Models/UserModel");
-const Sockid = require("./Models/Sockid");
-
-const idRoom = "564406c549227afebf301d720161596c";
-
+const UserSocketMapping = require("./Models/UserSocketMapping")
 const app = express();
-
-app.use(
-  cors({
-    origin: ["http://localhost:3000", "http://10.15.2.200:3000"],
-  })
-);
-app.use(express.json());
-
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: { origin: ["http://localhost:3000", "http://10.15.2.200:3000"] },
@@ -42,6 +31,16 @@ mongoose
     console.error("Something went wrong", err);
   });
 
+
+//Express middleware
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://10.15.2.200:3000"],
+  })
+);
+app.use(express.json());
+
+//Express routers
 app.use("/api/v1/", main);
 
 // 404 Not Found Middleware
@@ -74,11 +73,15 @@ const socketAuthMiddleware = async (socket, next) => {
       return socket.disconnect();
     }
     socket.username = user.username;
-    const newLink = new Sockid({
-      uid: user._id,
-      sockid: socket.id,
-    });
-    await newLink.save();
+    socket.uid = user._id
+    const newLink = await UserSocketMapping.findOneAndUpdate(
+      { uid },
+      { $addToSet: { sockets: socket.id } },
+      { upsert: true, new: true }
+    )
+    if(newLink){
+      console.log("New socket added to the map.");
+    }
     return next(); // Authentication successful
   } catch (error) {
     return socket.disconnect();
@@ -87,18 +90,35 @@ const socketAuthMiddleware = async (socket, next) => {
 
 io.use(socketAuthMiddleware);
 
+const idRoom = "564406c549227afebf301d720161596c";
+
 io.on("connection", (socket) => {
-  console.log(socket.id, "joined.");
+  console.log(socket.id, "joined as", socket.username);
   socket.join(idRoom);
 
-  socket.on("sendMessage", (data) => {
-    data.sender = socket.username;
-    io.to(idRoom).emit("receiveMessage", data);
+  socket.on("sendMessage", async (data) => {
+    data.sender = socket.username
+    const user = await User.findOne({username: data.recipient})
+    if(!user) return;
+
+    const mapping = await UserSocketMapping.findOne({ uid: user._id });
+
+    if (mapping) {
+      for (const socket of mapping.sockets) {
+        io.to(socket).emit('receiveMessage', data);
+      }
+    } else {
+      console.log('No matching user-to-socket mapping found for', user._id);
+    }
   });
 
   socket.on("typing", (data) => {
-    // Broadcast the "user typing" event to other users in the room.
-    io.to(idRoom).emit("user typing", data);
+    try {
+      // Broadcast the "user typing" event to the recipient.
+      io.to(idRoom).emit("user typing", data);
+    } catch (error) {
+      
+    }
   });
 
   socket.on("stopped typing", (data) => {
@@ -108,16 +128,20 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", async () => {
     try {
-      const deleteLink = await Sockid.deleteOne({ sockid: socket.id });
-      if (deleteLink) {
-        console.log(
-          `Link removal succeeded and the user with the id ${socket.id} disconnected.`
-        );
-      } else {
-        console.log(`An error occured while removing the link.`);
+      // Find the user-to-socket mapping document for the given user ID
+      const mapping = await UserSocketMapping.findOne({ uid: socket.uid });
+
+      if (mapping) {
+        // Remove the disconnected socket ID from the mapping
+        const index = mapping.sockets.indexOf(socket.id);
+        if (index !== -1) {
+          mapping.sockets.splice(index, 1);
+          await mapping.save();
+        }
       }
+      console.log('User-to-Socket Mapping Updated.');
     } catch (error) {
-      console.log(error);
+      console.error('Error:', error);
     }
   });
 });

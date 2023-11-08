@@ -1,6 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../Models/UserModel");
+const UserSocketMapping = require("../Models/UserSocketMapping")
 
 // Regular expression patterns for fields
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -139,7 +140,16 @@ const handleRegister = async (req, res) => {
     });
 
     await newUser.save();
+
+    const newMap = new UserSocketMapping({
+      uid: newUser._id,
+      sockets: []
+    })
+
+    await newMap.save();
+
     console.log("User registered:", newUser);
+    console.log("New user to socket map registered:", newMap);
     res.status(200).json({
       success: true,
       message: "reg.successful",
