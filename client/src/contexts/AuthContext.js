@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
   const [authToken, setAuthToken] = useState(localStorage.getItem('accessToken') || null);
   const [refreshToken, setRefreshToken] = useState(localStorage.getItem('refreshToken') || null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [userData, setUserData] = useState({});
 
   const verifyAccessToken = async () => {
     try {
@@ -30,6 +31,8 @@ export function AuthProvider({ children }) {
         return false;
       }
       console.log("Token is verified.");
+
+      setUserData(data.user)
       return true;
     } catch (error) {
       return false;
@@ -76,7 +79,7 @@ export function AuthProvider({ children }) {
   // Your other authentication-related functions (login, logout, etc.)
 
   return (
-    <AuthContext.Provider value={{ authToken, refreshToken, setAuthToken, setRefreshToken, loggedIn }}>
+    <AuthContext.Provider value={{ authToken, refreshToken, setAuthToken, setRefreshToken, loggedIn, userData }}>
       {children}
     </AuthContext.Provider>
   );

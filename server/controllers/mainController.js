@@ -150,7 +150,7 @@ const handleRegister = async (req, res) => {
   }
 };
 
-const handleVerifyAccessToken = (req, res) => {
+const handleVerifyAccessToken = async (req, res) => {
   try {
     const accessToken = req.headers.authorization;
 
@@ -170,8 +170,24 @@ const handleVerifyAccessToken = (req, res) => {
       });
     }
     console.log("Jwt valid.");
+    
+    const uid = jwt.decode(accessToken).uid
+    const findUser = await User.findById(uid)
+
+    if(!findUser){
+      return res.status(200).json({
+        success: false,
+        message: "user.does.not.exist",
+      });    
+    }
+    
     return res.status(200).json({
         success: true,
+        user: {
+          username: findUser.username,
+          email: findUser.email,
+          createdAt: findUser.createdAt
+        }
     })
   } catch (error) {
     if (error.name === "TokenExpiredError") {

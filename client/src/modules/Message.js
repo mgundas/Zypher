@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useSocket } from "../contexts/SocketContext";
+import { useAuth } from "../contexts/AuthContext";
 
 function breakLongMessage(message, maxLineLength) {
   const lines = [];
@@ -14,10 +15,10 @@ function breakLongMessage(message, maxLineLength) {
 const Message = ({ username, message, timestamp }) => {
   const timeRef = useRef(null);
   const messageRef = useRef(null)
-  const { socket } = useSocket();
+  const { userData } = useAuth();
   
   useEffect(() => {
-    if(username === socket.auth.username){
+    if(username === userData.username){
       messageRef.current.classList = "message-self"
     } else{
       messageRef.current.classList = "message-interlocutor"
