@@ -6,6 +6,8 @@ const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const User = require("./Models/UserModel");
+const Sockid = require("./Models/Sockid");
 
 const idRoom = "564406c549227afebf301d720161596c";
 
@@ -55,7 +57,7 @@ app.use((err, req, res, next) => {
   }
 });
 
-const socketAuthMiddleware = (socket, next) => {
+const socketAuthMiddleware = async (socket, next) => {
   // Extract the access token from the socket request
   const accessToken = socket.handshake.auth.accessToken;
 
@@ -66,13 +68,19 @@ const socketAuthMiddleware = (socket, next) => {
       console.log("Authentication failed.");
       return socket.disconnect(); // Authentication failed
     }
+    const uid = jwt.decode(accessToken).uid;
+    const user = await User.findById(uid);
+    if (!user) {
+      return socket.disconnect();
+    }
+    socket.username = user.username;
+    const newLink = new Sockid({
+      uid: user._id,
+      sockid: socket.id,
+    });
+    await newLink.save();
     return next(); // Authentication successful
   } catch (error) {
-    /*     if (error.name === 'TokenExpiredError') {
-      console.log("Authentication failed: Token has expired.");
-    } else {
-      console.log("Something went wrong.", error);
-    } */
     return socket.disconnect();
   }
 };
@@ -84,6 +92,7 @@ io.on("connection", (socket) => {
   socket.join(idRoom);
 
   socket.on("sendMessage", (data) => {
+    data.sender = socket.username;
     io.to(idRoom).emit("receiveMessage", data);
   });
 
@@ -97,8 +106,19 @@ io.on("connection", (socket) => {
     io.to(idRoom).emit("user stopped typing", data);
   });
 
-  socket.on("disconnect", () => {
-    console.log(`${socket.id} disconnected.`);
+  socket.on("disconnect", async () => {
+    try {
+      const deleteLink = await Sockid.deleteOne({ sockid: socket.id });
+      if (deleteLink) {
+        console.log(
+          `Link removal succeeded and the user with the id ${socket.id} disconnected.`
+        );
+      } else {
+        console.log(`An error occured while removing the link.`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   });
 });
 

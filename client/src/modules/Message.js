@@ -43,11 +43,11 @@ const Message = ({ username, message, timestamp }) => {
         <span className="font-medium text-pink-400 text-sm">
           {username}
         </span>
-        <p className="break-all">
+        <div className="break-all">
           {messageLines.map((line, index) => (
             <div key={index}>{line}</div>
           ))}
-        </p>
+        </div>
       </div>
       <span
         ref={timeRef}

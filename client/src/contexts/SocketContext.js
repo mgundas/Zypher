@@ -10,7 +10,7 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
-    const [auth, setAuth] = useState(null);
+    const [auth, setAuth] = useState(localStorage.getItem("accessToken") ? {accessToken: localStorage.getItem("accessToken")} : "" );
     const config = useConfig();
 
     const authenticateUser = async() => {

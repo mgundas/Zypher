@@ -1,12 +1,14 @@
 import { useRef, useState } from "react";
 import { useSocket } from "../contexts/SocketContext";
 import { useConfig } from "../contexts/ConfigContext";
+import { useAuth } from "../contexts/AuthContext";
 
-const Login = ({ sendInfoMessage, setLoggedIn }) => {
+const Login = ({ sendInfoMessage }) => {
   const timeoutRef = useRef(null)
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const { setAuth } = useSocket();
+  const {setAuthToken, setRefreshToken} = useAuth()
   const config = useConfig();
 
   const responses = new Map([
@@ -41,17 +43,17 @@ const Login = ({ sendInfoMessage, setLoggedIn }) => {
               const [message, messageType] = responses.get(data.message) || ["An unknown error occurred. Please try again.", "failure"];
               return sendInfoMessage(message, messageType);
             }
-            localStorage.setItem("accessToken", data.accessToken);
-            localStorage.setItem("refreshToken", data.refreshToken);
             sendInfoMessage("Login successful. Redirecting...", "success");
 
             clearTimeout(timeoutRef.current)
             timeoutRef.current = setTimeout(() => {
               setAuth({
-                username: data.username,
                 accessToken: data.accessToken
               })
-              setLoggedIn(true)
+              localStorage.setItem("accessToken", data.accessToken);
+              localStorage.setItem("refreshToken", data.refreshToken);
+              setAuthToken(data.accessToken)
+              setRefreshToken(data.refreshToken)
             }, 2000)
           }
         })

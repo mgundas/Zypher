@@ -6,10 +6,12 @@ import ChatInput from "./modules/ChatInput";
 import Login from "./modules/Login";
 import Register from "./modules/Register";
 import { useConfig } from "./contexts/ConfigContext";
+import { useAuth } from "./contexts/AuthContext";
 
 function App() {
   const { socket } = useSocket();
   const config = useConfig();
+  const {loggedIn} = useAuth();
 
   const infoBoxRef = useRef(null);
   const notificationTimeoutRef = useRef(null);
@@ -20,7 +22,6 @@ function App() {
 
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
   const [status, setStatus] = useState("Online");
 
   useEffect(() => {
@@ -197,7 +198,6 @@ function App() {
           <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
             <Login
               sendInfoMessage={sendInfoMessage}
-              setLoggedIn={setLoggedIn}
             />
             <div className="hidden sm:flex">or</div>
             <Register sendInfoMessage={sendInfoMessage} />

@@ -4,45 +4,36 @@ import {useConfig} from './ConfigContext'
 
 const AuthContext = createContext();
 
+export const useAuth = () => {
+  return useContext(AuthContext);
+}
+
 export function AuthProvider({ children }) {
   const config = useConfig()
   const [authToken, setAuthToken] = useState(localStorage.getItem('accessToken') || null);
   const [refreshToken, setRefreshToken] = useState(localStorage.getItem('refreshToken') || null);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const verifyAccessToken = async () => {
-
-    function isTokenValid(token) {
-      if (!token) {
-        // Token is missing
-        return false;
-      }
-      // Step 3: Verify the signature (if necessary)
-      // You may need a library like `jsonwebtoken` to verify the signature with a public key or secret.
-    
-      // Token is valid
-      return true;
-    }
-
-    // Implement logic to verify the access token with your backend
-    // You can make an API call with the access token to check its validity
     try {
-      // Make an API call with the access token to validate it
       const response = await fetch(`${config.apiUri}/verify-access-token`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `${authToken}`,
         },
       });
-
-      if (response.ok) {
-        // Access token is valid
-        return true;
+      const data = await response.json()
+      if (!response.ok) {
+        return false;
       }
-      // Access token is invalid, handle accordingly
+      if (!data.success){
+        return false;
+      }
+      console.log("Token is verified.");
+      return true;
     } catch (error) {
-      // Handle errors, such as network issues
+      return false;
     }
-    return false;
   };
 
   const refreshTokens = async () => {
@@ -77,6 +68,7 @@ export function AuthProvider({ children }) {
           // Access token is invalid, attempt to refresh tokens
           refreshTokens();
         }
+        setLoggedIn(true);
       });
     }
   }, [authToken]);
@@ -84,7 +76,7 @@ export function AuthProvider({ children }) {
   // Your other authentication-related functions (login, logout, etc.)
 
   return (
-    <AuthContext.Provider value={{ authToken, refreshToken, setAuthToken, setRefreshToken }}>
+    <AuthContext.Provider value={{ authToken, refreshToken, setAuthToken, setRefreshToken, loggedIn }}>
       {children}
     </AuthContext.Provider>
   );

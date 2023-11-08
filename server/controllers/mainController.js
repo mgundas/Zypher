@@ -61,12 +61,12 @@ const handleLogin = async (req, res) => {
       }
 
       const accessToken = jwt.sign(
-        { username },
+        { uid: user._id },
         process.env.ACCESSTOKEN_SECRET,
         { expiresIn: "1h" }
       );
       const refreshToken = jwt.sign(
-        { username },
+        { uid: user._id },
         process.env.REFRESHTOKEN_SECRET,
         { expiresIn: "30d" }
       );
@@ -152,7 +152,7 @@ const handleRegister = async (req, res) => {
 
 const handleVerifyAccessToken = (req, res) => {
   try {
-    const accessToken = req.headers.authorization.slice(7);
+    const accessToken = req.headers.authorization;
 
     if (!accessToken) {
       return res.status(200).json({
@@ -169,6 +169,7 @@ const handleVerifyAccessToken = (req, res) => {
         message: "access.token.not.valid",
       });
     }
+    console.log("Jwt valid.");
     return res.status(200).json({
         success: true,
     })
@@ -187,8 +188,13 @@ const handleVerifyAccessToken = (req, res) => {
   }
 };
 
+const handleFetchUserData = (req, res) => {
+  
+}
+
 module.exports = {
   handleLogin,
   handleRegister,
   handleVerifyAccessToken,
+  handleFetchUserData
 };
