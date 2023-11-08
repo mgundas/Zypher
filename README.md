@@ -1,7 +1,7 @@
 
 # Real Time Chat App
 
-This app is nowhere near finished. I still actively work on this project and learn a ton while developing it.
+This app is nowhere near finished. I'm still working on this project and learning a ton while developing.
 
 ## Scripts you can run:
 To start the frontend:
@@ -27,11 +27,11 @@ foo@bar:~$ npm start
 3. Socket.io
 4. jsonwebtokens
 5. bcrypt
+6. Mongoose/MongoDB
 
 ### Frontend:
 
 1. React.js
 2. socket.io-client
-3. react-jwt
 4. Tailwind.css
 5. Flowbite
