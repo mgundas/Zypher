@@ -97,7 +97,7 @@ function App() {
         <>
           <div
             ref={sidebarRef}
-            className="sidebar -translate-x-60 w-60"
+            className="sidebar -translate-x-60"
           >
             <div className="p-5 font-medium text-center">Conversations</div>
             <div className="flex flex-col">

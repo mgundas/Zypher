@@ -28,7 +28,7 @@ body{
 }
 
 .sidebar{
-    @apply absolute flex flex-col dark:text-white h-screen dark:bg-rtca-800 text-rtca-600 bg-rtca-300 z-20 overflow-auto transition-all
+    @apply w-60 absolute flex flex-col dark:text-white h-screen dark:bg-rtca-800 text-rtca-600 bg-rtca-300 z-20 overflow-auto transition-all 
 }
 
 .chat-screen{

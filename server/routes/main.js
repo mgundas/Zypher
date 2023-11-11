@@ -3,7 +3,7 @@ const {
   handleLogin, 
   handleRegister,
   handleVerifyAccessToken,
-  handleFetchUserData
+  handleRefreshTokens
 } = require("../controllers/mainController")
 
 const router = express.Router();
@@ -11,6 +11,6 @@ const router = express.Router();
 router.post("/register", handleRegister);
 router.post("/login", handleLogin);
 router.post("/verify-access-token", handleVerifyAccessToken)
-router.get("/fetch-user-data", handleFetchUserData)
+router.post("/refresh-tokens", handleRefreshTokens)
 
 module.exports = router;

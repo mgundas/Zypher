@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { useConfig } from './ConfigContext';
+import { useAuth } from './AuthContext';
 
 const SocketContext = createContext();
 
@@ -10,18 +11,18 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
-    const [auth, setAuth] = useState(localStorage.getItem("accessToken") ? {accessToken: localStorage.getItem("accessToken")} : "" );
     const config = useConfig();
+    const {authToken} = useAuth();
 
     const authenticateUser = async() => {
         try {
-            if(!auth) {
+            if(!authToken) {
                 //console.error("Authentication token is missing.");
                 return
             }
 
             const newSocket = io(config.socketUri, {autoConnect: false});
-            newSocket.auth = auth
+            newSocket.auth = {accessToken: authToken}
             newSocket.connect()
             setSocket(newSocket);
             
@@ -32,11 +33,11 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     authenticateUser();
-  }, [auth]);
+  }, [authToken]);
 
   // console.log('Socket instance:', socket);
 
   return (
-    <SocketContext.Provider value={{socket, setAuth}}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={{socket}}>{children}</SocketContext.Provider>
   );
 };

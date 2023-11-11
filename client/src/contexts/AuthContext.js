@@ -44,16 +44,18 @@ export function AuthProvider({ children }) {
     // You can make an API call with the refresh token to obtain new tokens
     try {
       // Make an API call to refresh tokens
-      const response = await fetch('/api/refresh-tokens', {
+      const response = await fetch(config.apiUri + '/refresh-tokens', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${refreshToken}`,
+          Authorization: `${refreshToken}`,
         },
       });
 
       if (response.ok) {
-        const { authToken: newAuthToken, refreshToken: newRefreshToken } = await response.json();
-        setAuthToken(newAuthToken);
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await response.json();
+        localStorage.setItem("accessToken",  newAccessToken)
+        localStorage.setItem("refreshToken",  newRefreshToken)
+        setAuthToken(newAccessToken);
         setRefreshToken(newRefreshToken);
       } else {
         // Handle token refresh failure

@@ -2,6 +2,26 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../Models/UserModel");
 const UserSocketMapping = require("../Models/UserSocketMapping")
+const RevokedToken = require('../Models/RevokedToken');
+
+async function revokeToken(token) {
+  try {
+    await RevokedToken.create({ token });
+    console.log('Token revoked successfully.');
+  } catch (error) {
+    console.error('Error revoking token:', error);
+  }
+}
+
+async function isTokenRevoked(token) {
+  try {
+    const result = await RevokedToken.findOne({ token });
+    return !!result; // Returns true if the token is found (revoked), false otherwise
+  } catch (error) {
+    console.error('Error checking token revocation:', error);
+    return true; // Assume an error means the token is revoked for safety
+  }
+}
 
 // Regular expression patterns for fields
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -174,12 +194,19 @@ const handleVerifyAccessToken = async (req, res) => {
     const isValid = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET);
 
     if (!isValid) {
+
+    }
+
+    if (await isTokenRevoked(accessToken)) {
+      // Token is revoked, deny access
+      console.log('Access denied: Token is revoked.');
       return res.status(200).json({
         success: false,
-        message: "access.token.not.valid",
+        message: "access.token.revoked",
       });
     }
-    console.log("Jwt valid.");
+
+    console.log("Access token is valid.");
     
     const uid = jwt.decode(accessToken).uid
     const findUser = await User.findById(uid)
@@ -214,13 +241,71 @@ const handleVerifyAccessToken = async (req, res) => {
   }
 };
 
-const handleFetchUserData = (req, res) => {
-  
+const handleRefreshTokens = async (req, res) => {
+  try {
+    const refreshToken = req.headers.authorization;
+
+    if (!refreshToken) {
+      return res.status(200).json({
+        success: false,
+        message: "no.refresh.token.provided",
+      });
+    }
+
+    const isValid = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
+
+    if (!isValid) {
+      return res.status(200).json({
+        success: false,
+        message: "refresh.token.not.valid",
+      });
+    }
+    console.log("Refresh token is valid.");
+    
+    const uid = jwt.decode(refreshToken).uid
+    const findUser = await User.findById(uid)
+
+    if(!findUser){
+      return res.status(200).json({
+        success: false,
+        message: "user.does.not.exist",
+      });    
+    }
+
+    const newAccessToken = jwt.sign(
+      { uid: findUser._id },
+      process.env.ACCESSTOKEN_SECRET,
+      { expiresIn: "1h" }
+    );
+    const newRefreshToken = jwt.sign(
+      { uid: findUser._id },
+      process.env.REFRESHTOKEN_SECRET,
+      { expiresIn: "30d" }
+    );
+
+    return res.status(200).json({
+      success: true,
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(200).json({
+        success: false,
+        message: "refresh.token.expired",
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: "server.error",
+      });
+    }
+  }
 }
 
 module.exports = {
   handleLogin,
   handleRegister,
   handleVerifyAccessToken,
-  handleFetchUserData
+  handleRefreshTokens
 };

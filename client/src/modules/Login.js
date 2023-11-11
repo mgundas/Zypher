@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { useSocket } from "../contexts/SocketContext";
 import { useConfig } from "../contexts/ConfigContext";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -7,7 +6,6 @@ const Login = ({ sendInfoMessage }) => {
   const timeoutRef = useRef(null)
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
-  const { setAuth } = useSocket();
   const {setAuthToken, setRefreshToken} = useAuth()
   const config = useConfig();
 
@@ -47,9 +45,6 @@ const Login = ({ sendInfoMessage }) => {
 
             clearTimeout(timeoutRef.current)
             timeoutRef.current = setTimeout(() => {
-              setAuth({
-                accessToken: data.accessToken
-              })
               localStorage.setItem("accessToken", data.accessToken);
               localStorage.setItem("refreshToken", data.refreshToken);
               setAuthToken(data.accessToken)
