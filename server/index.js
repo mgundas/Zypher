@@ -1,6 +1,7 @@
 require("dotenv").config();
 const main = require("./routes/main");
 const express = require("express");
+const useragent = require('express-useragent');
 const mongoose = require("mongoose");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -34,6 +35,7 @@ mongoose
 
 
 //Express middleware
+app.use(useragent.express());
 app.use(
   cors({
     origin: ["http://localhost:3000", "http://10.15.2.200:3000"],
@@ -106,7 +108,7 @@ io.use(socketAuthMiddleware);
 io.on("connection", (socket) => {
   console.log(socket.id, "joined as", socket.username);
 
-  socket.on("sendMessage", async (data) => {
+  socket.on("private message", async (data) => {
     data.sender = socket.username
     data.timestamp = Date.now()
 

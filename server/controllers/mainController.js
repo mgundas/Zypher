@@ -1,15 +1,16 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../Models/UserModel");
-const UserSocketMapping = require("../Models/UserSocketMapping")
-const RevokedToken = require('../Models/RevokedToken');
+const UserSocketMapping = require("../Models/UserSocketMapping");
+const RevokedToken = require("../Models/RevokedToken");
+const TokenUserMapping = require("../Models/TokenUserMapping");
 
 async function revokeToken(token) {
   try {
     await RevokedToken.create({ token });
-    console.log('Token revoked successfully.');
+    console.log("Token revoked successfully.");
   } catch (error) {
-    console.error('Error revoking token:', error);
+    console.error("Error revoking token:", error);
   }
 }
 
@@ -18,7 +19,7 @@ async function isTokenRevoked(token) {
     const result = await RevokedToken.findOne({ token });
     return !!result; // Returns true if the token is found (revoked), false otherwise
   } catch (error) {
-    console.error('Error checking token revocation:', error);
+    console.error("Error checking token revocation:", error);
     return true; // Assume an error means the token is revoked for safety
   }
 }
@@ -64,7 +65,7 @@ const handleLogin = async (req, res) => {
       });
     }
 
-    user.comparePassword(password, (err, isMatch) => {
+    user.comparePassword(password, async (err, isMatch) => {
       if (err) {
         console.error("Error:", err);
         return res.status(500).json({
@@ -91,6 +92,51 @@ const handleLogin = async (req, res) => {
         process.env.REFRESHTOKEN_SECRET,
         { expiresIn: "30d" }
       );
+
+      const ip = req.connection.remoteAddress;
+      const browser = req.useragent.browser;
+      const os = req.useragent.os;
+      const device = req.useragent.isMobile ? "Mobile" : "Desktop";
+
+      const findMapping = await TokenUserMapping.findOne({ uid: user._id });
+      if (findMapping) {
+        const newLink = await TokenUserMapping.findOneAndUpdate(
+          { uid: user._id },
+          {
+            $addToSet: {
+              tokens: {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                userAgent: {
+                  ip: ip,
+                  browser: browser,
+                  os: os,
+                  device: device,
+                },
+              },
+            },
+          },
+          { upsert: true, new: true }
+        );
+        if (newLink) {
+          console.log("New access & refreshToken added to the map.");
+        }
+      } else {
+        const newMap = new TokenUserMapping({
+          uid: user._id,
+          tokens: {
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            userAgent: {
+              ip: ip,
+              browser: browser,
+              os: os,
+              device: device,
+            },
+          },
+        });
+        await newMap.save();
+      }
 
       return res.status(200).json({
         success: true,
@@ -163,10 +209,16 @@ const handleRegister = async (req, res) => {
 
     const newMap = new UserSocketMapping({
       uid: newUser._id,
-      sockets: []
-    })
+      sockets: [],
+    });
 
     await newMap.save();
+
+    const tokenMap = new TokenUserMapping({
+      uid: newUser._id,
+    });
+
+    await tokenMap.save();
 
     console.log("User registered:", newUser);
     console.log("New user to socket map registered:", newMap);
@@ -202,7 +254,7 @@ const handleVerifyAccessToken = async (req, res) => {
 
     if (await isTokenRevoked(accessToken)) {
       // Token is revoked, deny access
-      console.log('Access denied: Token is revoked.');
+      console.log("Access denied: Token is revoked.");
       return res.status(200).json({
         success: false,
         message: "access.token.revoked",
@@ -210,25 +262,25 @@ const handleVerifyAccessToken = async (req, res) => {
     }
 
     // console.log("Access token is valid.");
-    
-    const uid = jwt.decode(accessToken).uid
-    const findUser = await User.findById(uid)
 
-    if(!findUser){
+    const uid = jwt.decode(accessToken).uid;
+    const findUser = await User.findById(uid);
+
+    if (!findUser) {
       return res.status(200).json({
         success: false,
         message: "user.does.not.exist",
-      });    
+      });
     }
-    
+
     return res.status(200).json({
-        success: true,
-        user: {
-          username: findUser.username,
-          email: findUser.email,
-          createdAt: findUser.createdAt
-        }
-    })
+      success: true,
+      user: {
+        username: findUser.username,
+        email: findUser.email,
+        createdAt: findUser.createdAt,
+      },
+    });
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       return res.status(200).json({
@@ -264,15 +316,15 @@ const handleRefreshTokens = async (req, res) => {
       });
     }
     console.log("Refresh token is valid.");
-    
-    const uid = jwt.decode(refreshToken).uid
-    const findUser = await User.findById(uid)
 
-    if(!findUser){
+    const uid = jwt.decode(refreshToken).uid;
+    const findUser = await User.findById(uid);
+
+    if (!findUser) {
       return res.status(200).json({
         success: false,
         message: "user.does.not.exist",
-      });    
+      });
     }
 
     const newAccessToken = jwt.sign(
@@ -304,16 +356,14 @@ const handleRefreshTokens = async (req, res) => {
       });
     }
   }
-}
+};
 
-const handleLogout = async (req, res) => {
-
-}
+const handleLogout = async (req, res) => {};
 
 module.exports = {
   handleLogin,
   handleRegister,
   handleVerifyAccessToken,
   handleRefreshTokens,
-  handleLogout
+  handleLogout,
 };
