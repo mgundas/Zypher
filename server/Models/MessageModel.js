@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { body } = require('express-validator');
 
 const messageSchema = new mongoose.Schema({
   sender: {
@@ -12,16 +11,9 @@ const messageSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  text: {
+  message: {
     type: String,
     required: true,
-    validate: {
-      validator: function (value) {
-        
-        return true;
-      },
-      message: 'Invalid message text.',
-    },
   },
   timestamp: {
     type: Date,

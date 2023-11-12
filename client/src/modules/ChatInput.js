@@ -14,17 +14,17 @@ function ChatInput({recipient}) {
     if (text) {
       if (!isTyping) {
         setIsTyping(true);
-        socket.emit("typing", { username: socket.auth.username });
+        socket.emit("typing", { recipient: recipient });
       }
       // Clear the previous timeout and set a new one
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
         setIsTyping(false);
-        socket.emit("stopped typing", { username: socket.auth.username });
+        socket.emit("stopped typing", { recipient: recipient });
       }, 1000); // Adjust the timeout duration as needed
     } else if (isTyping) {
       setIsTyping(false);
-      socket.emit("stopped typing", { username: socket.auth.username });
+      socket.emit("stopped typing", { recipient: recipient });
     }
   };
 

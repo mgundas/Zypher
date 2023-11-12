@@ -19,30 +19,73 @@ function App() {
   const bottomRef = useRef(null);
   const sidebarRef = useRef(null);
   const overlayRef = useRef(null);
+  const convoModal = useRef(null);
 
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [activeChat, setActiveChat] = useState(null);
   const [status, setStatus] = useState("Online");
   const [uniqueSenders, setUniqueSenders] = useState([]);
   const [filteredMessages, setFilteredMessages] = useState([]);
+  //const [lastMessage, setLastMessage] = useState({});
+  const [newConvoActive, setNewConvoActive] = useState(false);
+
+  useEffect(() => {
+    if (newConvoActive === true) {
+      convoModal.current?.classList.remove("!hidden");
+      console.log("true");
+    } else {
+      console.log("false");
+      convoModal.current?.classList.add("!hidden");
+    }
+  }, [newConvoActive]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [filteredMessages]);
 
-    const senders = [...new Set(messages.map((message) => message.sender))];
-    setUniqueSenders(senders);
-    
-    const filtered = messages.filter((message) => {
-      if(message.sender === activeChat && message.recipient === userData.username){
-        return message.sender === activeChat
+  /* const getLastMessage = (user) => {
+    const lastMessageArray = messages
+    .filter(message => {
+      if(message.sender === userData.username && message.recipient === user || message.sender === user && message.recipient === userData.user){
+        return message;
       }
-      if(message.sender === userData.username && message.recipient === activeChat){
-        return message.recipient === activeChat
+    })
+    .reduce((acc, current) => (current.timestamp > acc.timestamp ? current : acc), {});
+    console.log(lastMessageArray);
+    setLastMessage(lastMessageArray);
+  } */
+
+  useEffect(() => {
+    const senders = [
+      ...new Set(
+        messages.map((message) => {
+          if (message.sender !== userData.username) {
+            return message.sender;
+          } else {
+            return message.recipient;
+          }
+        })
+      ),
+    ];
+    setUniqueSenders(senders);
+
+    const filtered = messages.filter((message) => {
+      if (
+        message.sender === activeChat &&
+        message.recipient === userData.username
+      ) {
+        return message.sender === activeChat;
+      }
+      if (
+        message.sender === userData.username &&
+        message.recipient === activeChat
+      ) {
+        return message.recipient === activeChat;
       }
     });
     setFilteredMessages(filtered);
-    console.log(filtered);
   }, [messages, activeChat]);
 
   useEffect(() => {
@@ -51,19 +94,19 @@ function App() {
 
   const handleActiveChat = (sender) => {
     document.title = sender + " | " + config.appName;
-    setActiveChat(sender)
-  }
+    setActiveChat(sender);
+  };
 
   useEffect(() => {
     if (socket) {
       const handleReceiveMessage = (data) => {
         setMessages((prevMessages) => [...prevMessages, data]);
-        if (data.sender !== socket.auth.username) {
+        if (data.sender !== userData.username) {
           document.title = "New message!";
         }
         clearTimeout(notificationTimeoutRef.current);
         notificationTimeoutRef.current = setTimeout(() => {
-          if(activeChat){
+          if (activeChat) {
             document.title = activeChat + " | " + config.appName;
           } else {
             document.title = config.appName;
@@ -72,18 +115,18 @@ function App() {
       };
 
       const handleUserTyping = (data) => {
-        if (data.username === socket.auth.username) {
-          return;
-        } else {
-          setStatus("Typing...");
+        if (activeChat) {
+          if (activeChat === data.sender) {
+            setStatus("Typing...");
+          }
         }
       };
 
       const handleUserStoppedTyping = (data) => {
-        if (data.username === socket.auth.username) {
-          return;
-        } else {
-          setStatus("Online");
+        if (activeChat) {
+          if (activeChat === data.sender) {
+            setStatus("Online");
+          }
         }
       };
 
@@ -117,53 +160,89 @@ function App() {
     }, 2000);
   };
 
+  const closeSidebar = () => {
+    sidebarRef.current.classList.add("-translate-x-60");
+    overlayRef.current.classList.add("hidden");
+  };
+
+  const getInitials = (name) => {
+    const names = name.split(" ");
+    return names
+      .map((word) => word.charAt(0))
+      .join("")
+      .toUpperCase();
+  };
+
   const renderContent = () => {
     if (loggedIn && socket) {
       return (
         <>
+          <div ref={convoModal} className="convo-modal !hidden">
+            <div className="convo-modal-header">
+              <h1>Create a new conversation</h1>
+              <button
+                onClick={() => setNewConvoActive(false)}
+                className="convo-modal-header-x"
+              >
+                <i className="bi bi-x"></i>
+              </button>
+            </div>
+            <form
+              className="convo-modal-content"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setNewConvoActive(false);
+                setActiveChat(searchInput);
+              }}
+            >
+              <input
+                value={searchInput}
+                onChange={(e) => {
+                  setSearchInput(e.target.value);
+                }}
+                className="convo-modal-content-input"
+                placeholder="Search for a user."
+                maxLength={12}
+              />
+              <button type="submit" className=" chat-send-button">
+                <i className="bi bi-search"></i>
+              </button>
+            </form>
+          </div>
           <div ref={sidebarRef} className="sidebar -translate-x-60">
             <div className="p-5 font-medium text-center">Conversations</div>
             <div className="flex flex-1 flex-col">
               {uniqueSenders.map((sender, index) => (
                 <button
-                  onClick={() => {handleActiveChat(sender)}}
+                  onClick={() => {
+                    handleActiveChat(sender);
+                  }}
                   key={index}
                   className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all"
                 >
-                  <img
-                    src="https://via.placeholder.com/512x512"
-                    className="h-10 w-10 rounded-full"
-                  />
+                  <div className="bg-purple-600 p-2 rounded-full select-none text-center font-medium h-10 w-10">
+                    {getInitials(sender)}
+                  </div>
                   <div className="grid grid-rows-2 text-sm">
                     <div className="font-medium text-left">{sender}</div>
-                    <span className="">How have things been...</span>
+                    <span className="">{}</span>
                   </div>
                 </button>
               ))}
-              <button
-                onClick={() => {handleActiveChat("mgundas")}}
-                className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all"
-              >
-                <img
-                  src="https://via.placeholder.com/512x512"
-                  className="h-10 w-10 rounded-full"
-                />
-                <div className="grid grid-rows-2 text-sm">
-                  <div className="font-medium text-left">mgundas</div>
-                  <span className="">How have things been...</span>
-                </div>
-              </button>
             </div>
-            <button className="p-4 bg-green-800 hover:bg-green-500/50 transition-all">
+            <button
+              className="p-4 bg-green-800 hover:bg-green-500/50 transition-all"
+              onClick={() => {
+                setNewConvoActive(true);
+                closeSidebar();
+              }}
+            >
               New conversation
             </button>
           </div>
           <div
             ref={overlayRef}
-            onClick={() => {
-              sidebarRef.current.classList.add("-translate-x-60");
-              overlayRef.current.classList.add("hidden");
-            }}
+            onClick={closeSidebar}
             className="h-screen w-screen absolute bg-rtca-800/50 z-10 hidden"
           ></div>
           <div className="chat-screen">
@@ -179,14 +258,13 @@ function App() {
                   <i className="bi bi-list"></i>
                 </button>
                 {activeChat ? (
-                  <div className="p-4 flex gap-2 items-center">
-                    <img
-                      src="https://via.placeholder.com/512x512"
-                      className="h-10 w-10 rounded-full"
-                    />
-                    <div className="flex flex-col text-sm">
-                      <button className="font-medium">Mehmet</button>
-                      <span className="text-green-500 select-none">
+                  <div className="p-4 px-2 flex gap-2 items-center">
+                    <div className="bg-purple-600 p-2 rounded-full select-none text-center font-medium h-10 w-10">
+                      {getInitials(activeChat)}
+                    </div>
+                    <div className="flex flex-col text-sm items-start">
+                      <button className="font-medium">{activeChat}</button>
+                      <span className="text-green-400 select-none">
                         {status}
                       </span>
                     </div>
@@ -206,12 +284,12 @@ function App() {
             {activeChat ? (
               <>
                 <div className="flex-1 flex flex-col gap-1 items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white">
+                  <div className="bg-teal-600 text-sm p-1 px-2 rounded-lg font-medium select-none">
+                    Please do not share your password or personal information.
+                  </div>
                   <div className="time-divider">Today</div>
                   {filteredMessages.map((message, key) => (
-                    <Message
-                      key={key}
-                      message = {message}
-                    />
+                    <Message key={key} message={message} />
                   ))}
                   <div ref={bottomRef} className="opacity-0 content-none"></div>
                 </div>

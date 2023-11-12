@@ -185,7 +185,7 @@ const handleVerifyAccessToken = async (req, res) => {
     const accessToken = req.headers.authorization;
 
     if (!accessToken) {
-      return res.status(200).json({
+      return res.status(400).json({
         success: false,
         message: "no.access.token.provided",
       });
@@ -194,7 +194,10 @@ const handleVerifyAccessToken = async (req, res) => {
     const isValid = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET);
 
     if (!isValid) {
-
+      return res.status(200).json({
+        success: false,
+        message: "access.token.not.valid",
+      });
     }
 
     if (await isTokenRevoked(accessToken)) {
@@ -206,7 +209,7 @@ const handleVerifyAccessToken = async (req, res) => {
       });
     }
 
-    console.log("Access token is valid.");
+    // console.log("Access token is valid.");
     
     const uid = jwt.decode(accessToken).uid
     const findUser = await User.findById(uid)

@@ -58,3 +58,23 @@ body{
 .message-interlocutor{
     @apply ml-2 flex relative items-center bg-rtca-300 dark:bg-rtca-600 p-2 rounded-lg self-start after:border-8 after:border-l-black/0 after:border-t-black/0 after:border-b-black/0 after:-left-3.5 after:top-1 after:absolute dark:after:border-r-rtca-600 after:border-r-rtca-300 after:h-[1px] after:w-[1px]
 }
+
+.convo-modal {
+    @apply text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-rtca-800 rounded-lg grid
+}
+
+.convo-modal-header {
+    @apply p-3 font-medium bg-rtca-900/25 rounded-tr-lg rounded-tl-lg flex justify-between items-center select-none
+}
+
+.convo-modal-header-x{
+    @apply p-2 hover:bg-rtca-700 rounded-full h-8 w-8 flex items-center transition-all
+}
+
+.convo-modal-content{
+    @apply flex gap-2 p-4
+}
+
+.convo-modal-content-input{
+    @apply p-2 px-3 rounded-full bg-rtca-700 text-white placeholder:text-white/75 outline-none
+}

@@ -8,6 +8,7 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const User = require("./Models/UserModel");
 const UserSocketMapping = require("./Models/UserSocketMapping")
+const Message = require("./Models/MessageModel")
 const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
@@ -107,6 +108,7 @@ io.on("connection", (socket) => {
 
   socket.on("sendMessage", async (data) => {
     data.sender = socket.username
+    data.timestamp = Date.now()
 
     if(data.sender === data.recipient) return;
 
@@ -119,23 +121,52 @@ io.on("connection", (socket) => {
         io.to(recipientSocket).emit('receiveMessage', data);
       }
       io.to(socket.id).emit('receiveMessage', data);
+      const newMessage = new Message({
+        sender: socket.uid,
+        recipient: user._id,
+        message: data.message,
+        timestamp: data.timestamp
+      })
+      newMessage.save()
     } else {
       console.log('No matching user-to-socket mapping found for', user._id);
     }
   });
 
-  socket.on("typing", (data) => {
-    try {
-      // Broadcast the "user typing" event to the recipient.
-      io.emit("user typing", data);
-    } catch (error) {
-      
+  socket.on("typing", async (data) => {
+    data.sender = socket.username
+
+    if(data.sender === data.recipient) return;
+
+    const user = await User.findOne({username: data.recipient})
+    if(!user) return;
+
+    const mapping = await UserSocketMapping.findOne({ uid: user._id });
+    if (mapping) {
+      for (const recipientSocket of mapping.sockets) {
+        io.to(recipientSocket).emit('user typing', data);
+      }
+    } else {
+      console.log('No matching user-to-socket mapping found for', user._id);
     }
   });
 
-  socket.on("stopped typing", (data) => {
-    // Broadcast the "user stopped typing" event to other users in the room.
-    io.emit("user stopped typing", data);
+  socket.on("stopped typing", async (data) => {
+    data.sender = socket.username
+
+    if(data.sender === data.recipient) return;
+
+    const user = await User.findOne({username: data.recipient})
+    if(!user) return;
+
+    const mapping = await UserSocketMapping.findOne({ uid: user._id });
+    if (mapping) {
+      for (const recipientSocket of mapping.sockets) {
+        io.to(recipientSocket).emit('user stopped typing', data);
+      }
+    } else {
+      console.log('No matching user-to-socket mapping found for', user._id);
+    }
   });
 
   socket.on("disconnect", async () => {
