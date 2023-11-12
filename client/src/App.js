@@ -11,7 +11,7 @@ import { useAuth } from "./contexts/AuthContext";
 function App() {
   const { socket } = useSocket();
   const config = useConfig();
-  const {loggedIn} = useAuth();
+  const { loggedIn, userData } = useAuth();
 
   const infoBoxRef = useRef(null);
   const notificationTimeoutRef = useRef(null);
@@ -22,15 +22,37 @@ function App() {
 
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [activeChat, setActiveChat] = useState(null);
   const [status, setStatus] = useState("Online");
+  const [uniqueSenders, setUniqueSenders] = useState([]);
+  const [filteredMessages, setFilteredMessages] = useState([]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+
+    const senders = [...new Set(messages.map((message) => message.sender))];
+    setUniqueSenders(senders);
+    
+    const filtered = messages.filter((message) => {
+      if(message.sender === activeChat && message.recipient === userData.username){
+        return message.sender === activeChat
+      }
+      if(message.sender === userData.username && message.recipient === activeChat){
+        return message.recipient === activeChat
+      }
+    });
+    setFilteredMessages(filtered);
+    console.log(filtered);
+  }, [messages, activeChat]);
 
   useEffect(() => {
     document.title = config.appName;
   }, []);
+
+  const handleActiveChat = (sender) => {
+    document.title = sender + " | " + config.appName;
+    setActiveChat(sender)
+  }
 
   useEffect(() => {
     if (socket) {
@@ -41,7 +63,11 @@ function App() {
         }
         clearTimeout(notificationTimeoutRef.current);
         notificationTimeoutRef.current = setTimeout(() => {
-          document.title = config.appName;
+          if(activeChat){
+            document.title = activeChat + " | " + config.appName;
+          } else {
+            document.title = config.appName;
+          }
         }, 2000);
       };
 
@@ -95,33 +121,42 @@ function App() {
     if (loggedIn && socket) {
       return (
         <>
-          <div
-            ref={sidebarRef}
-            className="sidebar -translate-x-60"
-          >
+          <div ref={sidebarRef} className="sidebar -translate-x-60">
             <div className="p-5 font-medium text-center">Conversations</div>
-            <div className="flex flex-col">
-              <button className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all">
+            <div className="flex flex-1 flex-col">
+              {uniqueSenders.map((sender, index) => (
+                <button
+                  onClick={() => {handleActiveChat(sender)}}
+                  key={index}
+                  className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all"
+                >
+                  <img
+                    src="https://via.placeholder.com/512x512"
+                    className="h-10 w-10 rounded-full"
+                  />
+                  <div className="grid grid-rows-2 text-sm">
+                    <div className="font-medium text-left">{sender}</div>
+                    <span className="">How have things been...</span>
+                  </div>
+                </button>
+              ))}
+              <button
+                onClick={() => {handleActiveChat("mgundas")}}
+                className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all"
+              >
                 <img
                   src="https://via.placeholder.com/512x512"
                   className="h-10 w-10 rounded-full"
                 />
                 <div className="grid grid-rows-2 text-sm">
-                  <div className="font-medium text-left">Mehmet</div>
-                  <span className="">How have things been...</span>
-                </div>
-              </button>
-              <button className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all">
-                <img
-                  src="https://via.placeholder.com/512x512"
-                  className="h-10 w-10 rounded-full"
-                />
-                <div className="grid grid-rows-2 text-sm">
-                  <div className="font-medium text-left">Mehmet</div>
+                  <div className="font-medium text-left">mgundas</div>
                   <span className="">How have things been...</span>
                 </div>
               </button>
             </div>
+            <button className="p-4 bg-green-800 hover:bg-green-500/50 transition-all">
+              New conversation
+            </button>
           </div>
           <div
             ref={overlayRef}
@@ -143,16 +178,24 @@ function App() {
                 >
                   <i className="bi bi-list"></i>
                 </button>
-                <div className="p-4 flex gap-2 items-center">
-                  <img
-                    src="https://via.placeholder.com/512x512"
-                    className="h-10 w-10 rounded-full"
-                  />
-                  <div className="flex flex-col text-sm">
-                    <button className="font-medium">Mehmet</button>
-                    <span className="text-green-500 select-none">{status}</span>
+                {activeChat ? (
+                  <div className="p-4 flex gap-2 items-center">
+                    <img
+                      src="https://via.placeholder.com/512x512"
+                      className="h-10 w-10 rounded-full"
+                    />
+                    <div className="flex flex-col text-sm">
+                      <button className="font-medium">Mehmet</button>
+                      <span className="text-green-500 select-none">
+                        {status}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    <div className="font-medium p-4">Comuconnect</div>
+                  </>
+                )}
               </div>
               <div className="flex gap-4 items-center">
                 <ul className="flex gap-3 font-medium items-center">
@@ -160,21 +203,26 @@ function App() {
                 </ul>
               </div>
             </nav>
-            <div className="flex-1 flex flex-col gap-1 items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white">
-              <div className="time-divider">
-                Today
+            {activeChat ? (
+              <>
+                <div className="flex-1 flex flex-col gap-1 items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white">
+                  <div className="time-divider">Today</div>
+                  {filteredMessages.map((message, key) => (
+                    <Message
+                      key={key}
+                      message = {message}
+                    />
+                  ))}
+                  <div ref={bottomRef} className="opacity-0 content-none"></div>
+                </div>
+                <ChatInput recipient={activeChat} />
+              </>
+            ) : (
+              <div className="flex gap-2 items-center flex-1 justify-center dark:text-white font-medium">
+                Why don't you click on the <i className="bi bi-list"></i> button
+                to select a conversation?
               </div>
-              {messages.map((message, key) => (
-                <Message
-                  key={key}
-                  username={message.sender}
-                  message={message.message}
-                  timestamp="31.10.2023 6:27PM"
-                />
-              ))}
-              <div ref={bottomRef} className="opacity-0 content-none"></div>
-            </div>
-            <ChatInput />
+            )}
           </div>
         </>
       );
@@ -196,9 +244,7 @@ function App() {
             {errorMsg}
           </div>
           <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
-            <Login
-              sendInfoMessage={sendInfoMessage}
-            />
+            <Login sendInfoMessage={sendInfoMessage} />
             <div className="hidden sm:flex">or</div>
             <Register sendInfoMessage={sendInfoMessage} />
           </div>

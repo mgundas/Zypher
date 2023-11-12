@@ -74,15 +74,27 @@ const socketAuthMiddleware = async (socket, next) => {
     }
     socket.username = user.username;
     socket.uid = user._id
-    const newLink = await UserSocketMapping.findOneAndUpdate(
-      { uid },
-      { $addToSet: { sockets: socket.id } },
-      { upsert: true, new: true }
-    )
-    if(newLink){
-      console.log("New socket added to the map.");
+    const findMapping = await UserSocketMapping.findOne({uid: user._id})
+    if(findMapping){
+      const newLink = await UserSocketMapping.findOneAndUpdate(
+        { uid },
+        { $addToSet: { sockets: socket.id } },
+        { upsert: true, new: true }
+      )
+      if(newLink){
+        console.log("New socket added to the map.");
+      }
+      return next(); // Authentication successful
+    } else {
+      const newMap = new UserSocketMapping({
+        uid: user._id,
+        sockets: [socket.id]
+      })
+  
+      await newMap.save();
+      console.log("New socket mapping entry added.");
+      return next();
     }
-    return next(); // Authentication successful
   } catch (error) {
     return socket.disconnect();
   }
@@ -90,23 +102,23 @@ const socketAuthMiddleware = async (socket, next) => {
 
 io.use(socketAuthMiddleware);
 
-const idRoom = "564406c549227afebf301d720161596c";
-
 io.on("connection", (socket) => {
   console.log(socket.id, "joined as", socket.username);
-  socket.join(idRoom);
 
   socket.on("sendMessage", async (data) => {
     data.sender = socket.username
+
+    if(data.sender === data.recipient) return;
+
     const user = await User.findOne({username: data.recipient})
     if(!user) return;
 
     const mapping = await UserSocketMapping.findOne({ uid: user._id });
-
     if (mapping) {
-      for (const socket of mapping.sockets) {
-        io.to(socket).emit('receiveMessage', data);
+      for (const recipientSocket of mapping.sockets) {
+        io.to(recipientSocket).emit('receiveMessage', data);
       }
+      io.to(socket.id).emit('receiveMessage', data);
     } else {
       console.log('No matching user-to-socket mapping found for', user._id);
     }
@@ -115,7 +127,7 @@ io.on("connection", (socket) => {
   socket.on("typing", (data) => {
     try {
       // Broadcast the "user typing" event to the recipient.
-      io.to(idRoom).emit("user typing", data);
+      io.emit("user typing", data);
     } catch (error) {
       
     }
@@ -123,7 +135,7 @@ io.on("connection", (socket) => {
 
   socket.on("stopped typing", (data) => {
     // Broadcast the "user stopped typing" event to other users in the room.
-    io.to(idRoom).emit("user stopped typing", data);
+    io.emit("user stopped typing", data);
   });
 
   socket.on("disconnect", async () => {

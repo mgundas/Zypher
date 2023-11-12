@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useSocket } from "../contexts/SocketContext";
 
-function ChatInput() {
+function ChatInput({recipient}) {
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef(null);
@@ -33,7 +33,7 @@ function ChatInput() {
     if (message.trim() !== "") {
       socket.emit("sendMessage", {
         message: message.trim(),
-        recipient: "mgundas"
+        recipient: recipient
       });
       // clearTimeout(typingTimeoutRef.current);
       // socket.emit("stopped typing", { username: socket.auth.username });

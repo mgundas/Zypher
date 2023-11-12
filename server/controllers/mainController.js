@@ -303,9 +303,14 @@ const handleRefreshTokens = async (req, res) => {
   }
 }
 
+const handleLogout = async (req, res) => {
+
+}
+
 module.exports = {
   handleLogin,
   handleRegister,
   handleVerifyAccessToken,
-  handleRefreshTokens
+  handleRefreshTokens,
+  handleLogout
 };

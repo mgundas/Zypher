@@ -12,13 +12,13 @@ function breakLongMessage(message, maxLineLength) {
   return lines;
 }
 
-const Message = ({ username, message, timestamp }) => {
+const Message = ({ message }) => {
   const timeRef = useRef(null);
   const messageRef = useRef(null)
   const { userData } = useAuth();
   
   useEffect(() => {
-    if(username === userData.username){
+    if(message.sender === userData.username){
       messageRef.current.classList = "message-self"
     } else{
       messageRef.current.classList = "message-interlocutor"
@@ -31,7 +31,7 @@ const Message = ({ username, message, timestamp }) => {
 
   const maxLineLength = 65; // Adjust to your desired line length
 
-  const messageLines = breakLongMessage(message, maxLineLength);
+  const messageLines = breakLongMessage(message.message, maxLineLength);
 
   return (
     <div
@@ -42,7 +42,7 @@ const Message = ({ username, message, timestamp }) => {
     >
       <div className="flex flex-col break-words transition-all">
         <span className="font-medium text-pink-400 text-sm">
-          {username}
+          {message.sender}
         </span>
         <div className="break-all">
           {messageLines.map((line, index) => (
