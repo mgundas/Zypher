@@ -43,12 +43,16 @@ body{
     @apply bg-rtca-300 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 justify-between items-center h-16
 }
 
+.nav-button{
+    @apply rounded-full h-10 w-10 flex items-center justify-center hover:bg-rtca-700 transition-all
+}
+
 .chat-input{
-    @apply flex grow p-2 rounded-full px-5 z-[1] border-none bg-rtca-300 dark:text-rtca-100 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all
+    @apply flex grow p-2 rounded-lg px-5 z-[1] border-none bg-rtca-300 dark:text-rtca-100 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all
 }
 
 .chat-send-button{
-    @apply bg-green-700 p-2 px-4 text-white rounded-full hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all
+    @apply bg-green-700 h-10 w-10 text-white rounded-lg hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all
 }
 
 .message-self{

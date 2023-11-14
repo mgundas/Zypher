@@ -20,6 +20,7 @@ function App() {
   const sidebarRef = useRef(null);
   const overlayRef = useRef(null);
   const convoModal = useRef(null);
+  const chatWindow = useRef(null);
 
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
@@ -77,20 +78,21 @@ function App() {
         message.recipient === userData.username
       ) {
         return message.sender === activeChat;
-      }
-      if (
+      } else if (
         message.sender === userData.username &&
         message.recipient === activeChat
       ) {
         return message.recipient === activeChat;
+      } else {
+        return null;
       }
     });
     setFilteredMessages(filtered);
-  }, [messages, activeChat]);
+  }, [messages, activeChat, userData.username]);
 
   useEffect(() => {
     document.title = config.appName;
-  }, []);
+  }, [config.appName]);
 
   const handleActiveChat = (sender) => {
     document.title = sender + " | " + config.appName;
@@ -133,14 +135,20 @@ function App() {
       socket.on("user typing", handleUserTyping);
       socket.on("user stopped typing", handleUserStoppedTyping);
       socket.on("receiveMessage", handleReceiveMessage);
+      socket.on("seen", (data) => {
+        console.log(data);
+      })
 
       return () => {
+        socket.off("seen", (data) => {
+          console.log(data);
+        });
         socket.off("user typing", handleUserTyping);
         socket.off("user stopped typing", handleUserStoppedTyping);
         socket.off("receiveMessage", handleReceiveMessage);
       };
     }
-  }, [socket, messages]);
+  }, [socket, messages, userData.username, config.appName, activeChat]);
 
   const sendInfoMessage = (message, type) => {
     const types = {
@@ -271,25 +279,26 @@ function App() {
                   </div>
                 ) : (
                   <>
-                    <div className="font-medium p-4">Comuconnect</div>
+                    <div className="font-medium p-4">{config.appName}</div>
                   </>
                 )}
               </div>
               <div className="flex gap-4 items-center">
                 <ul className="flex gap-3 font-medium items-center">
                   <ToggleDarkMode />
+                  <button className="nav-button"><i className="bi bi-box-arrow-right"></i></button>
                 </ul>
               </div>
             </nav>
             {activeChat ? (
               <>
-                <div className="flex-1 flex flex-col gap-1 items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white">
+                <div ref={chatWindow} className="flex-1 flex flex-col gap-1 items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white">
                   <div className="bg-teal-600 text-sm p-1 px-2 rounded-lg font-medium select-none">
                     Please do not share your password or personal information.
                   </div>
                   <div className="time-divider">Today</div>
-                  {filteredMessages.map((message, key) => (
-                    <Message key={key} message={message} />
+                  {filteredMessages.map((message, index, array) => (
+                    <Message key={index} id={message.id} chatWindow={chatWindow} message={message} isLastMessage={index === array.length - 1} />
                   ))}
                   <div ref={bottomRef} className="opacity-0 content-none"></div>
                 </div>

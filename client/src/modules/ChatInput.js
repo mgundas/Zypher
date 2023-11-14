@@ -31,7 +31,7 @@ function ChatInput({recipient}) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (message.trim() !== "") {
-      socket.emit("sendMessage", {
+      socket.emit("private message", {
         message: message.trim(),
         recipient: recipient
       });

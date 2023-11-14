@@ -8,7 +8,7 @@ export const useConfig = () => {
 
 export const ConfigProvider = ({ children }) => {
   const config = {
-    appName: "Comuconnect",
+    appName: "Zypher",
     socketUri: "http://localhost/",
     apiUri: "http://localhost/api/v1",
     notice: {

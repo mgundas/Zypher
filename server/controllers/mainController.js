@@ -82,6 +82,7 @@ const handleLogin = async (req, res) => {
         });
       }
 
+      // Create the json web tokens.
       const accessToken = jwt.sign(
         { uid: user._id },
         process.env.ACCESSTOKEN_SECRET,
@@ -93,7 +94,8 @@ const handleLogin = async (req, res) => {
         { expiresIn: "30d" }
       );
 
-      const ip = req.connection.remoteAddress;
+      //List the information about the remote user
+      /* const ip = req.connection.remoteAddress;
       const browser = req.useragent.browser;
       const os = req.useragent.os;
       const device = req.useragent.isMobile ? "Mobile" : "Desktop";
@@ -136,7 +138,7 @@ const handleLogin = async (req, res) => {
           },
         });
         await newMap.save();
-      }
+      } */
 
       return res.status(200).json({
         success: true,
