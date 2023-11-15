@@ -8,7 +8,6 @@ import { convertTime } from "../helpers/timeConverter";
 const Message = ({ message, isLastMessage, id }) => {
   const timeRef = useRef(null);
   const messageRef = useRef(null);
-  const usernameRef = useRef(null);
 
   const { userData } = useAuth();
   const { socket } = useSocket();
@@ -23,12 +22,8 @@ const Message = ({ message, isLastMessage, id }) => {
 
   useEffect(() => {
     if (message.sender === userData.username) {
-      const randomColor = generateRandomColor(userData.username);
-      usernameRef.current.classList.add(`text-[${randomColor}]`);
       setIsSelf(true);
     } else {
-      const randomColor = generateRandomColor(message.sender);
-      usernameRef.current.classList.add(`text-[${randomColor}]`);
       setIsSelf(false);
     }
   }, [message.sender, userData.username]);
@@ -114,7 +109,9 @@ const Message = ({ message, isLastMessage, id }) => {
       className={isSelf ? "message-self" : "message-interlocutor"}
     >
       <div className="flex relative flex-col break-words transition-all">
-        <span ref={usernameRef} className="font-medium text-sm">
+        <span style={{
+          color: generateRandomColor(message.sender)
+        }} className="font-medium text-sm">
           {message.sender}
         </span>
         <div className="break-all">
@@ -125,7 +122,7 @@ const Message = ({ message, isLastMessage, id }) => {
       </div>
       <span
         ref={timeRef}
-        className="font-medium text-rtca-400 opacity-0 transition-all absolute -bottom-3 text-xs -right-3 z-[1] p-1 rounded-full bg-rtca-800/25"
+        className="font-medium text-rtca-400 opacity-0 transition-all absolute -bottom-3 text-xs -right-3 z-[1] p-1 rounded-md bg-rtca-800/25"
       >
         {convertTime(message.timestamp)}
       </span>

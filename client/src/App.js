@@ -7,6 +7,7 @@ import Login from "./modules/Login";
 import Register from "./modules/Register";
 import { useConfig } from "./contexts/ConfigContext";
 import { useAuth } from "./contexts/AuthContext";
+import { generateRandomColor } from "./helpers/generateRandomColor";
 
 function App() {
   const { socket } = useSocket();
@@ -302,7 +303,9 @@ function App() {
                 </button>
                 {activeChat ? (
                   <div className="p-4 px-2 flex gap-2 items-center">
-                    <div className="bg-purple-600 p-2 rounded-full select-none text-center font-medium h-10 w-10">
+                    <div style={{
+                      backgroundColor: generateRandomColor(activeChat)
+                    }} className="p-2 rounded-full select-none text-center font-medium h-10 w-10 ">
                       {getInitials(activeChat)}
                     </div>
                     <div className="flex flex-col text-sm items-start">
@@ -349,7 +352,7 @@ function App() {
                   <div ref={bottomRef} className="opacity-0 content-none"></div>
                   <div
                     ref={seenRef}
-                    className="text-xs self-end hidden transition-all rounded-full"
+                    className="text-xs self-end hidden transition-all"
                   >
                     Seen
                   </div>
