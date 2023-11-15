@@ -21,6 +21,10 @@ const userSchema = new Schema({
   // Store the salt for each user
   salt: String,
   password: String,
+  isOnline: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now, // Set the default value to the current date and time

@@ -21,30 +21,37 @@ function App() {
   const overlayRef = useRef(null);
   const convoModal = useRef(null);
   const chatWindow = useRef(null);
+  const seenRef = useRef(null);
+  const checkInterval = useRef(null);
 
+  const [isOnline, setIsOnline] = useState(false);
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isSeen, setIsSeen] = useState(false);
+  const [seenId, setSeenId] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [activeChat, setActiveChat] = useState(null);
-  const [status, setStatus] = useState("Online");
+  const [status, setStatus] = useState(isOnline ? "Online" : "Offline");
   const [uniqueSenders, setUniqueSenders] = useState([]);
   const [filteredMessages, setFilteredMessages] = useState([]);
   //const [lastMessage, setLastMessage] = useState({});
   const [newConvoActive, setNewConvoActive] = useState(false);
 
   useEffect(() => {
+    setStatus(isOnline ? "Online" : "Offline");
+  }, [isOnline]);
+
+  useEffect(() => {
     if (newConvoActive === true) {
       convoModal.current?.classList.remove("!hidden");
-      console.log("true");
     } else {
-      console.log("false");
       convoModal.current?.classList.add("!hidden");
     }
   }, [newConvoActive]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [filteredMessages]);
+  }, [filteredMessages, isSeen]);
 
   /* const getLastMessage = (user) => {
     const lastMessageArray = messages
@@ -87,6 +94,7 @@ function App() {
         return null;
       }
     });
+    seenRef.current?.classList.add("hidden");
     setFilteredMessages(filtered);
   }, [messages, activeChat, userData.username]);
 
@@ -100,12 +108,34 @@ function App() {
   };
 
   useEffect(() => {
+    if (activeChat) {
+      socket.emit("isOnline", { username: activeChat }, (response) => {
+        console.log(response);
+        setIsOnline(response)
+      });
+      clearInterval(checkInterval.current);
+      checkInterval.current = setInterval(() => {
+        socket.emit("isOnline", { username: activeChat }, (response) => {
+          console.log(response);
+          setIsOnline(response)
+        });
+      }, 100 * 60);
+    }
+
+    return () => {
+      clearInterval(checkInterval.current);
+    };
+  }, [activeChat]);
+
+  useEffect(() => {
     if (socket) {
       const handleReceiveMessage = (data) => {
         setMessages((prevMessages) => [...prevMessages, data]);
         if (data.sender !== userData.username) {
           document.title = "New message!";
         }
+        setIsSeen(false);
+        seenRef.current?.classList.add("hidden");
         clearTimeout(notificationTimeoutRef.current);
         notificationTimeoutRef.current = setTimeout(() => {
           if (activeChat) {
@@ -127,22 +157,27 @@ function App() {
       const handleUserStoppedTyping = (data) => {
         if (activeChat) {
           if (activeChat === data.sender) {
-            setStatus("Online");
+            setStatus(isOnline ? "Online" : "Offline");
           }
+        }
+      };
+
+      const handleSeen = (data) => {
+        if (activeChat === data.sender) {
+          setIsSeen(true);
+          seenRef.current.classList.remove("hidden");
+        } else {
+          return;
         }
       };
 
       socket.on("user typing", handleUserTyping);
       socket.on("user stopped typing", handleUserStoppedTyping);
       socket.on("receiveMessage", handleReceiveMessage);
-      socket.on("seen", (data) => {
-        console.log(data);
-      })
+      socket.on("seen", handleSeen);
 
       return () => {
-        socket.off("seen", (data) => {
-          console.log(data);
-        });
+        socket.off("seen", handleSeen);
         socket.off("user typing", handleUserTyping);
         socket.off("user stopped typing", handleUserStoppedTyping);
         socket.off("receiveMessage", handleReceiveMessage);
@@ -272,7 +307,7 @@ function App() {
                     </div>
                     <div className="flex flex-col text-sm items-start">
                       <button className="font-medium">{activeChat}</button>
-                      <span className="text-green-400 select-none">
+                      <span className="text-rtca-400 select-none">
                         {status}
                       </span>
                     </div>
@@ -286,21 +321,38 @@ function App() {
               <div className="flex gap-4 items-center">
                 <ul className="flex gap-3 font-medium items-center">
                   <ToggleDarkMode />
-                  <button className="nav-button"><i className="bi bi-box-arrow-right"></i></button>
+                  <button className="nav-button">
+                    <i className="bi bi-box-arrow-right"></i>
+                  </button>
                 </ul>
               </div>
             </nav>
             {activeChat ? (
               <>
-                <div ref={chatWindow} className="flex-1 flex flex-col gap-1 items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white">
-                  <div className="bg-teal-600 text-sm p-1 px-2 rounded-lg font-medium select-none">
+                <div
+                  ref={chatWindow}
+                  className="flex-1 flex flex-col gap-1 items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white relative"
+                >
+                  <div className="bg-teal-700 text-sm p-1 px-2 rounded-md font-medium select-none">
                     Please do not share your password or personal information.
                   </div>
                   <div className="time-divider">Today</div>
                   {filteredMessages.map((message, index, array) => (
-                    <Message key={index} id={message.id} chatWindow={chatWindow} message={message} isLastMessage={index === array.length - 1} />
+                    <Message
+                      seenId={seenId}
+                      key={index}
+                      id={message.id}
+                      message={message}
+                      isLastMessage={index === array.length - 1}
+                    />
                   ))}
                   <div ref={bottomRef} className="opacity-0 content-none"></div>
+                  <div
+                    ref={seenRef}
+                    className="text-xs self-end hidden transition-all rounded-full"
+                  >
+                    Seen
+                  </div>
                 </div>
                 <ChatInput recipient={activeChat} />
               </>

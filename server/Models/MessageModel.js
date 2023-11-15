@@ -15,6 +15,11 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  seen: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
   timestamp: {
     type: Date,
     default: Date.now,

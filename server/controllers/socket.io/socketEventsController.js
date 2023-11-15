@@ -82,6 +82,10 @@ const handleDisconnect = async (io, socket) => {
       if (index !== -1) {
         mapping.sockets.splice(index, 1);
         await mapping.save();
+        if(mapping.sockets.length <= 0) {
+          const updateUser = await User.findOneAndUpdate({_id: socket.uid}, {isOnline: false})
+          if(updateUser) console.log("User data updated.");
+        }
       }
     }
     console.log("User-to-Socket Mapping Updated.");
@@ -98,14 +102,39 @@ const handleMessageSeen = async (io, socket, data) => {
   const user = await User.findOne({ username: data.recipient });
   if (!user) return;
 
+  const message = await Message.findOneAndUpdate(
+    { _id: data.id },
+    { seen: true }
+  );
+  if (!message) return;
+
   const mapping = await UserSocketMapping.findOne({ uid: user._id });
   if (mapping) {
     for (const recipientSocket of mapping.sockets) {
-      console.log("triggered");
       io.to(recipientSocket).emit("seen", data);
     }
   } else {
     console.log("No matching user-to-socket mapping found for", user._id);
+  }
+};
+
+const handleOnlineCheck = async (io, socket, data, cb) => {
+  try {
+    const user = await User.findOne({ username: data.username });
+    if (user) {
+      const mapping = await UserSocketMapping.findOne({ uid: user._id });
+      if (mapping) {
+        if (mapping.sockets.length > 0) {
+          return cb(true);
+        }
+        return cb(false);
+      } 
+      return cb(false);
+    }
+    return cb(false);
+
+  } catch (error) {
+    cb(false);
   }
 };
 
@@ -115,4 +144,5 @@ module.exports = {
   handleUserStoppedTyping,
   handleDisconnect,
   handleMessageSeen,
+  handleOnlineCheck,
 };

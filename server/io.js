@@ -8,6 +8,7 @@ const {
   handleUserStoppedTyping,
   handleDisconnect,
   handleMessageSeen,
+  handleOnlineCheck,
 } = require("./controllers/socket.io/socketEventsController");
 const cleanupStaleSockets = require("./controllers/socket.io/cleanupStaleSockets");
 
@@ -31,12 +32,15 @@ const initializeIo = (io) => {
   io.on("connection", (socket) => {
     console.log(socket.id, "joined as", socket.username);
 
-    socket.on("messageSeen", (data) => {handleMessageSeen(io, socket, data)})
+    socket.on("messageSeen", (data) => {
+      handleMessageSeen(io, socket, data);
+    });
     socket.on("private message", (data) => privateMessage(io, socket, data));
     socket.on("typing", (data) => handleUserTyping(io, socket, data));
     socket.on("stopped typing", (data) =>
       handleUserStoppedTyping(io, socket, data)
     );
+    socket.on("isOnline", (data, cb) =>  handleOnlineCheck(io, socket, data, cb));
     socket.on("disconnect", () => handleDisconnect(io, socket));
   });
 };

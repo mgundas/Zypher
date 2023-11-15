@@ -30,6 +30,9 @@ const authenticationMiddleware = async (socket, next) => {
         { upsert: true, new: true }
       );
       if (newLink) {
+        const updateUser = await User.findOneAndUpdate({_id: user._id}, {isOnline: true})
+        if(updateUser) console.log("User data updated.");
+
         console.log("New socket added to the map.");
       }
       return next(); // Authentication successful
