@@ -8,6 +8,8 @@ import Register from "./modules/Register";
 import { useConfig } from "./contexts/ConfigContext";
 import { useAuth } from "./contexts/AuthContext";
 import { generateRandomColor } from "./helpers/generateRandomColor";
+import { SenderList } from "./modules/SenderList";
+import { getInitials } from "./helpers/getInitials";
 
 function App() {
   const { socket } = useSocket();
@@ -28,8 +30,6 @@ function App() {
   const [isOnline, setIsOnline] = useState(false);
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
-  const [isSeen, setIsSeen] = useState(false);
-  const [seenId, setSeenId] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [activeChat, setActiveChat] = useState(null);
   const [status, setStatus] = useState(isOnline ? "Online" : "Offline");
@@ -52,7 +52,7 @@ function App() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [filteredMessages, isSeen]);
+  }, [filteredMessages]);
 
   /* const getLastMessage = (user) => {
     const lastMessageArray = messages
@@ -112,13 +112,13 @@ function App() {
     if (activeChat) {
       socket.emit("isOnline", { username: activeChat }, (response) => {
         console.log(response);
-        setIsOnline(response)
+        setIsOnline(response);
       });
       clearInterval(checkInterval.current);
       checkInterval.current = setInterval(() => {
         socket.emit("isOnline", { username: activeChat }, (response) => {
           console.log(response);
-          setIsOnline(response)
+          setIsOnline(response);
         });
       }, 100 * 60);
     }
@@ -126,7 +126,7 @@ function App() {
     return () => {
       clearInterval(checkInterval.current);
     };
-  }, [activeChat]);
+  }, [activeChat, socket]);
 
   useEffect(() => {
     if (socket) {
@@ -135,7 +135,6 @@ function App() {
         if (data.sender !== userData.username) {
           document.title = "New message!";
         }
-        setIsSeen(false);
         seenRef.current?.classList.add("hidden");
         clearTimeout(notificationTimeoutRef.current);
         notificationTimeoutRef.current = setTimeout(() => {
@@ -163,28 +162,24 @@ function App() {
         }
       };
 
-      const handleSeen = (data) => {
-        if (activeChat === data.sender) {
-          setIsSeen(true);
-          seenRef.current.classList.remove("hidden");
-        } else {
-          return;
-        }
-      };
-
       socket.on("user typing", handleUserTyping);
       socket.on("user stopped typing", handleUserStoppedTyping);
       socket.on("receiveMessage", handleReceiveMessage);
-      socket.on("seen", handleSeen);
 
       return () => {
-        socket.off("seen", handleSeen);
         socket.off("user typing", handleUserTyping);
         socket.off("user stopped typing", handleUserStoppedTyping);
         socket.off("receiveMessage", handleReceiveMessage);
       };
     }
-  }, [socket, messages, userData.username, config.appName, activeChat]);
+  }, [
+    socket,
+    messages,
+    userData.username,
+    config.appName,
+    activeChat,
+    isOnline,
+  ]);
 
   const sendInfoMessage = (message, type) => {
     const types = {
@@ -209,103 +204,60 @@ function App() {
     overlayRef.current.classList.add("hidden");
   };
 
-  const getInitials = (name) => {
-    const names = name.split(" ");
-    return names
-      .map((word) => word.charAt(0))
-      .join("")
-      .toUpperCase();
-  };
-
   const renderContent = () => {
     if (loggedIn && socket) {
       return (
         <>
-          <div ref={convoModal} className="convo-modal !hidden">
-            <div className="convo-modal-header">
-              <h1>Create a new conversation</h1>
-              <button
-                onClick={() => setNewConvoActive(false)}
-                className="convo-modal-header-x"
-              >
-                <i className="bi bi-x"></i>
-              </button>
-            </div>
-            <form
-              className="convo-modal-content"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setNewConvoActive(false);
-                setActiveChat(searchInput);
-              }}
-            >
-              <input
-                value={searchInput}
-                onChange={(e) => {
-                  setSearchInput(e.target.value);
-                }}
-                className="convo-modal-content-input"
-                placeholder="Search for a user."
-                maxLength={12}
-              />
-              <button type="submit" className=" chat-send-button">
-                <i className="bi bi-search"></i>
-              </button>
-            </form>
-          </div>
-          <div ref={sidebarRef} className="sidebar -translate-x-60">
-            <div className="p-5 font-medium text-center">Conversations</div>
-            <div className="flex flex-1 flex-col">
-              {uniqueSenders.map((sender, index) => (
-                <button
-                  onClick={() => {
-                    handleActiveChat(sender);
-                  }}
-                  key={index}
-                  className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all"
-                >
-                  <div className="bg-purple-600 p-2 rounded-full select-none text-center font-medium h-10 w-10">
-                    {getInitials(sender)}
-                  </div>
-                  <div className="grid grid-rows-2 text-sm">
-                    <div className="font-medium text-left">{sender}</div>
-                    <span className="">{}</span>
-                  </div>
+          {/* Open the modal using document.getElementById('ID').showModal() method */}
+          <dialog id="my_modal_1" className="modal">
+            <div className="modal-box bg-rtca-800">
+              <form method="dialog">
+                {/* if there is a button in form, it will close the modal */}
+                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                  ✕
                 </button>
-              ))}
+              </form>
+              <h3 className="font-bold text-lg">Start a new conversation.</h3>
+              <p className="py-2 flex">
+                <form
+                  className="flex gap-2 p-4 grow items-center justify-center"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setNewConvoActive(false);
+                    setActiveChat(searchInput);
+                  }}
+                >
+                  <input
+                    value={searchInput}
+                    onChange={(e) => {
+                      setSearchInput(e.target.value);
+                    }}
+                    className="convo-modal-content-input grow"
+                    placeholder="Search for a user."
+                    maxLength={12}
+                  />
+                  <button type="submit" className=" chat-send-button">
+                    <i className="bi bi-search"></i>
+                  </button>
+                </form>
+              </p>
             </div>
-            <button
-              className="p-4 bg-green-800 hover:bg-green-500/50 transition-all"
-              onClick={() => {
-                setNewConvoActive(true);
-                closeSidebar();
-              }}
-            >
-              New conversation
-            </button>
-          </div>
-          <div
-            ref={overlayRef}
-            onClick={closeSidebar}
-            className="h-screen w-screen absolute bg-rtca-800/50 z-10 hidden"
-          ></div>
+          </dialog>
           <div className="chat-screen">
             <nav className="navbar">
               <div className="flex items-center">
-                <button
-                  onClick={() => {
-                    sidebarRef.current.classList.remove("-translate-x-60");
-                    overlayRef.current.classList.remove("hidden");
-                  }}
-                  className="rounded-full h-10 w-10 hover:bg-rtca-600/50 transition-all"
-                >
-                  <i className="bi bi-list"></i>
-                </button>
+                <SenderList
+                  uniqueSenders={uniqueSenders}
+                  handleActiveChat={handleActiveChat}
+                />
                 {activeChat ? (
-                  <div className="p-4 px-2 flex gap-2 items-center">
-                    <div style={{
-                      backgroundColor: generateRandomColor(activeChat)
-                    }} className="p-2 rounded-full select-none text-center font-medium h-10 w-10 ">
+                  <div className="p-4 px-2 flex gap-3 items-center">
+                    <div
+                      style={{
+                        backgroundColor: generateRandomColor(activeChat),
+                      }}
+                      className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10 "
+                    >
                       {getInitials(activeChat)}
                     </div>
                     <div className="flex flex-col text-sm items-start">
@@ -334,15 +286,12 @@ function App() {
               <>
                 <div
                   ref={chatWindow}
-                  className="flex-1 flex flex-col gap-1 items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white relative"
+                  className="flex-1 flex flex-col items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white relative"
                 >
-                  <div className="bg-teal-700 text-sm p-1 px-2 rounded-md font-medium select-none">
-                    Please do not share your password or personal information.
-                  </div>
-                  <div className="time-divider">Today</div>
+                    <div className="flex p-1 rounded-full px-2 items-center bg-teal-700 text-sm font-medium select-none">Please do not share your password or personal information.</div>
+                  {/* <div className="time-divider">Today</div> */}
                   {filteredMessages.map((message, index, array) => (
                     <Message
-                      seenId={seenId}
                       key={index}
                       id={message.id}
                       message={message}
@@ -350,12 +299,6 @@ function App() {
                     />
                   ))}
                   <div ref={bottomRef} className="opacity-0 content-none"></div>
-                  <div
-                    ref={seenRef}
-                    className="text-xs self-end hidden transition-all"
-                  >
-                    Seen
-                  </div>
                 </div>
                 <ChatInput recipient={activeChat} />
               </>
@@ -370,7 +313,7 @@ function App() {
       );
     } else {
       return (
-        <div className="z-10 dark:text-white grid gap-5 mb-10 mt-10 md:mt-20 items-center">
+        <div className="dark:text-white grid gap-5 mb-10 mt-10 md:mt-20 items-center">
           <h1 className="row-span-2 text-2xl text-center font-medium">
             {config.appName}
           </h1>

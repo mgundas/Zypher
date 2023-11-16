@@ -12,7 +12,7 @@ export const ConfigProvider = ({ children }) => {
     socketUri: "http://localhost/",
     apiUri: "http://localhost/api/v1",
     notice: {
-        visible: true,
+        visible: false,
         title: "Welcome aboard!",
         message: "Comuconnect is finally online!"
     }

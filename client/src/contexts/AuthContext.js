@@ -27,73 +27,8 @@ export function AuthProvider({ children }) {
   const [userData, setUserData] = useState({});
   const checkTimeout = useRef(null);
   const loadingOverlay = useRef(null);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  const handleLogout = async () => {};
-
-  const verifyAccessToken = async () => {
-    try {
-      const response = await fetch(`${config.apiUri}/verify-access-token`, {
-        method: "POST",
-        headers: {
-          Authorization: `${authToken}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        return false;
-      }
-      if (!data.success) {
-        return false;
-      } else {
-      }
-      console.log("Token is verified.");
-
-      setUserData(data.user);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const refreshTokens = async () => {
-    // Implement logic to refresh tokens with your backend
-    // You can make an API call with the refresh token to obtain new tokens
-    try {
-      // Make an API call to refresh tokens
-      const response = await fetch(config.apiUri + "/refresh-tokens", {
-        method: "POST",
-        headers: {
-          Authorization: `${refreshToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-          await response.json();
-        localStorage.setItem("accessToken", newAccessToken);
-        localStorage.setItem("refreshToken", newRefreshToken);
-        setAuthToken(newAccessToken);
-        setRefreshToken(newRefreshToken);
-      } else {
-        setLoggedIn(false);
-      }
-    } catch (error) {
-      // Handle errors, such as network issues
-    }
-  };
-
-  const checkVerification = () => {
-    verifyAccessToken().then((isValid) => {
-      if (!isValid) {
-        // Access token is invalid, attempt to refresh tokens
-
-        return refreshTokens();
-      }
-      loadingOverlay.current.classList.add("hidden");
-      setLoggedIn(true);
-    });
-  };
+  //const handleLogout = async () => {};
 
   const handleOffline = () => {
     loadingOverlay.current.classList.remove("hidden");
@@ -105,6 +40,70 @@ export function AuthProvider({ children }) {
 
   // Check the access token validity on component mount
   useEffect(() => {
+    const verifyAccessToken = async () => {
+      try {
+        const response = await fetch(`${config.apiUri}/verify-access-token`, {
+          method: "POST",
+          headers: {
+            Authorization: `${authToken}`,
+          },
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          return false;
+        }
+        if (!data.success) {
+          return false;
+        } else {
+        }
+        console.log("Token is verified.");
+
+        setUserData(data.user);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    };
+
+    const refreshTokens = async () => {
+      // Implement logic to refresh tokens with your backend
+      // You can make an API call with the refresh token to obtain new tokens
+      try {
+        // Make an API call to refresh tokens
+        const response = await fetch(config.apiUri + "/refresh-tokens", {
+          method: "POST",
+          headers: {
+            Authorization: `${refreshToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+            await response.json();
+          localStorage.setItem("accessToken", newAccessToken);
+          localStorage.setItem("refreshToken", newRefreshToken);
+          setAuthToken(newAccessToken);
+          setRefreshToken(newRefreshToken);
+        } else {
+          setLoggedIn(false);
+        }
+      } catch (error) {
+        // Handle errors, such as network issues
+      }
+    };
+
+    const checkVerification = () => {
+      verifyAccessToken().then((isValid) => {
+        if (!isValid) {
+          // Access token is invalid, attempt to refresh tokens
+
+          return refreshTokens();
+        }
+        loadingOverlay.current.classList.add("hidden");
+        setLoggedIn(true);
+      });
+    };
+
     if (authToken) {
       window.addEventListener("online", handleOnline);
       window.addEventListener("offline", handleOffline);
@@ -122,7 +121,7 @@ export function AuthProvider({ children }) {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [authToken]);
+  }, [authToken, refreshToken, config.apiUri]);
 
   // Your other authentication-related functions (login, logout, etc.)
 

@@ -8,9 +8,25 @@ import { convertTime } from "../helpers/timeConverter";
 const Message = ({ message, isLastMessage, id }) => {
   const timeRef = useRef(null);
   const messageRef = useRef(null);
+  const seenRef = useRef(null);
 
   const { userData } = useAuth();
   const { socket } = useSocket();
+
+  useState(() => {
+    const handleSeen = (data) => {
+      if(data.id === id){
+        seenRef.current?.classList.remove("hidden")
+      }
+    }
+
+    if(socket){
+      socket.on("seen", handleSeen)
+    }
+    return () => {
+      socket.off("seen", handleSeen)
+    }
+  }, [socket])
 
   const [isSelf, setIsSelf] = useState(false);
   const [hasBeenSeen, setHasBeenSeen] = useState(false);
@@ -104,28 +120,20 @@ const Message = ({ message, isLastMessage, id }) => {
   return (
     <div
       ref={messageRef}
-      onMouseOver={handleTimeHover}
-      onMouseOut={handleTimeHover}
-      className={isSelf ? "message-self" : "message-interlocutor"}
+      className={
+        isSelf ? "chat self-end chat-end" : "chat self-start chat-start "
+      }
     >
-      <div className="flex relative flex-col break-words transition-all">
-        <span style={{
-          color: generateRandomColor(message.sender)
-        }} className="font-medium text-sm">
-          {message.sender}
-        </span>
-        <div className="break-all">
-          {messageLines.map((line, index) => (
-            <div key={index}>{line}</div>
-          ))}
-        </div>
+      <div className="chat-header items-center pb-1">
+        {message.sender}
+        <time className="text-xs opacity-50 mx-1">{convertTime(message.timestamp)}</time>
       </div>
-      <span
-        ref={timeRef}
-        className="font-medium text-rtca-400 opacity-0 transition-all absolute -bottom-3 text-xs -right-3 z-[1] p-1 rounded-md bg-rtca-800/25"
-      >
-        {convertTime(message.timestamp)}
-      </span>
+      <div className="chat-bubble max-w-full bg-rtca-800">
+        {messageLines.map((line, index) => (
+          <div key={index}>{line}</div>
+        ))}
+      </div>
+      <div ref={seenRef} className="chat-footer opacity-50 hidden">Seen</div>
     </div>
   );
 };
