@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSocket } from "../contexts/SocketContext";
 import { useAuth } from "../contexts/AuthContext";
-import { generateRandomColor } from "../helpers/generateRandomColor";
 import { breakLongMessage } from "../helpers/wordBreaker";
 import { convertTime } from "../helpers/timeConverter";
 
 const Message = ({ message, isLastMessage, id }) => {
-  const timeRef = useRef(null);
   const messageRef = useRef(null);
   const seenRef = useRef(null);
 
@@ -43,10 +41,6 @@ const Message = ({ message, isLastMessage, id }) => {
       setIsSelf(false);
     }
   }, [message.sender, userData.username]);
-
-  const handleTimeHover = (e) => {
-    timeRef.current.classList.toggle("opacity-100");
-  };
 
   const isMessageVisibleInViewport = () => {
     const messageElement = messageRef.current;

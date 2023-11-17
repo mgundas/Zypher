@@ -20,9 +20,6 @@ function App() {
   const notificationTimeoutRef = useRef(null);
   const infoTimeoutRef = useRef(null);
   const bottomRef = useRef(null);
-  const sidebarRef = useRef(null);
-  const overlayRef = useRef(null);
-  const convoModal = useRef(null);
   const chatWindow = useRef(null);
   const seenRef = useRef(null);
   const checkInterval = useRef(null);
@@ -30,25 +27,15 @@ function App() {
   const [isOnline, setIsOnline] = useState(false);
   const [messages, setMessages] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
-  const [searchInput, setSearchInput] = useState("");
   const [activeChat, setActiveChat] = useState(null);
   const [status, setStatus] = useState(isOnline ? "Online" : "Offline");
   const [uniqueSenders, setUniqueSenders] = useState([]);
   const [filteredMessages, setFilteredMessages] = useState([]);
   //const [lastMessage, setLastMessage] = useState({});
-  const [newConvoActive, setNewConvoActive] = useState(false);
 
   useEffect(() => {
     setStatus(isOnline ? "Online" : "Offline");
   }, [isOnline]);
-
-  useEffect(() => {
-    if (newConvoActive === true) {
-      convoModal.current?.classList.remove("!hidden");
-    } else {
-      convoModal.current?.classList.add("!hidden");
-    }
-  }, [newConvoActive]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -199,96 +186,106 @@ function App() {
     }, 2000);
   };
 
-  const closeSidebar = () => {
-    sidebarRef.current.classList.add("-translate-x-60");
-    overlayRef.current.classList.add("hidden");
-  };
-
   const renderContent = () => {
     if (loggedIn && socket) {
       return (
         <>
-          {/* Open the modal using document.getElementById('ID').showModal() method */}
-          <dialog id="my_modal_1" className="modal">
-            <div className="modal-box bg-rtca-800">
-              <form method="dialog">
-                {/* if there is a button in form, it will close the modal */}
-                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                  ✕
-                </button>
-              </form>
-              <h3 className="font-bold text-lg">Start a new conversation.</h3>
-              <p className="py-2 flex">
-                <form
-                  className="flex gap-2 p-4 grow items-center justify-center"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    setNewConvoActive(false);
-                    setActiveChat(searchInput);
-                  }}
-                >
-                  <input
-                    value={searchInput}
-                    onChange={(e) => {
-                      setSearchInput(e.target.value);
-                    }}
-                    className="convo-modal-content-input grow"
-                    placeholder="Search for a user."
-                    maxLength={12}
-                  />
-                  <button type="submit" className=" chat-send-button">
-                    <i className="bi bi-search"></i>
-                  </button>
-                </form>
-              </p>
-            </div>
-          </dialog>
           <div className="chat-screen">
-            <nav className="navbar">
-              <div className="flex items-center">
-                <SenderList
-                  uniqueSenders={uniqueSenders}
-                  handleActiveChat={handleActiveChat}
-                />
-                {activeChat ? (
-                  <div className="p-4 px-2 flex gap-3 items-center">
-                    <div
-                      style={{
-                        backgroundColor: generateRandomColor(activeChat),
-                      }}
-                      className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10 "
+            <div className="navbar bg-base-100">
+              <div className="navbar-start">
+                <div className="flex items-center">
+                  <SenderList
+                    setActiveChat={setActiveChat}
+                    uniqueSenders={uniqueSenders}
+                    handleActiveChat={handleActiveChat}
+                  />
+                  {activeChat ? (
+                    <div className="p-4 px-2 flex gap-3 items-center">
+                      <div
+                        style={{
+                          backgroundColor: generateRandomColor(activeChat),
+                        }}
+                        className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10 "
+                      >
+                        {getInitials(activeChat)}
+                      </div>
+                      <div className="flex flex-col text-sm items-start">
+                        <button className="font-medium">{activeChat}</button>
+                        <span className="text-rtca-400 select-none">
+                          {status}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </div>
+              <div className="navbar-center hidden sm:block">
+                <button className="btn btn-ghost text-xl">
+                  {config.appName}
+                </button>
+              </div>
+              <div className="navbar-end gap-2">
+                <ToggleDarkMode />
+                <button className="btn btn-ghost btn-circle">
+                  <div className="indicator">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
                     >
-                      {getInitials(activeChat)}
-                    </div>
-                    <div className="flex flex-col text-sm items-start">
-                      <button className="font-medium">{activeChat}</button>
-                      <span className="text-rtca-400 select-none">
-                        {status}
-                      </span>
-                    </div>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                      />
+                    </svg>
+                    <span className="badge badge-xs badge-primary indicator-item"></span>
                   </div>
-                ) : (
-                  <>
-                    <div className="font-medium p-4">{config.appName}</div>
-                  </>
-                )}
+                </button>
+                <div className="dropdown dropdown-end">
+                  <div
+                    tabIndex={0}
+                    style={{
+                      backgroundColor: generateRandomColor(userData.username),
+                    }}
+                    className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10 "
+                  >
+                    {getInitials(userData.username)}
+                  </div>
+                  <ul
+                    tabIndex={0}
+                    className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-rtca-800 rounded-box rounded-t-none w-52"
+                  >
+                    <li>
+                      <button className="justify-between">
+                        Profile
+                        <span className="badge bg-rtca-700 border-none">New</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button>Settings</button>
+                    </li>
+                    <li>
+                      <button>Logout</button>
+                    </li>
+                  </ul>
+                </div>
               </div>
-              <div className="flex gap-4 items-center">
-                <ul className="flex gap-3 font-medium items-center">
-                  <ToggleDarkMode />
-                  <button className="nav-button">
-                    <i className="bi bi-box-arrow-right"></i>
-                  </button>
-                </ul>
-              </div>
-            </nav>
+            </div>
             {activeChat ? (
               <>
                 <div
                   ref={chatWindow}
                   className="flex-1 flex flex-col items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white relative"
                 >
-                    <div className="flex p-1 rounded-full px-2 items-center bg-teal-700 text-sm font-medium select-none">Please do not share your password or personal information.</div>
+                  <div className="flex p-1 rounded-lg text-center px-2 items-center bg-teal-700 text-sm font-medium select-none">
+                    Please do not share your password or personal information.
+                  </div>
                   {/* <div className="time-divider">Today</div> */}
                   {filteredMessages.map((message, index, array) => (
                     <Message
