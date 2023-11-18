@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import { useConfig } from "./ConfigContext";
-import { LoadingOverlay } from "../modules/LoadingOverlay";
+import { LoadingOverlay } from "../components/LoadingOverlay";
 
 const AuthContext = createContext();
 

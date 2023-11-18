@@ -1,15 +1,14 @@
 import { useRef, useEffect, useState } from "react";
 import { useSocket } from "./contexts/SocketContext";
-import ToggleDarkMode from "./modules/ToggleDarkMode";
-import Message from "./modules/Message";
-import ChatInput from "./modules/ChatInput";
-import Login from "./modules/Login";
-import Register from "./modules/Register";
+import Message from "./components/Message";
+import ChatInput from "./components/ChatInput";
+import Login from "./components/Login";
+import Register from "./components/Register";
 import { useConfig } from "./contexts/ConfigContext";
 import { useAuth } from "./contexts/AuthContext";
 import { generateRandomColor } from "./helpers/generateRandomColor";
-import { SenderList } from "./modules/SenderList";
 import { getInitials } from "./helpers/getInitials";
+import { Navbar } from "./components/Navbar";
 
 function App() {
   const { socket } = useSocket();
@@ -192,191 +191,7 @@ function App() {
       return (
         <>
           <div className="chat-screen">
-            <div className="navbar bg-base-100">
-              <div className="navbar-start">
-                <div className="flex items-center">
-                  <SenderList
-                    setActiveChat={setActiveChat}
-                    uniqueSenders={uniqueSenders}
-                    handleActiveChat={handleActiveChat}
-                  />
-                  {activeChat ? (
-                    <div className="p-4 px-2 flex gap-3 items-center">
-                      <div
-                        style={{
-                          backgroundColor: generateRandomColor(activeChat),
-                        }}
-                        className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10 "
-                      >
-                        {getInitials(activeChat)}
-                      </div>
-                      <div className="flex flex-col text-sm items-start">
-                        <button className="font-medium">{activeChat}</button>
-                        <span className="text-rtca-400 select-none">
-                          {status}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-              </div>
-              <div className="navbar-center hidden sm:block">
-                <button className="btn btn-ghost text-xl">
-                  {config.appName}
-                </button>
-              </div>
-              <div className="navbar-end gap-2">
-                <ToggleDarkMode />
-                <div className="dropdown dropdown-end">
-                  <button tabIndex={0} className="btn btn-ghost btn-circle">
-                    <div className="indicator">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                        />
-                      </svg>
-                      <span className="badge badge-xs badge-primary indicator-item"></span>
-                    </div>
-                  </button>
-                  <div
-                    tabIndex={0}
-                    className="dropdown-content z-[1] card card-compact w-64 p-2 shadow bg-rtca-800 rounded-t-none"
-                  >
-                    <div className="p-1 grid gap-1">
-                      <h3 className="text-center text-lg font-medium">
-                        Notifications
-                      </h3>
-                      <div className="overflow-y-auto max-h-[calc(100vh/2)]">
-                        <div className="p-1 relative flex gap-2 text-sm">
-                          <div className="absolute right-3 select-none">
-                            10w
-                          </div>
-                          <div
-                            style={{
-                              backgroundColor: generateRandomColor(
-                                userData.username
-                              ),
-                            }}
-                            className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 "
-                          >
-                            {getInitials(userData.username)}
-                          </div>
-                          <div className="grid">
-                            <p>New follower!</p>
-                            <p>@mitchgrassi started to follow you.</p>
-                          </div>
-                        </div>
-                        <div className="p-1 flex gap-2 text-sm">
-                          <div
-                            style={{
-                              backgroundColor: generateRandomColor(
-                                userData.username
-                              ),
-                            }}
-                            className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 "
-                          >
-                            {getInitials(userData.username)}
-                          </div>
-                          <div className="grid">
-                            <p>New follower!</p>
-                            <p>@mitchgrassi started to follow you.</p>
-                          </div>
-                        </div>
-                        <div className="p-1 flex gap-2 text-sm">
-                          <div
-                            style={{
-                              backgroundColor: generateRandomColor(
-                                userData.username
-                              ),
-                            }}
-                            className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 "
-                          >
-                            {getInitials(userData.username)}
-                          </div>
-                          <div className="grid">
-                            <p>New follower!</p>
-                            <p>@mitchgrassi started to follow you.</p>
-                          </div>
-                        </div>
-                        <div className="p-1 flex gap-2 text-sm">
-                          <div
-                            style={{
-                              backgroundColor: generateRandomColor(
-                                userData.username
-                              ),
-                            }}
-                            className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 "
-                          >
-                            {getInitials(userData.username)}
-                          </div>
-                          <div className="grid">
-                            <p>New follower!</p>
-                            <p>@mitchgrassi started to follow you.</p>
-                          </div>
-                        </div>
-                        <div className="p-1 flex gap-2 text-sm">
-                          <div
-                            style={{
-                              backgroundColor: generateRandomColor(
-                                userData.username
-                              ),
-                            }}
-                            className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 "
-                          >
-                            {getInitials(userData.username)}
-                          </div>
-                          <div className="grid">
-                            <p>New follower!</p>
-                            <p>@mitchgrassi started to follow you.</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="dropdown dropdown-end">
-                  <div
-                    tabIndex={0}
-                    style={{
-                      backgroundColor: generateRandomColor(userData.username),
-                    }}
-                    className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10 "
-                  >
-                    {getInitials(userData.username)}
-                  </div>
-                  <ul
-                    tabIndex={0}
-                    className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-rtca-800 rounded-box rounded-t-none w-52"
-                  >
-                    <li>
-                      <button className="justify-between">
-                        Profile
-                        <span className="badge bg-rtca-700 border-none">
-                          New
-                        </span>
-                      </button>
-                    </li>
-                    <li>
-                      <button>Settings</button>
-                    </li>
-                    <li>
-                      <button>Logout</button>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+            <Navbar setActiveChat={setActiveChat} uniqueSenders={uniqueSenders} handleActiveChat={handleActiveChat} activeChat={activeChat} status={status} />
             {activeChat ? (
               <>
                 <div
@@ -414,10 +229,22 @@ function App() {
                 </button>
                 <div className="p-2 flex gap-2">
                   {randomUsers.map((user, index) => {
-                    if(user.username === userData.username) return;
+                    if (user.username === userData.username) return;
                     return (
-                      <button onClick={() => setActiveChat(user.username)} className="btn btn-accent" key={index}>{user.username}</button>
-                    )
+                      <button className="relative tooltip tooltip-bottom" data-tip={user.username}>
+                        <span className="h-3 w-3 rounded-full bg-green-600 absolute -top-0.5 -right-0.5 z-[1]"></span>
+                        <div
+                          onClick={() => setActiveChat(user.username)}
+                          key={index}
+                          style={{
+                            backgroundColor: generateRandomColor(user.username),
+                          }}
+                          className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 text-white relative"
+                        >
+                          {getInitials(user.username)}
+                        </div>
+                      </button>
+                    );
                   })}
                 </div>
               </div>
