@@ -1,4 +1,5 @@
 const UserSocketMapping = require("../../Models/UserSocketMapping");
+const User = require("../../Models/UserModel")
 
 const cleanupStaleSockets = async (io) => {
   try {
@@ -13,6 +14,9 @@ const cleanupStaleSockets = async (io) => {
       await UserSocketMapping.findByIdAndUpdate(mapping._id, {
         $set: { sockets: activeSockets },
       });
+
+      // Set all users' isOnline field to false
+      await User.updateMany({}, { $set: { isOnline: false } });
     }
   } catch (error) {
     console.error('Error cleaning up stale sockets:', error);

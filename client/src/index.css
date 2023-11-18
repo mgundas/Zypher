@@ -4,19 +4,22 @@
 
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css");
 
+/* 
 ::-webkit-scrollbar {
     @apply w-2 rounded-full
-    /* Customize the scrollbar width */
 }
 
 ::-webkit-scrollbar-track {
     @apply bg-rtca-400 dark:bg-rtca-600 rounded-full
-    /* Customize the scrollbar track */
 }
 
 ::-webkit-scrollbar-thumb {
     @apply bg-rtca-500 dark:bg-rtca-500 rounded-full
-    /* Customize the scrollbar thumb */
+} 
+*/
+
+:root{
+    background-color: transparent;
 }
 
 body{

@@ -30,6 +30,7 @@ function App() {
   const [activeChat, setActiveChat] = useState(null);
   const [status, setStatus] = useState(isOnline ? "Online" : "Offline");
   const [uniqueSenders, setUniqueSenders] = useState([]);
+  const [randomUsers, setRandomUsers] = useState([]);
   const [filteredMessages, setFilteredMessages] = useState([]);
   //const [lastMessage, setLastMessage] = useState({});
 
@@ -170,13 +171,13 @@ function App() {
 
   const sendInfoMessage = (message, type) => {
     const types = {
-      success: "dark:bg-green-900 bg-green-700",
-      failure: "dark:bg-red-900 bg-rt-800",
-      warning: "dark:bg-yellow-600 bg-yellow-500",
-      info: "dark:bg-teal-900 bg-teal-700",
+      success: "alert-success",
+      failure: "alert-error",
+      warning: "alert-warning",
+      info: "alert-info",
     };
 
-    infoBoxRef.current.className = `info-box ${types[type]}`;
+    infoBoxRef.current.className = `alert !w-auto justify-self-center ${types[type]}`;
     setErrorMsg(message);
     infoBoxRef.current.classList.remove("hidden");
 
@@ -228,25 +229,122 @@ function App() {
               </div>
               <div className="navbar-end gap-2">
                 <ToggleDarkMode />
-                <button className="btn btn-ghost btn-circle">
-                  <div className="indicator">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                      />
-                    </svg>
-                    <span className="badge badge-xs badge-primary indicator-item"></span>
+                <div className="dropdown dropdown-end">
+                  <button tabIndex={0} className="btn btn-ghost btn-circle">
+                    <div className="indicator">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                        />
+                      </svg>
+                      <span className="badge badge-xs badge-primary indicator-item"></span>
+                    </div>
+                  </button>
+                  <div
+                    tabIndex={0}
+                    className="dropdown-content z-[1] card card-compact w-64 p-2 shadow bg-rtca-800 rounded-t-none"
+                  >
+                    <div className="p-1 grid gap-1">
+                      <h3 className="text-center text-lg font-medium">
+                        Notifications
+                      </h3>
+                      <div className="overflow-y-auto max-h-[calc(100vh/2)]">
+                        <div className="p-1 relative flex gap-2 text-sm">
+                          <div className="absolute right-3 select-none">
+                            10w
+                          </div>
+                          <div
+                            style={{
+                              backgroundColor: generateRandomColor(
+                                userData.username
+                              ),
+                            }}
+                            className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 "
+                          >
+                            {getInitials(userData.username)}
+                          </div>
+                          <div className="grid">
+                            <p>New follower!</p>
+                            <p>@mitchgrassi started to follow you.</p>
+                          </div>
+                        </div>
+                        <div className="p-1 flex gap-2 text-sm">
+                          <div
+                            style={{
+                              backgroundColor: generateRandomColor(
+                                userData.username
+                              ),
+                            }}
+                            className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 "
+                          >
+                            {getInitials(userData.username)}
+                          </div>
+                          <div className="grid">
+                            <p>New follower!</p>
+                            <p>@mitchgrassi started to follow you.</p>
+                          </div>
+                        </div>
+                        <div className="p-1 flex gap-2 text-sm">
+                          <div
+                            style={{
+                              backgroundColor: generateRandomColor(
+                                userData.username
+                              ),
+                            }}
+                            className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 "
+                          >
+                            {getInitials(userData.username)}
+                          </div>
+                          <div className="grid">
+                            <p>New follower!</p>
+                            <p>@mitchgrassi started to follow you.</p>
+                          </div>
+                        </div>
+                        <div className="p-1 flex gap-2 text-sm">
+                          <div
+                            style={{
+                              backgroundColor: generateRandomColor(
+                                userData.username
+                              ),
+                            }}
+                            className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 "
+                          >
+                            {getInitials(userData.username)}
+                          </div>
+                          <div className="grid">
+                            <p>New follower!</p>
+                            <p>@mitchgrassi started to follow you.</p>
+                          </div>
+                        </div>
+                        <div className="p-1 flex gap-2 text-sm">
+                          <div
+                            style={{
+                              backgroundColor: generateRandomColor(
+                                userData.username
+                              ),
+                            }}
+                            className="mask mask-squircle select-none flex items-center justify-center font-medium h-10 w-10 "
+                          >
+                            {getInitials(userData.username)}
+                          </div>
+                          <div className="grid">
+                            <p>New follower!</p>
+                            <p>@mitchgrassi started to follow you.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </button>
+                </div>
                 <div className="dropdown dropdown-end">
                   <div
                     tabIndex={0}
@@ -264,7 +362,9 @@ function App() {
                     <li>
                       <button className="justify-between">
                         Profile
-                        <span className="badge bg-rtca-700 border-none">New</span>
+                        <span className="badge bg-rtca-700 border-none">
+                          New
+                        </span>
                       </button>
                     </li>
                     <li>
@@ -300,9 +400,26 @@ function App() {
                 <ChatInput recipient={activeChat} />
               </>
             ) : (
-              <div className="flex gap-2 items-center flex-1 justify-center dark:text-white font-medium">
-                Why don't you click on the <i className="bi bi-list"></i> button
-                to select a conversation?
+              <div className="flex flex-col flex-1 items-center justify-center">
+                <button
+                  onClick={() => {
+                    socket.emit("randomUsers", 10, (data) => {
+                      setRandomUsers(data);
+                      console.log(data);
+                    });
+                  }}
+                  className="btn btn-outline btn-accent"
+                >
+                  Randomize
+                </button>
+                <div className="p-2 flex gap-2">
+                  {randomUsers.map((user, index) => {
+                    if(user.username === userData.username) return;
+                    return (
+                      <button onClick={() => setActiveChat(user.username)} className="btn btn-accent" key={index}>{user.username}</button>
+                    )
+                  })}
+                </div>
               </div>
             )}
           </div>
@@ -322,8 +439,21 @@ function App() {
           ) : (
             <></>
           )}
-          <div ref={infoBoxRef} className="hidden">
-            {errorMsg}
+          <div ref={infoBoxRef} class="hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <span>{errorMsg}</span>
           </div>
           <div className="row-span-1 flex flex-row flex-wrap gap-10 items-center justify-center">
             <Login sendInfoMessage={sendInfoMessage} />

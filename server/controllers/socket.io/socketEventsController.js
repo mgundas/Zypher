@@ -138,6 +138,21 @@ const handleOnlineCheck = async (io, socket, data, cb) => {
   }
 };
 
+const handleGetRandomOnlineUsers = async (io, socket, data, cb) => {
+  try {
+    const size = data || 10;
+    const randomOnlineEntries = await User.aggregate([
+      { $match: { isOnline: true } }, // Add a $match stage to filter by the condition
+      { $sample: { size: size } },
+      { $project: { password: 0, salt: 0 } }
+    ]);
+
+    cb(randomOnlineEntries)
+  } catch (error) {
+    console.error('Error fetching random online entries:', error);
+  }
+}
+
 module.exports = {
   privateMessage,
   handleUserTyping,
@@ -145,4 +160,5 @@ module.exports = {
   handleDisconnect,
   handleMessageSeen,
   handleOnlineCheck,
+  handleGetRandomOnlineUsers,
 };

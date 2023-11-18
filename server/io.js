@@ -9,6 +9,7 @@ const {
   handleDisconnect,
   handleMessageSeen,
   handleOnlineCheck,
+  handleGetRandomOnlineUsers,
 } = require("./controllers/socket.io/socketEventsController");
 const cleanupStaleSockets = require("./controllers/socket.io/cleanupStaleSockets");
 
@@ -41,6 +42,7 @@ const initializeIo = (io) => {
       handleUserStoppedTyping(io, socket, data)
     );
     socket.on("isOnline", (data, cb) =>  handleOnlineCheck(io, socket, data, cb));
+    socket.on("randomUsers", (data, cb) => handleGetRandomOnlineUsers(io, socket, data, cb))
     socket.on("disconnect", () => handleDisconnect(io, socket));
   });
 };
