@@ -10,7 +10,7 @@ import { NotificationItem } from "./modules/NotificationItem";
 
 export const Navbar = ({
   setActiveChat,
-  uniqueSenders,
+  messages,
   handleActiveChat,
   activeChat,
   status,
@@ -25,7 +25,7 @@ export const Navbar = ({
         <div className="flex items-center">
           <SenderList
             setActiveChat={setActiveChat}
-            uniqueSenders={uniqueSenders}
+            messages={messages}
             handleActiveChat={handleActiveChat}
           />
           {activeChat ? (
@@ -84,12 +84,28 @@ export const Navbar = ({
           >
             <div className="p-1 grid gap-">
               <h3 className="text-center text-lg font-medium">Notifications</h3>
-              <div className="overflow-y-auto grid gap-1 max-h-[calc(100vh/2)]">
+              <div className="overflow-y-auto overflow-x-hidden grid gap-1 max-h-[calc(100vh/2)]">
                 <NotificationItem
                   notficiationData={{
                     username: userData.username,
                     title: "New follower!",
                     content: "@mitchgrassi started to follow you.",
+                    timestamp: "10w",
+                  }}
+                />
+                <NotificationItem
+                  notficiationData={{
+                    username: "dongalamasyon",
+                    title: "New follower!",
+                    content: "@dongalamasyon started to follow you.",
+                    timestamp: "10w",
+                  }}
+                />
+                <NotificationItem
+                  notficiationData={{
+                    username: "s2mdimdick",
+                    title: "New follower!",
+                    content: "@s2mdimdick started to follow you.",
                     timestamp: "10w",
                   }}
                 />

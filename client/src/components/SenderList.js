@@ -1,13 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { getInitials } from "../helpers/getInitials";
 import { generateRandomColor } from "../helpers/generateRandomColor";
+import { useAuth } from "../contexts/AuthContext";
 
 export const SenderList = ({
   handleActiveChat,
-  uniqueSenders,
   setActiveChat,
+  messages
 }) => {
+  const { userData } = useAuth();
   const [searchInput, setSearchInput] = useState("");
+  const [uniqueSenders, setUniqueSenders] = useState([]);
+
+  useEffect(() => {
+    const senders = [
+      ...new Set(
+        messages.map((message) => {
+          if (message.sender !== userData.username) {
+            return message.sender;
+          } else {
+            return message.recipient;
+          }
+        })
+      ),
+    ];
+    setUniqueSenders(senders);
+  }, [messages, userData.username]);
 
   return (
     <>

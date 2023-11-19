@@ -4,6 +4,7 @@ const User = require("../Models/UserModel");
 const UserSocketMapping = require("../Models/UserSocketMapping");
 const RevokedToken = require("../Models/RevokedToken");
 const TokenUserMapping = require("../Models/TokenUserMapping");
+const Message = require("../Models/MessageModel");
 
 async function revokeToken(token) {
   try {
@@ -360,6 +361,27 @@ const handleRefreshTokens = async (req, res) => {
   }
 };
 
+const handleMessage = async (req, res) => {
+  try {
+    const { sender, recipient, limit, skip } = req.query;
+
+    const messages = await Message.find({
+      $or: [
+        { sender, recipient },
+        { sender: recipient, recipient: sender },
+      ],
+    })
+      .sort({ timestamp: -1 }) // Sort by timestamp in descending order
+      .limit(parseInt(limit))
+      .skip(parseInt(skip) * parseInt(limit));
+
+    res.json({ messages });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 const handleLogout = async (req, res) => {};
 
 module.exports = {
@@ -367,5 +389,6 @@ module.exports = {
   handleRegister,
   handleVerifyAccessToken,
   handleRefreshTokens,
+  handleMessage,
   handleLogout,
 };

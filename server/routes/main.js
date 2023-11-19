@@ -4,8 +4,10 @@ const {
   handleRegister,
   handleVerifyAccessToken,
   handleRefreshTokens,
-  handleLogout
+  handleLogout,
+  handleMessage,
 } = require("../controllers/mainController")
+const authMiddleware = require("../controllers/authMiddleware")
 
 const router = express.Router();
 
@@ -13,6 +15,7 @@ router.post("/register", handleRegister);
 router.post("/login", handleLogin);
 router.post("/verify-access-token", handleVerifyAccessToken)
 router.post("/refresh-tokens", handleRefreshTokens)
+router.get("/messages", authMiddleware, handleMessage)
 router.post("/logout", handleLogout)
 
 module.exports = router;

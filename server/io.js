@@ -41,8 +41,12 @@ const initializeIo = (io) => {
     socket.on("stopped typing", (data) =>
       handleUserStoppedTyping(io, socket, data)
     );
-    socket.on("isOnline", (data, cb) =>  handleOnlineCheck(io, socket, data, cb));
-    socket.on("randomUsers", (data, cb) => handleGetRandomOnlineUsers(io, socket, data, cb))
+    socket.on("isOnline", (data, cb) =>
+      handleOnlineCheck(io, socket, data, cb)
+    );
+    socket.on("randomUsers", (data, cb) =>
+      handleGetRandomOnlineUsers(io, socket, data, cb)
+    );
     socket.on("disconnect", () => handleDisconnect(io, socket));
   });
 };
