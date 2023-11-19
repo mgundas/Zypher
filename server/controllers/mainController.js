@@ -365,14 +365,13 @@ const handleRefreshTokens = async (req, res) => {
 const handleMessage = async (req, res) => {
   try {
     const { sender, recipient, limit, skip } = req.query;
-    console.log(sender, recipient, limit, skip);
 
-    const findSender = await User.find({sender})
+    const findSender = await User.findById(sender)
     if(!findSender){
       return res.status(400).json({ error: 'sender.does.not.exist' });
     }
 
-    const findRecipient = await User.find({recipient})
+    const findRecipient = await User.findById(recipient)
     if(!findRecipient){
       return res.status(400).json({ error: 'recipient.does.not.exist' });
     }
@@ -382,8 +381,8 @@ const handleMessage = async (req, res) => {
 
     const messages = await Message.find({
       $or: [
-        { senderId, recipientId },
         { sender: recipientId, recipient: senderId },
+        { sender: senderId, recipient: recipientId },
       ],
     })
       .sort({ timestamp: 1 }) // Sort by timestamp in descending order

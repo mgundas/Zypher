@@ -127,7 +127,7 @@ function App() {
       const data = await response.json();
       console.log(data);
 
-      setMessages((prevMessages) => [...prevMessages, ...data.messages]);
+      setMessages(data.messages);
       console.log(messages);
       setLoadedMessages((prevLoaded) => prevLoaded + data.messages.length);
       setTotalMessages(data.total); // Assuming the API returns the total number of messages
