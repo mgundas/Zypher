@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { generateRandomColor } from "../helpers/generateRandomColor";
 import { getInitials } from "../helpers/getInitials";
 
-export const MainWindow = ({setActiveChat}) => {
+export const MainWindow = ({handleActiveChat}) => {
   const { socket } = useSocket();
 
   const [randomUsers, setRandomUsers] = useState([]);
@@ -29,13 +29,13 @@ export const MainWindow = ({setActiveChat}) => {
           if (user.username === userData.username) return;
           return (
             <button
+              key={index}
               className="relative tooltip tooltip-bottom"
               data-tip={user.username}
             >
               <span className="h-3 w-3 rounded-full bg-green-600 absolute -top-0.5 -right-0.5 z-[1]"></span>
               <div
-                onClick={() => setActiveChat(user.username)}
-                key={index}
+                onClick={() => handleActiveChat(user._id)}
                 style={{
                   backgroundColor: generateRandomColor(user.username),
                 }}

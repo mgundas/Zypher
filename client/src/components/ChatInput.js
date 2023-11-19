@@ -1,11 +1,13 @@
 import React, { useState, useRef } from "react";
 import { useSocket } from "../contexts/SocketContext";
+import { useRecipient } from "../contexts/RecipientContext";
 
 function ChatInput({recipient}) {
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef(null);
   const { socket } = useSocket();
+  const { recipientData } = useRecipient();
 
   const handleInputChange = (e) => {
     const text = e.target.value;
@@ -14,17 +16,17 @@ function ChatInput({recipient}) {
     if (text) {
       if (!isTyping) {
         setIsTyping(true);
-        socket.emit("typing", { recipient: recipient });
+        socket.emit("typing", { recipient: recipientData.username });
       }
       // Clear the previous timeout and set a new one
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
         setIsTyping(false);
-        socket.emit("stopped typing", { recipient: recipient });
+        socket.emit("stopped typing", { recipient: recipientData.username });
       }, 1000); // Adjust the timeout duration as needed
     } else if (isTyping) {
       setIsTyping(false);
-      socket.emit("stopped typing", { recipient: recipient });
+      socket.emit("stopped typing", { recipient: recipientData.username });
     }
   };
 
@@ -33,7 +35,7 @@ function ChatInput({recipient}) {
     if (message.trim() !== "") {
       socket.emit("private message", {
         message: message.trim(),
-        recipient: recipient
+        recipient: recipientData.username
       });
       // clearTimeout(typingTimeoutRef.current);
       // socket.emit("stopped typing", { username: socket.auth.username });

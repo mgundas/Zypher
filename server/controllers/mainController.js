@@ -279,6 +279,7 @@ const handleVerifyAccessToken = async (req, res) => {
     return res.status(200).json({
       success: true,
       user: {
+        id: findUser._id,
         username: findUser.username,
         email: findUser.email,
         createdAt: findUser.createdAt,
@@ -364,14 +365,28 @@ const handleRefreshTokens = async (req, res) => {
 const handleMessage = async (req, res) => {
   try {
     const { sender, recipient, limit, skip } = req.query;
+    console.log(sender, recipient, limit, skip);
+
+    const findSender = await User.find({sender})
+    if(!findSender){
+      return res.status(400).json({ error: 'sender.does.not.exist' });
+    }
+
+    const findRecipient = await User.find({recipient})
+    if(!findRecipient){
+      return res.status(400).json({ error: 'recipient.does.not.exist' });
+    }
+
+    const senderId = findSender._id
+    const recipientId = findRecipient._id
 
     const messages = await Message.find({
       $or: [
-        { sender, recipient },
-        { sender: recipient, recipient: sender },
+        { senderId, recipientId },
+        { sender: recipientId, recipient: senderId },
       ],
     })
-      .sort({ timestamp: -1 }) // Sort by timestamp in descending order
+      .sort({ timestamp: 1 }) // Sort by timestamp in descending order
       .limit(parseInt(limit))
       .skip(parseInt(skip) * parseInt(limit));
 
@@ -379,6 +394,27 @@ const handleMessage = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
+const handleFetchRecipient = async (req, res) => {
+  try {
+    const {recipient} = req.query
+
+    if(!recipient) return res.status(400).json({success: false, message:"recipient.id.not.provided"})
+
+    const findRecipient = await User.findById(recipient)
+
+    if(!findRecipient) return res.status(200).json({success: false, message:"recipient.does.not.exist"})
+
+    res.status(200).json({
+      username: findRecipient.username,
+      id: findRecipient._id,
+      createdAt: findRecipient.createdAt,
+      isOnline: findRecipient.isOnline,
+    })
+  } catch (error) {
+    return res.status(500).json({success: false, message:"server.error"})
   }
 }
 
@@ -390,5 +426,6 @@ module.exports = {
   handleVerifyAccessToken,
   handleRefreshTokens,
   handleMessage,
+  handleFetchRecipient,
   handleLogout,
 };

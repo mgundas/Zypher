@@ -5,19 +5,20 @@ import { getInitials } from "../helpers/getInitials";
 import { useConfig } from "../contexts/ConfigContext";
 import { useSocket } from "../contexts/SocketContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useRecipient } from "../contexts/RecipientContext";
 import ToggleDarkMode from "./ToggleDarkMode";
 import { NotificationItem } from "./modules/NotificationItem";
 
 export const Navbar = ({
-  setActiveChat,
   messages,
   handleActiveChat,
-  activeChat,
   status,
 }) => {
   const { socket } = useSocket();
   const config = useConfig();
   const { userData } = useAuth();
+  const { recipientData, activeChat, setActiveChat } = useRecipient();
+
 
   return (
     <div className="navbar bg-base-100">
@@ -32,14 +33,14 @@ export const Navbar = ({
             <div className="p-4 px-2 flex gap-3 items-center">
               <div
                 style={{
-                  backgroundColor: generateRandomColor(activeChat),
+                  backgroundColor: generateRandomColor(recipientData.username),
                 }}
                 className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10 "
               >
-                {getInitials(activeChat)}
+                {getInitials(recipientData.username)}
               </div>
               <div className="flex flex-col text-sm items-start">
-                <button className="font-medium">{activeChat}</button>
+                <button className="font-medium">{recipientData.username}</button>
                 <span className="text-rtca-400 select-none">{status}</span>
               </div>
             </div>

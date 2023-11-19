@@ -3,17 +3,19 @@ import { useSocket } from "../contexts/SocketContext";
 import { useAuth } from "../contexts/AuthContext";
 import { breakLongMessage } from "../helpers/wordBreaker";
 import { convertTime } from "../helpers/timeConverter";
+import { useRecipient } from "../contexts/RecipientContext";
 
-const Message = ({ message, isLastMessage, id }) => {
+const Message = ({ message, isLastMessage, }) => {
   const messageRef = useRef(null);
   const seenRef = useRef(null);
 
   const { userData } = useAuth();
   const { socket } = useSocket();
+  const { recipientData, activeChat } = useRecipient();
 
   useState(() => {
     const handleSeen = (data) => {
-      if(data.id === id){
+      if(data.id === message._id){
         seenRef.current?.classList.remove("hidden")
       }
     }
@@ -35,12 +37,12 @@ const Message = ({ message, isLastMessage, id }) => {
   const messageLines = breakLongMessage(message.message, maxLineLength);
 
   useEffect(() => {
-    if (message.sender === userData.username) {
+    if (message.sender === userData.id) {
       setIsSelf(true);
     } else {
       setIsSelf(false);
     }
-  }, [message.sender, userData.username]);
+  }, [message.sender, userData.id]);
 
   const isMessageVisibleInViewport = () => {
     const messageElement = messageRef.current;
@@ -69,7 +71,7 @@ const Message = ({ message, isLastMessage, id }) => {
         isBrowserFocused &&
         isTabVisible
       ) {
-        handleMessageSeen(id);
+        handleMessageSeen(message._id);
         setHasBeenSeen(true);
       }
     };
@@ -104,7 +106,6 @@ const Message = ({ message, isLastMessage, id }) => {
     isLastMessage,
     hasBeenSeen,
     isSelf,
-    id,
     isBrowserFocused,
     isTabVisible,
     message.sender,
@@ -119,7 +120,7 @@ const Message = ({ message, isLastMessage, id }) => {
       }
     >
       <div className="chat-header items-center pb-1">
-        {message.sender}
+        {message.sender === userData.id ? userData.username : recipientData.username}
         <time className="text-xs opacity-50 mx-1">{convertTime(message.timestamp)}</time>
       </div>
       <div className="chat-bubble max-w-full bg-rtca-800">

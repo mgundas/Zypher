@@ -4,7 +4,6 @@ const Message = require("../../Models/MessageModel");
 
 const privateMessage = async (io, socket, data) => {
   try {
-    data.sender = socket.username;
     data.timestamp = Date.now();
 
     if (data.sender === data.recipient) return;
@@ -22,11 +21,10 @@ const privateMessage = async (io, socket, data) => {
       });
       await newMessage.save(); // Make sure to await the save operation
 
-      data.id = newMessage._id;
       for (const recipientSocket of mapping.sockets) {
-        io.to(recipientSocket).emit("receiveMessage", data);
+        io.to(recipientSocket).emit("receiveMessage", newMessage);
       }
-      io.to(socket.id).emit("receiveMessage", data);
+      io.to(socket.id).emit("receiveMessage", newMessage);
     } else {
       console.log("No matching user-to-socket mapping found for", user._id);
     }

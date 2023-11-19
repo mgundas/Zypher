@@ -96,7 +96,7 @@ export const SenderList = ({
             </button>
           </form>
           <h3 className="font-bold text-lg">Start a new conversation.</h3>
-          <p className="py-2 flex">
+          <div className="py-2 flex">
             <form
               method="dialog"
               className="flex gap-2 p-4 grow items-center justify-center"
@@ -118,7 +118,7 @@ export const SenderList = ({
                 <i className="bi bi-search"></i>
               </button>
             </form>
-          </p>
+          </div>
         </div>
       </dialog>
     </>

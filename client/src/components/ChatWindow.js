@@ -1,22 +1,17 @@
 import React, {useState, useRef, useEffect} from "react";
 import Message from "./Message";
 import ChatInput from "./ChatInput";
-import { useSocket } from "../contexts/SocketContext";
-import { useConfig } from "../contexts/ConfigContext";
 import { useAuth } from "../contexts/AuthContext";
-import { generateRandomColor } from "../helpers/generateRandomColor";
-import { getInitials } from "../helpers/getInitials";
+import { useRecipient } from "../contexts/RecipientContext";
 
 export const ChatWindow = ({
   messages,
-  activeChat
+  chatWindowRef
 }) => {
-  const { socket } = useSocket();
-  const config = useConfig();
   const { userData } = useAuth();
+  const { recipientData } = useRecipient();
 
   const bottomRef = useRef(null);
-  const chatWindow = useRef(null);
 
   const [filteredMessages, setFilteredMessages] = useState([]);
 
@@ -27,26 +22,26 @@ export const ChatWindow = ({
   useEffect(() => {
     const filtered = messages.filter((message) => {
       if (
-        message.sender === activeChat &&
-        message.recipient === userData.username
+        message.sender === recipientData.id &&
+        message.recipient === userData.id
       ) {
-        return message.sender === activeChat;
+        return message.sender === recipientData.id;
       } else if (
-        message.sender === userData.username &&
-        message.recipient === activeChat
+        message.sender === userData.id &&
+        message.recipient === recipientData.id
       ) {
-        return message.recipient === activeChat;
+        return message.recipient === recipientData.id;
       } else {
         return null;
       }
     });
     setFilteredMessages(filtered);
-  }, [messages, activeChat, userData.username]);
+  }, [messages, userData.id, recipientData.id]);
 
   return (
     <>
       <div
-        ref={chatWindow}
+        ref={chatWindowRef}
         className="flex-1 flex flex-col items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white 
 relative"
       >
@@ -57,14 +52,13 @@ relative"
         {filteredMessages.map((message, index, array) => (
           <Message
             key={index}
-            id={message.id}
             message={message}
             isLastMessage={index === array.length - 1}
           />
         ))}
         <div ref={bottomRef} className="opacity-0 content-none"></div>
       </div>
-      <ChatInput recipient={activeChat} />
+      <ChatInput />
     </>
   );
 };

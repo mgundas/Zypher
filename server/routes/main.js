@@ -6,6 +6,7 @@ const {
   handleRefreshTokens,
   handleLogout,
   handleMessage,
+  handleFetchRecipient,
 } = require("../controllers/mainController")
 const authMiddleware = require("../controllers/authMiddleware")
 
@@ -16,6 +17,7 @@ router.post("/login", handleLogin);
 router.post("/verify-access-token", handleVerifyAccessToken)
 router.post("/refresh-tokens", handleRefreshTokens)
 router.get("/messages", authMiddleware, handleMessage)
+router.get("/fetchRecipient", authMiddleware, handleFetchRecipient)
 router.post("/logout", handleLogout)
 
 module.exports = router;
