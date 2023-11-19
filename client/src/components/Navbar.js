@@ -8,6 +8,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRecipient } from "../contexts/RecipientContext";
 import ToggleDarkMode from "./ToggleDarkMode";
 import { NotificationItem } from "./modules/NotificationItem";
+import { RecipientProfile } from "./RecipientProfile";
 
 export const Navbar = ({
   messages,
@@ -40,9 +41,10 @@ export const Navbar = ({
                 {getInitials(recipientData.username)}
               </div>
               <div className="flex flex-col text-sm items-start">
-                <button className="font-medium">{recipientData.username}</button>
+                <button onClick={() => document.getElementById("recipientProfile").showModal()} className="font-medium">{recipientData.username}</button>
                 <span className="text-rtca-400 select-none">{status}</span>
               </div>
+              <RecipientProfile />
             </div>
           ) : (
             <></>

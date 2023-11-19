@@ -385,7 +385,7 @@ const handleMessage = async (req, res) => {
         { sender: senderId, recipient: recipientId },
       ],
     })
-      .sort({ timestamp: 1 }) // Sort by timestamp in descending order
+      .sort({ timestamp: 1 }) // Sort by timestamp in ascending order
       .limit(parseInt(limit))
       .skip(parseInt(skip) * parseInt(limit));
 
