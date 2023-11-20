@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import { useConfig } from "../contexts/ConfigContext";
-import { useAuth } from "../contexts/AuthContext";
+import { useConfig } from "../../contexts/ConfigContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Login = ({ sendInfoMessage }) => {
   const timeoutRef = useRef(null)

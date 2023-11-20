@@ -1,19 +1,22 @@
-import React, {useState, useRef, useEffect} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Message from "./Message";
 import ChatInput from "./ChatInput";
 import { useAuth } from "../contexts/AuthContext";
 import { useRecipient } from "../contexts/RecipientContext";
 
-export const ChatWindow = ({
-  messages,
-  chatWindowRef
-}) => {
+export const ChatWindow = ({ messages, chatWindowRef, handleScroll, loading }) => {
   const { userData } = useAuth();
   const { recipientData } = useRecipient();
 
   const bottomRef = useRef(null);
+  const loadingRef = useRef(null)
 
   const [filteredMessages, setFilteredMessages] = useState([]);
+
+  useEffect(() => {
+    if(loading === true) loadingRef.current.classList.remove("invisible")
+    if(loading === false) loadingRef.current.classList.add("invisible")
+  }, [loading])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -42,12 +45,14 @@ export const ChatWindow = ({
     <>
       <div
         ref={chatWindowRef}
+        onScroll={handleScroll}
         className="flex-1 flex flex-col items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white 
 relative"
       >
-        <div className="flex p-1 rounded-lg text-center px-2 items-center bg-teal-700 text-sm font-medium select-none">
+        <div ref={loadingRef} className="loading loading-spinner loading-lg text-success"></div>
+        {/* <div className="flex p-1 rounded-lg text-center px-2 items-center bg-teal-700 text-sm font-medium select-none">
           Please do not share your password or personal information.
-        </div>
+        </div> */}
         {/* <div className="time-divider">Today</div> */}
         {filteredMessages.map((message, index, array) => (
           <Message

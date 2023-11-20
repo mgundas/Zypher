@@ -5,14 +5,15 @@ import { useAuth } from "./contexts/AuthContext";
 import { Navbar } from "./components/Navbar";
 import { ChatWindow } from "./components/ChatWindow";
 import { MainWindow } from "./components/MainWindow";
-import { LoginScreen } from "./components/LoginScreen";
+import { LoginScreen } from "./components/pages/LoginScreen";
 import { useRecipient } from "./contexts/RecipientContext";
 
 function App() {
   const { socket } = useSocket();
   const config = useConfig();
   const { loggedIn, userData, authToken } = useAuth();
-  const { setRecipient, recipientData, activeChat, setActiveChat } = useRecipient();
+  const { setRecipient, recipientData, activeChat, setActiveChat } =
+    useRecipient();
 
   const notificationTimeoutRef = useRef(null);
   const checkInterval = useRef(null);
@@ -40,16 +41,22 @@ function App() {
 
   useEffect(() => {
     if (activeChat) {
-      socket.emit("isOnline", { username: recipientData.username }, (response) => {
-        console.log(response);
-        setIsOnline(response);
-      });
+      socket.emit(
+        "isOnline",
+        { username: recipientData.username },
+        (response) => {
+          setIsOnline(response);
+        }
+      );
       clearInterval(checkInterval.current);
       checkInterval.current = setInterval(() => {
-        socket.emit("isOnline", { username: recipientData.username }, (response) => {
-          console.log(response);
-          setIsOnline(response);
-        });
+        socket.emit(
+          "isOnline",
+          { username: recipientData.username },
+          (response) => {
+            setIsOnline(response);
+          }
+        );
       }, 100 * 60);
     }
 
@@ -62,10 +69,10 @@ function App() {
     if (socket) {
       const handleReceiveMessage = (data) => {
         setMessages((prevMessages) => [...prevMessages, data]);
-        console.log(data);
         if (data.sender !== userData.id) {
           document.title = "New message!";
         }
+        setLoadedMessages((prevLoaded) => prevLoaded + 1);
         clearTimeout(notificationTimeoutRef.current);
         notificationTimeoutRef.current = setTimeout(() => {
           if (recipientData.length) {
@@ -125,16 +132,30 @@ function App() {
         }
       );
       const data = await response.json();
-      console.log(data);
 
-      setMessages(data.messages);
-      console.log(messages);
+      setMessages((prevMessages) => [...data.messages, ...prevMessages]);
       setLoadedMessages((prevLoaded) => prevLoaded + data.messages.length);
       setTotalMessages(data.total); // Assuming the API returns the total number of messages
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleScroll = () => {
+    const container = chatWindowRef.current;
+
+    if (
+      container.scrollTop === 0 &&
+      !loading &&
+      loadedMessages < totalMessages
+    ) {
+      const limit = 10 // Adjust the limit as needed
+      const skip = Math.floor(loadedMessages / 10);
+
+      console.log(limit, skip)
+      fetchMessages(limit, skip);
     }
   };
 
@@ -160,6 +181,8 @@ function App() {
               messages={messages}
               activeChat={activeChat}
               chatWindowRef={chatWindowRef}
+              handleScroll={handleScroll}
+              loading={loading}
             />
           ) : (
             <MainWindow handleActiveChat={handleActiveChat} />

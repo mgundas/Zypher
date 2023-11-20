@@ -366,56 +366,69 @@ const handleMessage = async (req, res) => {
   try {
     const { sender, recipient, limit, skip } = req.query;
 
-    const findSender = await User.findById(sender)
-    if(!findSender){
-      return res.status(400).json({ error: 'sender.does.not.exist' });
+    const findSender = await User.findById(sender);
+    if (!findSender) {
+      return res.status(400).json({ error: "sender.does.not.exist" });
     }
 
-    const findRecipient = await User.findById(recipient)
-    if(!findRecipient){
-      return res.status(400).json({ error: 'recipient.does.not.exist' });
+    const findRecipient = await User.findById(recipient);
+    if (!findRecipient) {
+      return res.status(400).json({ error: "recipient.does.not.exist" });
     }
 
-    const senderId = findSender._id
-    const recipientId = findRecipient._id
+    const senderId = findSender._id;
+    const recipientId = findRecipient._id;
 
-    const messages = await Message.find({
+    const query = {
       $or: [
         { sender: recipientId, recipient: senderId },
         { sender: senderId, recipient: recipientId },
       ],
-    })
-      .sort({ timestamp: 1 }) // Sort by timestamp in ascending order
+    }
+
+    const messageList = await Message.find(query)
+      .sort({ timestamp: `desc` }) // Sort by timestamp in ascending order
       .limit(parseInt(limit))
       .skip(parseInt(skip) * parseInt(limit));
 
-    res.json({ messages });
+    const messages = messageList.reverse();
+    // Count the number of documents that match the query
+    const total = await Message.countDocuments(query);
+    
+
+    res.json({ messages, total });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};
 
 const handleFetchRecipient = async (req, res) => {
   try {
-    const {recipient} = req.query
+    const { recipient } = req.query;
 
-    if(!recipient) return res.status(400).json({success: false, message:"recipient.id.not.provided"})
+    if (!recipient)
+      return res
+        .status(400)
+        .json({ success: false, message: "recipient.id.not.provided" });
 
-    const findRecipient = await User.findById(recipient)
+    const findRecipient = await User.findById(recipient);
 
-    if(!findRecipient) return res.status(200).json({success: false, message:"recipient.does.not.exist"})
+    if (!findRecipient)
+      return res
+        .status(200)
+        .json({ success: false, message: "recipient.does.not.exist" });
 
     res.status(200).json({
       username: findRecipient.username,
       id: findRecipient._id,
       createdAt: findRecipient.createdAt,
       isOnline: findRecipient.isOnline,
-    })
+    });
   } catch (error) {
-    return res.status(500).json({success: false, message:"server.error"})
+    return res.status(500).json({ success: false, message: "server.error" });
   }
-}
+};
 
 const handleLogout = async (req, res) => {};
 

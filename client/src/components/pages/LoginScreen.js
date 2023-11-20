@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
-import { useConfig } from "../contexts/ConfigContext";
-import { useAuth } from "../contexts/AuthContext";
+import { useConfig } from "../../contexts/ConfigContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const LoginScreen = () => {
   const config = useConfig();

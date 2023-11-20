@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useConfig } from "../contexts/ConfigContext";
+import { useConfig } from "../../contexts/ConfigContext";
 
 const Register = ({ sendInfoMessage }) => {
   const [emailInput, setEmailInput] = useState("");
