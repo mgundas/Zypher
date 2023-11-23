@@ -11,20 +11,18 @@ import { useRecipient } from "./contexts/RecipientContext";
 function App() {
   const { socket } = useSocket();
   const config = useConfig();
-  const { loggedIn, userData, authToken } = useAuth();
+  const { loggedIn, userData } = useAuth();
   const { setRecipient, recipientData, activeChat, setActiveChat } =
     useRecipient();
 
   const notificationTimeoutRef = useRef(null);
   const checkInterval = useRef(null);
-  const chatWindowRef = useRef(null);
 
   const [isOnline, setIsOnline] = useState(false);
   const [messages, setMessages] = useState([]);
   const [status, setStatus] = useState(isOnline ? "Online" : "Offline");
-
   const [loadedMessages, setLoadedMessages] = useState(0);
-  const [totalMessages, setTotalMessages] = useState(0);
+
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -63,7 +61,7 @@ function App() {
     return () => {
       clearInterval(checkInterval.current);
     };
-  }, [activeChat, socket]);
+  }, [activeChat, socket, recipientData.username]);
 
   useEffect(() => {
     if (socket) {
@@ -113,57 +111,13 @@ function App() {
     socket,
     messages,
     userData.username,
+    recipientData.username,
+    recipientData.length,
+    userData.id,
     config.appName,
     activeChat,
     isOnline,
   ]);
-
-  const fetchMessages = async (limit, skip) => {
-    try {
-      setLoading(true);
-
-      const response = await fetch(
-        `${config.apiUri}/messages?sender=${userData.id}&recipient=${recipientData.id}&limit=${limit}&skip=${skip}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `${authToken}`,
-          },
-        }
-      );
-      const data = await response.json();
-
-      setMessages((prevMessages) => [...data.messages, ...prevMessages]);
-      setLoadedMessages((prevLoaded) => prevLoaded + data.messages.length);
-      setTotalMessages(data.total); // Assuming the API returns the total number of messages
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleScroll = () => {
-    const container = chatWindowRef.current;
-
-    if (
-      container.scrollTop === 0 &&
-      !loading &&
-      loadedMessages < totalMessages
-    ) {
-      const limit = 10 // Adjust the limit as needed
-      const skip = Math.floor(loadedMessages / 10);
-
-      console.log(limit, skip)
-      fetchMessages(limit, skip);
-    }
-  };
-
-  useEffect(() => {
-    if (activeChat) {
-      fetchMessages(10, 0);
-    }
-  }, [activeChat]);
 
   const renderContent = () => {
     if (loggedIn && socket) {
@@ -180,9 +134,11 @@ function App() {
             <ChatWindow
               messages={messages}
               activeChat={activeChat}
-              chatWindowRef={chatWindowRef}
-              handleScroll={handleScroll}
               loading={loading}
+              loadedMessages={loadedMessages}
+              setLoadedMessages={setLoadedMessages}
+              setLoading={setLoading}
+              setMessages={setMessages}
             />
           ) : (
             <MainWindow handleActiveChat={handleActiveChat} />

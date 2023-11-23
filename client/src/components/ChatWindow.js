@@ -1,22 +1,33 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Message from "./Message";
 import ChatInput from "./ChatInput";
 import { useAuth } from "../contexts/AuthContext";
 import { useRecipient } from "../contexts/RecipientContext";
+import { useConfig } from "../contexts/ConfigContext";
 
-export const ChatWindow = ({ messages, chatWindowRef, handleScroll, loading }) => {
-  const { userData } = useAuth();
-  const { recipientData } = useRecipient();
+export const ChatWindow = ({
+  messages,
+  loading,
+  loadedMessages,
+  setLoadedMessages,
+  setLoading,
+  setMessages,
+}) => {
+  const config = useConfig();
+  const { userData, authToken } = useAuth();
+  const { recipientData, activeChat } = useRecipient();
 
   const bottomRef = useRef(null);
-  const loadingRef = useRef(null)
+  const loadingRef = useRef(null);
+  const chatWindowRef = useRef(null);
 
   const [filteredMessages, setFilteredMessages] = useState([]);
+  const [totalMessages, setTotalMessages] = useState(0);
 
   useEffect(() => {
-    if(loading === true) loadingRef.current.classList.remove("invisible")
-    if(loading === false) loadingRef.current.classList.add("invisible")
-  }, [loading])
+    if (loading === true) loadingRef.current.classList.remove("invisible");
+    if (loading === false) loadingRef.current.classList.add("invisible");
+  }, [loading]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -41,6 +52,52 @@ export const ChatWindow = ({ messages, chatWindowRef, handleScroll, loading }) =
     setFilteredMessages(filtered);
   }, [messages, userData.id, recipientData.id]);
 
+  const fetchMessages = useCallback(async (limit, skip) => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        `${config.apiUri}/messages?sender=${userData.id}&recipient=${recipientData.id}&limit=${limit}&skip=${skip}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `${authToken}`,
+          },
+        }
+      );
+      const data = await response.json();
+
+      setMessages((prevMessages) => [...data.messages, ...prevMessages]);
+      setLoadedMessages((prevLoaded) => prevLoaded + data.messages.length);
+      setTotalMessages(data.total);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [authToken, config.apiUri, recipientData.id, setLoadedMessages, setLoading, setMessages, userData.id]);
+
+  const handleScroll = () => {
+    const container = chatWindowRef.current;
+
+    if (
+      container.scrollTop === 0 &&
+      !loading &&
+      loadedMessages < totalMessages
+    ) {
+      const limit = 10; // Adjust the limit as needed
+      const skip = Math.floor(loadedMessages / 10);
+
+      console.log(limit, skip);
+      fetchMessages(limit, skip);
+    }
+  };
+
+  useEffect(() => {
+    if (activeChat) {
+      fetchMessages(10, 0);
+    }
+  }, [activeChat, fetchMessages]);
   return (
     <>
       <div
@@ -49,7 +106,10 @@ export const ChatWindow = ({ messages, chatWindowRef, handleScroll, loading }) =
         className="flex-1 flex flex-col items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white 
 relative"
       >
-        <div ref={loadingRef} className="loading loading-spinner loading-lg text-success"></div>
+        <div
+          ref={loadingRef}
+          className="loading loading-spinner loading-lg text-success"
+        ></div>
         {/* <div className="flex p-1 rounded-lg text-center px-2 items-center bg-teal-700 text-sm font-medium select-none">
           Please do not share your password or personal information.
         </div> */}
