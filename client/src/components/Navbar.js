@@ -98,17 +98,17 @@ export const Navbar = ({
                 />
                 <NotificationItem
                   notficiationData={{
-                    username: "dongalamasyon",
+                    username: "taylorswift",
                     title: "New follower!",
-                    content: "@dongalamasyon started to follow you.",
+                    content: "@taylorswift started to follow you.",
                     timestamp: "10w",
                   }}
                 />
                 <NotificationItem
                   notficiationData={{
-                    username: "s2mdimdick",
+                    username: "arianagrande",
                     title: "New follower!",
-                    content: "@s2mdimdick started to follow you.",
+                    content: "@arianagrande started to follow you.",
                     timestamp: "10w",
                   }}
                 />
