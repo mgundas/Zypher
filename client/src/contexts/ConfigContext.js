@@ -14,7 +14,7 @@ export const ConfigProvider = ({ children }) => {
     notice: {
         visible: false,
         title: "Welcome aboard!",
-        message: "Comuconnect is finally online!"
+        message: "Zypher is finally online!"
     }
   };
 

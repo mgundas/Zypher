@@ -1,5 +1,5 @@
 
-# Real Time Chat App
+# Zypher, Real Time Chat App.
 
 This app is nowhere near finished. I'm still working on this project and learning a ton while developing.
 
