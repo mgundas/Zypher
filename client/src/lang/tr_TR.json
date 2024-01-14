@@ -1,0 +1,16 @@
+{
+    "locale": "tr_TR",
+    "lang": "Türkçe",
+    "content": {
+        "title": "Zypher",
+        "description": "Zypher neredeyse herkesi bulabileceğin bir anlık mesajlaşma uygulamasıdır!",
+        "mainWindow": {
+            "randomize": "Rastgele"
+        },
+        "navbar": {
+            "profile": "Profil",
+            "settings": "Ayarlar",
+            "logout": "Çıkış yap"
+        }
+    }
+}

@@ -1,18 +1,38 @@
-import {useState} from "react";
+import { useEffect, useState } from "react";
 import { useSocket } from "../contexts/SocketContext";
 import { useAuth } from "../contexts/AuthContext";
 import { generateRandomColor } from "../helpers/generateRandomColor";
 import { getInitials } from "../helpers/getInitials";
+import { useLanguage } from "../contexts/LanguageContext";
 
-export const MainWindow = ({handleActiveChat}) => {
+export const MainWindow = ({ handleActiveChat }) => {
   const { socket } = useSocket();
+  const { langData, setLanguage, availableLangs } = useLanguage();
 
   const [randomUsers, setRandomUsers] = useState([]);
+  const [langList, setLangList] = useState([])
   const { userData } = useAuth();
+
+  let langSet = new Set;
+
+  useEffect(() => {
+    for(let i = 0; i < availableLangs.size; i++){
+      langSet.add(availableLangs.get(i))
+    }
+    console.log(langSet);
+    langSet.forEach(singleLang => {
+      setLangList(prevList => [...prevList, singleLang])
+    })
+  }, [availableLangs])
 
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center">
+      {langList.map((lang, index) => {
+        return (
+          <button onClick={() => {setLanguage(lang[0])}} className="btn btn-outline btn-accent" key={index}>{lang[1]}</button>
+        )
+      })}
       <button
         onClick={() => {
           socket.emit("randomUsers", 10, (data) => {
@@ -22,7 +42,7 @@ export const MainWindow = ({handleActiveChat}) => {
         }}
         className="btn btn-outline btn-accent"
       >
-        Randomize
+        {langData.content.mainWindow.randomize}
       </button>
       <div className="p-2 flex gap-2">
         {randomUsers.map((user, index) => {

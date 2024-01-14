@@ -9,6 +9,7 @@ import { useRecipient } from "../contexts/RecipientContext";
 import ToggleDarkMode from "./ToggleDarkMode";
 import { NotificationItem } from "./modules/NotificationItem";
 import { RecipientProfile } from "./RecipientProfile";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export const Navbar = ({
   messages,
@@ -16,6 +17,7 @@ export const Navbar = ({
   status,
 }) => {
   const { socket } = useSocket();
+  const { langData } = useLanguage();
   const config = useConfig();
   const { userData } = useAuth();
   const { recipientData, activeChat, setActiveChat } = useRecipient();
@@ -132,15 +134,15 @@ export const Navbar = ({
           >
             <li>
               <button className="justify-between">
-                Profile
+                {langData.content.navbar.profile}
                 <span className="badge bg-rtca-700 border-none">New</span>
               </button>
             </li>
             <li>
-              <button>Settings</button>
+              <button>{langData.content.navbar.settings}</button>
             </li>
             <li>
-              <button>Logout</button>
+              <button>{langData.content.navbar.logout}</button>
             </li>
           </ul>
         </div>
