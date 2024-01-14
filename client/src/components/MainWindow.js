@@ -10,27 +10,14 @@ export const MainWindow = ({ handleActiveChat }) => {
   const { langData, setLanguage, availableLangs } = useLanguage();
 
   const [randomUsers, setRandomUsers] = useState([]);
-  const [langList, setLangList] = useState([])
   const { userData } = useAuth();
-
-  let langSet = new Set;
-
-  useEffect(() => {
-    for(let i = 0; i < availableLangs.size; i++){
-      langSet.add(availableLangs.get(i))
-    }
-    console.log(langSet);
-    langSet.forEach(singleLang => {
-      setLangList(prevList => [...prevList, singleLang])
-    })
-  }, [availableLangs])
 
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center">
-      {langList.map((lang, index) => {
+      {[...availableLangs].map((lang, index) => {
         return (
-          <button onClick={() => {setLanguage(lang[0])}} className="btn btn-outline btn-accent" key={index}>{lang[1]}</button>
+          <button onClick={() => {setLanguage(lang[1][0])}} className="btn btn-outline btn-accent" key={index}>{lang[1][1]}</button>
         )
       })}
       <button
