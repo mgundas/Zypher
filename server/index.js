@@ -13,15 +13,17 @@ const app = express();
 const { mongoose } = require("./database")
 const { configureSocket } = require("./socketConfig")
 const {httpServer, io} = configureSocket(app);
-const {initializeIo} = require("./io")
+const {initializeIo} = require("./io");
+const morgan = require("morgan");
 initializeIo(io)
 
 //Express middleware
+app.use(morgan("dev"))
 app.use(useragent.express());
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://admin.socket.io"],
+    origin: ["http://localhost:3000", "https://dev.pyromaniacduck.cloud"],
   })
 );
 

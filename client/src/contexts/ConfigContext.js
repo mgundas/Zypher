@@ -9,8 +9,8 @@ export const useConfig = () => {
 export const ConfigProvider = ({ children }) => {
   const config = {
     appName: "Zypher",
-    socketUri: "http://localhost/",
-    apiUri: "http://localhost/api/v1",
+    socketUri: "https://api.pyromaniacduck.cloud/",
+    apiUri: "https://api.pyromaniacduck.cloud/api/v1",
     notice: {
         visible: false,
         title: "Welcome aboard!",
