@@ -6,12 +6,20 @@
   <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
-  <meta name="description" content="Zypher - A real-time chat app." />
+  <meta name="description" content="Zypher is an instant messaging app where you can talk to random people or people you already know." />
+  <meta property="og:description" content="Zypher is an instant messaging app where you can talk to random people or people you already know." />
+  <meta property="og:title" content="Zypher - where you can connect with almost anyone!" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image" content="https://dev.pyromaniacduck.cloud/cover.jpg" />
+  <meta name="twitter:description" content="Zypher is an instant messaging app where you can talk to random people or people you already know.">
+  <meta name="twitter:title" content="Zypher - where you can connect with almost anyone!">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://dev.pyromaniacduck.cloud/cover.jpg">
+  <!-- <meta property="" content=""> -->
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
   <title>Zypher</title>
   <script>
-    // It's best to inline this in `head` to avoid FOUC (flash of unstyled content) when changing pages or themes
     if (
       localStorage.getItem('color-theme') === 'dark' ||
       (!('color-theme' in localStorage) &&

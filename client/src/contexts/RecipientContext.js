@@ -38,7 +38,7 @@ export const RecipientProvider = ({ children }) => {
     if (recipient) {
       fetchUser();
     }
-  }, [recipient]);
+  }, [recipient, authToken, config.apiUri]);
 
   return (
     <RecipientContext.Provider value={{ recipientData, setRecipient, activeChat, setActiveChat }}>
