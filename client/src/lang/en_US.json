@@ -4,13 +4,21 @@
     "content": {
         "title": "Zypher",
         "description": "Zypher is an instant messaging app where you can find almost anybody!",
+        "common": {
+            "new": "New",
+            "yes": "Yes",
+            "no": "No",
+            "ok": "Okay"
+        },
         "mainWindow": {
             "randomize": "Randomize"
         },
         "navbar": {
             "profile": "Profile",
             "settings": "Settings",
-            "logout": "Logout"
+            "logout": "Logout",
+            "languages": "Languages",
+            "notifications": "Notifications"
         }
     }
 }

@@ -11,8 +11,13 @@ export const LanguageProvider = ({ children }) => {
 	const [langData, setLangData] = useState({})
 	const availableLangs = new Map([
 		[0, ["en_US", "English"]],
-		[1, ["tr_TR", "Turkish"]],
+		[1, ["tr_TR", "Türkçe"]],
 	])
+
+	const setLang = (locale) => {
+		setLanguage(locale)
+		localStorage.setItem("locale", locale)
+	}
 
 	useEffect(() => {
 		const fetchLangFile = async () => {
@@ -33,7 +38,7 @@ export const LanguageProvider = ({ children }) => {
 
 
 	return (
-		<LanguageContext.Provider value={{ setLanguage, availableLangs, langData }}>
+		<LanguageContext.Provider value={{ setLang, availableLangs, langData }}>
 			{children}
 		</LanguageContext.Provider>
 	)

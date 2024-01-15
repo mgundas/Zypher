@@ -15,11 +15,6 @@ export const MainWindow = ({ handleActiveChat }) => {
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center">
-      {[...availableLangs].map((lang, index) => {
-        return (
-          <button onClick={() => {setLanguage(lang[1][0])}} className="btn btn-outline btn-accent" key={index}>{lang[1][1]}</button>
-        )
-      })}
       <button
         onClick={() => {
           socket.emit("randomUsers", 10, (data) => {

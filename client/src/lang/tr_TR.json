@@ -4,13 +4,21 @@
     "content": {
         "title": "Zypher",
         "description": "Zypher neredeyse herkesi bulabileceğin bir anlık mesajlaşma uygulamasıdır!",
+        "common": {
+            "new": "Yeni",
+            "yes": "Evet",
+            "no": "Hayır",
+            "ok": "Tamam"
+        },
         "mainWindow": {
             "randomize": "Rastgele"
         },
         "navbar": {
             "profile": "Profil",
             "settings": "Ayarlar",
-            "logout": "Çıkış yap"
+            "logout": "Çıkış yap",
+            "languages": "Diller",
+            "notifications": "Bildirimler"
         }
     }
 }

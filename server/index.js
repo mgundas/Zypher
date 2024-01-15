@@ -23,7 +23,7 @@ app.use(useragent.express());
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://dev.pyromaniacduck.cloud"],
+    origin: ["http://localhost:3000", "https://zypher.pyromaniacduck.cloud"],
   })
 );
 
