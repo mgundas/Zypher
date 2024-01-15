@@ -11,7 +11,7 @@ const Message = ({ message, isLastMessage, }) => {
 
   const { userData } = useAuth();
   const { socket } = useSocket();
-  const { recipientData, activeChat } = useRecipient();
+  const { recipientData } = useRecipient();
 
   useState(() => {
     const handleSeen = (data) => {
@@ -110,6 +110,7 @@ const Message = ({ message, isLastMessage, }) => {
     isTabVisible,
     message.sender,
     socket,
+    message._id
   ]);
 
   return (
