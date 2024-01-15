@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSocket } from "../contexts/SocketContext";
 import { useAuth } from "../contexts/AuthContext";
 import { generateRandomColor } from "../helpers/generateRandomColor";
@@ -7,7 +7,7 @@ import { useLanguage } from "../contexts/LanguageContext";
 
 export const MainWindow = ({ handleActiveChat }) => {
   const { socket } = useSocket();
-  const { langData, setLanguage, availableLangs } = useLanguage();
+  const { langData } = useLanguage();
 
   const [randomUsers, setRandomUsers] = useState([]);
   const { userData } = useAuth();
@@ -28,7 +28,7 @@ export const MainWindow = ({ handleActiveChat }) => {
       </button>
       <div className="p-2 flex gap-2">
         {randomUsers.map((user, index) => {
-          if (user.username === userData.username) return;
+          if (user.username === userData.username) return(<></>);
           return (
             <button
               key={index}

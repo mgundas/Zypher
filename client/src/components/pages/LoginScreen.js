@@ -1,12 +1,10 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
 import { useConfig } from "../../contexts/ConfigContext";
-import { useAuth } from "../../contexts/AuthContext";
 
 export const LoginScreen = () => {
   const config = useConfig();
-  const { loggedIn, userData } = useAuth();
 
   const infoBoxRef = useRef(null);
   const infoTimeoutRef = useRef(null);

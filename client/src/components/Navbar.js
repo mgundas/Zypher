@@ -3,7 +3,6 @@ import { SenderList } from "./SenderList";
 import { generateRandomColor } from "../helpers/generateRandomColor";
 import { getInitials } from "../helpers/getInitials";
 import { useConfig } from "../contexts/ConfigContext";
-import { useSocket } from "../contexts/SocketContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useRecipient } from "../contexts/RecipientContext";
 import ToggleDarkMode from "./ToggleDarkMode";
@@ -16,7 +15,6 @@ export const Navbar = ({
 	handleActiveChat,
 	status,
 }) => {
-	const { socket } = useSocket();
 	const { langData, setLang, availableLangs } = useLanguage();
 	const config = useConfig();
 	const { userData } = useAuth();
@@ -112,25 +110,9 @@ export const Navbar = ({
 							<div className="overflow-y-auto overflow-x-hidden grid gap-1 max-h-[calc(100vh/2)]">
 								<NotificationItem
 									notficiationData={{
-										username: userData.username,
+										username: "will",
 										title: "New follower!",
-										content: "@mitchgrassi started to follow you.",
-										timestamp: "10w",
-									}}
-								/>
-								<NotificationItem
-									notficiationData={{
-										username: "taylorswift",
-										title: "New follower!",
-										content: "@taylorswift started to follow you.",
-										timestamp: "10w",
-									}}
-								/>
-								<NotificationItem
-									notficiationData={{
-										username: "arianagrande",
-										title: "New follower!",
-										content: "@arianagrande started to follow you.",
+										content: "Sit tight! We'll implement this feature soon.",
 										timestamp: "10w",
 									}}
 								/>
