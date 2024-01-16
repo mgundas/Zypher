@@ -19,7 +19,6 @@ export const MainWindow = ({ handleActiveChat }) => {
         onClick={() => {
           socket.emit("randomUsers", 10, (data) => {
             setRandomUsers(data);
-            console.log(data);
           });
         }}
         className="btn btn-outline btn-accent"
@@ -28,7 +27,7 @@ export const MainWindow = ({ handleActiveChat }) => {
       </button>
       <div className="p-2 flex gap-2">
         {randomUsers.map((user, index) => {
-          if (user.username === userData.username) return(<></>);
+          if (user.username === userData.username) return(<span className="hidden" key={index}>It's you haha</span>);
           return (
             <button
               key={index}
