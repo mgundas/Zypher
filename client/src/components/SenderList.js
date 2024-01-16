@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { getInitials } from "../helpers/getInitials";
 import { generateRandomColor } from "../helpers/generateRandomColor";
 import { useAuth } from "../contexts/AuthContext";
@@ -13,13 +13,16 @@ export const SenderList = ({
   const [senders, setSenders] = useState([])
 
   useEffect(() => {
+    console.log(messages);
     setSenders([
       ...new Set(
         messages.map((message) => {
           if (message.sender !== userData.id) {
             return `${message.senderUname} ${message.sender}`;
-          } else {
+          } else if (message.recipient !== userData.id) {
             return `${message.recipientUname} ${message.recipient}`;
+          } else {
+            return "";
           }
         })
       ),
@@ -51,6 +54,7 @@ export const SenderList = ({
             <div className="p-5 font-medium text-center">Conversations</div>
             <div className="flex flex-1 flex-col">
               {senders ? (senders.map((sender, index) => {
+                console.log(senders);
                 const userData = sender.split(" ")
                 return (
                   <button
