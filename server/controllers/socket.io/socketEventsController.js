@@ -19,12 +19,23 @@ const privateMessage = async (io, socket, data) => {
         message: data.message,
         timestamp: data.timestamp,
       });
-      await newMessage.save(); // Make sure to await the save operation
+      const savedMessage = await newMessage.save(); // Make sure to await the save operation
+      const { _id, recipient, sender, message, seen, timestamp } = savedMessage
+      const messageToEmit = {
+        _id: _id.toString(),
+        recipient: recipient.toString(),
+        recipientUname: user.username,
+        sender: sender.toString(),
+        senderUname: socket.username,
+        message: message,
+        seen: seen,
+        timestamp: timestamp,
+      }
 
       for (const recipientSocket of mapping.sockets) {
-        io.to(recipientSocket).emit("receiveMessage", newMessage);
+        io.to(recipientSocket).emit("receiveMessage", messageToEmit);
       }
-      io.to(socket.id).emit("receiveMessage", newMessage);
+      io.to(socket.id).emit("receiveMessage", messageToEmit);
     } else {
       console.log("No matching user-to-socket mapping found for", user._id);
     }

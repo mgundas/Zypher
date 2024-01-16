@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getInitials } from "../helpers/getInitials";
 import { generateRandomColor } from "../helpers/generateRandomColor";
 import { useAuth } from "../contexts/AuthContext";
@@ -10,22 +10,21 @@ export const SenderList = ({
 }) => {
   const { userData } = useAuth();
   const [searchInput, setSearchInput] = useState("");
-  const [uniqueSenders, setUniqueSenders] = useState([]);
+  const [senders, setSenders] = useState([])
 
   useEffect(() => {
-    const senders = [
+    setSenders([
       ...new Set(
         messages.map((message) => {
-          if (message.sender !== userData.username) {
-            return message.sender;
+          if (message.sender !== userData.id) {
+            return `${message.senderUname} ${message.sender}`;
           } else {
-            return message.recipient;
+            return `${message.recipientUname} ${message.recipient}`;
           }
         })
       ),
-    ];
-    setUniqueSenders(senders);
-  }, [messages, userData.username]);
+    ]);
+  }, [messages, userData.id]);
 
   return (
     <>
@@ -51,29 +50,32 @@ export const SenderList = ({
           <div className="w-80 flex flex-col min-h-full bg-rtca-900">
             <div className="p-5 font-medium text-center">Conversations</div>
             <div className="flex flex-1 flex-col">
-              {uniqueSenders.map((sender, index) => (
-                <button
-                  onClick={() => {
-                    handleActiveChat(sender);
-                    document.getElementById("senderListDrawer").checked = false;
-                  }}
-                  key={index}
-                  className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all"
-                >
-                  <div
-                    style={{
-                      backgroundColor: generateRandomColor(sender),
+              {senders ? (senders.map((sender, index) => {
+                const userData = sender.split(" ")
+                return (
+                  <button
+                    onClick={() => {
+                      handleActiveChat(userData[1]);
+                      document.getElementById("senderListDrawer").checked = false;
                     }}
-                    className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10"
+                    key={index}
+                    className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all"
                   >
-                    {getInitials(sender)}
-                  </div>
-                  <div className="grid grid-rows-2 text-sm">
-                    <div className="font-medium text-left">{sender}</div>
-                    <span className="">{}</span>
-                  </div>
-                </button>
-              ))}
+                    <div
+                      style={{
+                        backgroundColor: generateRandomColor(userData[0]),
+                      }}
+                      className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10"
+                    >
+                      {getInitials(userData[0])}
+                    </div>
+                    <div className="grid grid-rows-2 text-sm">
+                      <div className="font-medium text-left">{userData[0]}</div>
+                      <span className="">Last message goes here...</span>
+                    </div>
+                  </button>
+                )
+              })) : (<></>)}
             </div>
             <button
               className="p-4 bg-green-800 hover:bg-green-500/50 transition-all"

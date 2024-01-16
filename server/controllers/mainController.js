@@ -392,11 +392,22 @@ const handleMessage = async (req, res) => {
       .skip(parseInt(skip) * parseInt(limit));
 
     const messages = messageList.reverse();
+    
     // Count the number of documents that match the query
     const total = await Message.countDocuments(query);
-    
 
-    res.json({ messages, total });
+    const toBeSent = messages.map((message) => ({
+      _id: message._id.toString(),
+      recipient: message.recipient.toString(),
+      recipientUname: findRecipient.username,
+      senderUname: findSender.username,
+      sender: message.sender.toString(),
+      message: message.message,
+      seen: message.seen,
+      timestamp: message.timestamp,
+    }));
+
+    res.json({ messages: toBeSent, total: total });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -430,7 +441,7 @@ const handleFetchRecipient = async (req, res) => {
   }
 };
 
-const handleLogout = async (req, res) => {};
+const handleLogout = async (req, res) => { };
 
 module.exports = {
   handleLogin,

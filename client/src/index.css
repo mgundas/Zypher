@@ -35,7 +35,7 @@ body{
 }
 
 .chat-screen{
-    @apply h-screen flex flex-col bg-rtca-200 dark:bg-rtca-700
+    @apply h-screen flex flex-col bg-rtca-300 dark:bg-rtca-700
 }
 
 .time-divider{
@@ -43,7 +43,7 @@ body{
 }
 
 .navbar{
-    @apply bg-rtca-300 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 justify-between items-center h-16
+    @apply bg-rtca-400 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 justify-between items-center h-16
 }
 
 .nav-button{

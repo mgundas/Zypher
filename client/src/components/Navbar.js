@@ -15,6 +15,7 @@ export const Navbar = ({
 	handleActiveChat,
 	status,
 }) => {
+   // Context imports
 	const { langData, setLang, availableLangs } = useLanguage();
 	const config = useConfig();
 	const { userData } = useAuth();
@@ -28,6 +29,7 @@ export const Navbar = ({
 					<SenderList
 						setActiveChat={setActiveChat}
 						messages={messages}
+                  activeChat={activeChat}
 						handleActiveChat={handleActiveChat}
 					/>
 					{activeChat ? (
