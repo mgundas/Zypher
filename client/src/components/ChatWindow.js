@@ -57,7 +57,7 @@ export const ChatWindow = ({
       setLoading(true);
 
       const response = await fetch(
-        `${config.apiUri}/messages?sender=${userData.id}&recipient=${recipientData.id}&limit=${limit}&skip=${skip}`,
+        `${config.apiUri}/messages?requester=${userData.id}&recipient=${recipientData.id}&limit=${limit}&skip=${skip}`,
         {
           method: "GET",
           headers: {

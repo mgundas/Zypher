@@ -364,10 +364,10 @@ const handleRefreshTokens = async (req, res) => {
 
 const handleMessage = async (req, res) => {
   try {
-    const { sender, recipient, limit, skip } = req.query;
+    const { requester, recipient, limit, skip } = req.query;
 
-    const findSender = await User.findById(sender);
-    if (!findSender) {
+    const findRequester = await User.findById(requester);
+    if (!findRequester) {
       return res.status(400).json({ error: "sender.does.not.exist" });
     }
 
@@ -376,13 +376,13 @@ const handleMessage = async (req, res) => {
       return res.status(400).json({ error: "recipient.does.not.exist" });
     }
 
-    const senderId = findSender._id;
+    const requesterId = findRequester._id;
     const recipientId = findRecipient._id;
 
     const query = {
       $or: [
-        { sender: recipientId, recipient: senderId },
-        { sender: senderId, recipient: recipientId },
+        { sender: recipientId, recipient: requesterId },
+        { sender: requesterId, recipient: recipientId },
       ],
     }
 
@@ -392,20 +392,42 @@ const handleMessage = async (req, res) => {
       .skip(parseInt(skip) * parseInt(limit));
 
     const messages = messageList.reverse();
-    
+
     // Count the number of documents that match the query
     const total = await Message.countDocuments(query);
 
-    const toBeSent = messages.map((message) => ({
-      _id: message._id.toString(),
-      recipient: message.recipient.toString(),
-      recipientUname: findRecipient.username,
-      senderUname: findSender.username,
-      sender: message.sender.toString(),
-      message: message.message,
-      seen: message.seen,
-      timestamp: message.timestamp,
-    }));
+    const toBeSent = messages.map(message => {
+      const { sender, recipient } = message
+
+      let senderUname;
+      let recipientUname;
+
+
+      if(sender.toString() === requesterId.toString() && recipient.toString() === recipientId.toString()){
+        senderUname = findRequester.username
+        recipientUname = findRecipient.username
+      } else if(sender.toString() === recipientId.toString() && recipient.toString() === requesterId.toString()){
+        senderUname = findRecipient.username
+        recipientUname = findRequester.username
+      } else {
+        senderUname = "poop"
+        recipientUname = "poopy"
+      }
+
+      // console.log(message.sender, findRequester._id, message.recipient, findRecipient._id);
+      // console.log(senderUname, recipientUname);
+
+      return {
+        _id: message._id.toString(),
+        recipient: message.recipient.toString(),
+        recipientUname: recipientUname,
+        senderUname: senderUname,
+        sender: message.sender.toString(),
+        message: message.message,
+        seen: message.seen,
+        timestamp: message.timestamp,
+      }
+    });
 
     res.json({ messages: toBeSent, total: total });
   } catch (error) {

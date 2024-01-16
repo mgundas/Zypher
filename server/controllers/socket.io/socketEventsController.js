@@ -21,6 +21,18 @@ const privateMessage = async (io, socket, data) => {
       });
       const savedMessage = await newMessage.save(); // Make sure to await the save operation
       const { _id, recipient, sender, message, seen, timestamp } = savedMessage
+
+      let socketUname;
+      let recipientUname;
+      
+      if(sender === socket.uid && recipient === user._id) {
+        socketUname = socket.username
+        recipientUname = user.username
+      } else if(sender === user._id && recipient === socket.id){
+        socketUname = user.username
+        recipientUname = socket.username
+      }
+
       const messageToEmit = {
         _id: _id.toString(),
         recipient: recipient.toString(),
