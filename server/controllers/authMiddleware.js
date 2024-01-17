@@ -36,6 +36,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     // continue if no error occurs
+    req.authUser = userExists
     next();
 
   } catch (error) {

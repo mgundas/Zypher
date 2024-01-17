@@ -364,12 +364,14 @@ const handleRefreshTokens = async (req, res) => {
 
 const handleMessage = async (req, res) => {
   try {
-    const { requester, recipient, limit, skip } = req.query;
+    const { recipient, limit, skip } = req.query;
 
-    const findRequester = await User.findById(requester);
-    if (!findRequester) {
-      return res.status(400).json({ error: "sender.does.not.exist" });
-    }
+    const findRequester = req.authUser
+
+//  const findRequester = await User.findById(requester);  // Just realized how stupid this piece code was. It literally enables EVERYONE to fetch messages between other people.
+//  if (!findRequester) {
+//    return res.status(400).json({ error: "sender.does.not.exist" });
+//  }
 
     const findRecipient = await User.findById(recipient);
     if (!findRecipient) {
@@ -462,7 +464,9 @@ const handleFetchRecipient = async (req, res) => {
   }
 };
 
-const handleLogout = async (req, res) => { };
+const handleLogout = async (req, res) => {
+  // TODO: handle logout
+};
 
 module.exports = {
   handleLogin,

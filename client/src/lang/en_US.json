@@ -8,7 +8,9 @@
             "new": "New",
             "yes": "Yes",
             "no": "No",
-            "ok": "Okay"
+            "ok": "Okay",
+            "open": "Open",
+            "close": "Close"
         },
         "mainWindow": {
             "randomize": "Randomize"
@@ -19,6 +21,16 @@
             "logout": "Logout",
             "languages": "Languages",
             "notifications": "Notifications"
+        },
+        "recipientProfile": {
+            "joinedOn": "Joined on:",
+            "userId": "User ID:"
+        },
+        "conversationDrawer": {
+            "conversations": "Conversations",
+            "newConvo": "New Conversation",
+            "startNewConvo": "Start a new conversation",
+            "searchUser": "Search user"
         }
     }
 }

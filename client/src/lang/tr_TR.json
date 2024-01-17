@@ -8,7 +8,9 @@
             "new": "Yeni",
             "yes": "Evet",
             "no": "Hayır",
-            "ok": "Tamam"
+            "ok": "Tamam",
+            "open": "Open",
+            "close": "Close"
         },
         "mainWindow": {
             "randomize": "Rastgele"
@@ -19,6 +21,16 @@
             "logout": "Çıkış yap",
             "languages": "Diller",
             "notifications": "Bildirimler"
+        },
+        "recipientProfile": {
+            "joinedOn": "Katılma zamanı:",
+            "userId": "Kullanıcı ID:"
+        },
+        "conversationDrawer": {
+            "conversations": "Diyaloglar",
+            "newConvo": "Yeni Diyalog",
+            "startNewConvo": "Yeni bir diyalog başlat",
+            "searchUser": "Kullanıcı ara"
         }
     }
 }

@@ -2,9 +2,11 @@ import React from "react";
 import { useRecipient } from "../contexts/RecipientContext";
 import { generateRandomColor } from "../helpers/generateRandomColor";
 import { getInitials } from "../helpers/getInitials";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export const RecipientProfile = () => {
   const { recipientData } = useRecipient();
+  const { langData } = useLanguage();
 
   const convertTime = (time) => {
     const date = new Date(time);
@@ -38,14 +40,14 @@ export const RecipientProfile = () => {
           <div className="flex flex-col grow px-2 justify-center">
             <p className="font-medium">{recipientData.username}</p>
             <p className="font-medium">
-              Joined on: {convertTime(recipientData.createdAt)}
+              {langData.content.recipientProfile.joinedOn} {convertTime(recipientData.createdAt)}
             </p>
-            <p className="font-medium">User id: {recipientData.id}</p>
+            <p className="font-medium">{langData.content.recipientProfile.userId} {recipientData.id}</p>
           </div>
         </div>
       </div>
       <form method="dialog" className="modal-backdrop">
-        <button>close</button>
+        <button>{langData.content.common.close}</button>
       </form>
     </dialog>
   );

@@ -3,12 +3,14 @@ import { getInitials } from "../helpers/getInitials";
 import { generateRandomColor } from "../helpers/generateRandomColor";
 import { useAuth } from "../contexts/AuthContext";
 import { useRecipient } from "../contexts/RecipientContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export const SenderList = ({
   messages
 }) => {
   const { setRecipient } = useRecipient();
   const { userData } = useAuth();
+  const { langData } = useLanguage();
   const [searchInput, setSearchInput] = useState("");
   const [senders, setSenders] = useState([])
 
@@ -50,7 +52,7 @@ export const SenderList = ({
             className="drawer-overlay"
           ></label>
           <div className="w-80 flex flex-col min-h-full bg-rtca-900">
-            <div className="p-5 font-medium text-center">Conversations</div>
+            <div className="p-5 font-medium text-center">{langData.content.conversationDrawer.conversations}</div>
             <div className="flex flex-1 flex-col">
               {senders ? (senders.map((sender, index) => {
                 const userData = sender.split(" ")
@@ -86,7 +88,7 @@ export const SenderList = ({
                 document.getElementById("newConvoModal").showModal()
               }
             >
-              New conversation
+              {langData.content.conversationDrawer.newConvo}
             </button>
           </div>
         </div>
@@ -100,7 +102,7 @@ export const SenderList = ({
               ✕
             </button>
           </form>
-          <h3 className="font-bold text-lg">Start a new conversation.</h3>
+          <h3 className="font-bold text-lg">{langData.content.conversationDrawer.startNewConvo}</h3>
           <div className="py-2 flex">
             <form
               method="dialog"
@@ -116,7 +118,7 @@ export const SenderList = ({
                   setSearchInput(e.target.value);
                 }}
                 className="convo-modal-content-input grow"
-                placeholder="Search for a user."
+                placeholder={langData.content.conversationDrawer.searchUser}
                 maxLength={12}
               />
               <button className="chat-send-button">

@@ -68,7 +68,7 @@ export const ChatWindow = ({
       setLoading(true);
 
       const response = await fetch(
-        `${config.apiUri}/messages?requester=${userData.id}&recipient=${recipientData.id}&limit=${limit}&skip=${skip}`,
+        `${config.apiUri}/messages?recipient=${recipientData.id}&limit=${limit}&skip=${skip}`,
         {
           method: "GET",
           headers: {
@@ -87,7 +87,7 @@ export const ChatWindow = ({
     } finally {
       setLoading(false);
     }
-  }, [authToken, config.apiUri, recipientData.id, setLoadedMessages, setLoading, setMessages, userData.id]);
+  }, [authToken, config.apiUri, recipientData.id, setLoadedMessages, setLoading, setMessages]);
 
   const handleScroll = () => {
     const container = chatWindowRef.current;
