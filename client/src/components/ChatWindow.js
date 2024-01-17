@@ -20,6 +20,7 @@ export const ChatWindow = ({
   const bottomRef = useRef(null);
   const loadingRef = useRef(null);
   const chatWindowRef = useRef(null);
+  const toBottomRef = useRef(null);
 
   const [filteredMessages, setFilteredMessages] = useState([]);
   const [totalMessages, setTotalMessages] = useState(0);
@@ -30,31 +31,18 @@ export const ChatWindow = ({
   }, [loading]);
 
   useEffect(() => {
-    const handleLoad = () => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-      // Add your logic here to handle the fully loaded state
-    };
-
-    // Listen for the 'load' event on the window
-    window.addEventListener('load', handleLoad);
-
-    // Clean up the event listener when the component unmounts
-    return () => {
-      window.removeEventListener('load', handleLoad);
-    };
-  }, []); // The empty dependency array ensures the effect runs only once on mount
-
-
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [recipient])
 
   useEffect(() => {
     // Check if the user is close to the bottom
-    const isCloseToBottom = chatWindowRef.current.scrollHeight - chatWindowRef.current.scrollTop <= chatWindowRef.current.clientHeight + 100;
+    const isCloseToBottom = chatWindowRef.current.scrollHeight - chatWindowRef.current.scrollTop <= chatWindowRef.current.clientHeight + 1000;
 
     // If the user is close to the bottom, scroll to the bottom
     if (isCloseToBottom) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [filteredMessages, recipient]);
+  }, [filteredMessages]);
 
   useEffect(() => {
     const filtered = messages.filter((message) => {
@@ -115,6 +103,12 @@ export const ChatWindow = ({
       console.log(limit, skip);
       fetchMessages(limit, skip);
     }
+
+    if(container.scrollTop + container.clientHeight === container.scrollHeight){
+      toBottomRef.current?.classList.add("hidden")
+    } else {
+      toBottomRef.current?.classList.remove("hidden")
+    }
   };
 
   useEffect(() => {
@@ -122,6 +116,7 @@ export const ChatWindow = ({
       fetchMessages(10, 0);
     }
   }, [activeChat, fetchMessages]);
+  
   return (
     <>
       <div
@@ -146,6 +141,7 @@ relative"
           />
         ))}
         <div ref={bottomRef} className="opacity-0 content-none"></div>
+        <button onClick={() => {bottomRef.current?.scrollIntoView({ behavior: 'smooth' });}} ref={toBottomRef} className="fixed bottom-16 py-1 px-2 bg-rtca-800 hover:bg-rtca-900 transition-all rounded-full hidden"><i className="bi bi-chevron-double-down"></i></button>
       </div>
       <ChatInput />
     </>

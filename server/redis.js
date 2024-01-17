@@ -9,6 +9,7 @@ redisClient.on('connect', () => {
     console.log('Connected to Redis');
 });
 
+// Check if the connection to Redis is failed
 redisClient.on('error', (err) => {
     console.error(`Error connecting to Redis: ${err}`);
 });
