@@ -15,7 +15,7 @@ export const ChatWindow = ({
 }) => {
   const config = useConfig();
   const { userData, authToken } = useAuth();
-  const { recipientData, activeChat } = useRecipient();
+  const { recipientData, activeChat, recipient } = useRecipient();
 
   const bottomRef = useRef(null);
   const loadingRef = useRef(null);
@@ -30,8 +30,31 @@ export const ChatWindow = ({
   }, [loading]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [filteredMessages]);
+    const handleLoad = () => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      // Add your logic here to handle the fully loaded state
+    };
+
+    // Listen for the 'load' event on the window
+    window.addEventListener('load', handleLoad);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('load', handleLoad);
+    };
+  }, []); // The empty dependency array ensures the effect runs only once on mount
+
+
+
+  useEffect(() => {
+    // Check if the user is close to the bottom
+    const isCloseToBottom = chatWindowRef.current.scrollHeight - chatWindowRef.current.scrollTop <= chatWindowRef.current.clientHeight + 100;
+
+    // If the user is close to the bottom, scroll to the bottom
+    if (isCloseToBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [filteredMessages, recipient]);
 
   useEffect(() => {
     const filtered = messages.filter((message) => {
@@ -67,7 +90,8 @@ export const ChatWindow = ({
       );
       const data = await response.json();
 
-      setMessages((prevMessages) => [...data.messages, ...prevMessages]);
+      setMessages((prevMessages) => [...new Set(data.messages), ...new Set(prevMessages)]);
+      // setMessages((prevMessages) => [...data.messages, ...prevMessages]);
       setLoadedMessages((prevLoaded) => prevLoaded + data.messages.length);
       setTotalMessages(data.total);
     } catch (error) {

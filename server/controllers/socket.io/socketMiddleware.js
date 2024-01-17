@@ -32,8 +32,6 @@ const authenticationMiddleware = async (socket, next) => {
       if (newLink) {
         const updateUser = await User.findOneAndUpdate({_id: user._id}, {isOnline: true})
         if(updateUser) console.log("User data updated.");
-
-        console.log("New socket added to the map.");
       }
       return next(); // Authentication successful
     } else {
@@ -43,7 +41,6 @@ const authenticationMiddleware = async (socket, next) => {
       });
 
       await newMap.save();
-      console.log("New socket mapping entry added.");
       return next();
     }
   } catch (error) {

@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@socket.io/admin-ui": "^0.5.1",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -19,6 +18,7 @@
     "express-useragent": "^1.0.15",
     "express-validator": "^7.0.1",
     "express.js": "^1.0.0",
+    "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.3.0",
     "mongoose": "^8.0.4",

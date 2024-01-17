@@ -6,29 +6,29 @@ const privateMessage = async (io, socket, data) => {
   try {
     data.timestamp = Date.now();
 
-    if (data.sender === data.recipient) return;
+    if (data.sender === data.recipient) return; // Make sure the sender is not sending a message to themselves
 
-    const user = await User.findOne({ username: data.recipient });
+    const user = await User.findOne({ username: data.recipient }); // Check if the recipient user exists
     if (!user) return;
 
-    const mapping = await UserSocketMapping.findOne({ uid: user._id });
+    const mapping = await UserSocketMapping.findOne({ uid: user._id }); // Find the sockets the user is connected to
     if (mapping) {
       const newMessage = new Message({
-        sender: socket.uid, // Assuming socket.uid is the correct user ID
+        sender: socket.uid,
         recipient: user._id,
         message: data.message,
         timestamp: data.timestamp,
       });
       const savedMessage = await newMessage.save(); // Make sure to await the save operation
-      const { _id, recipient, sender, message, seen, timestamp } = savedMessage
+      const { _id, recipient, sender, message, seen, timestamp } = savedMessage // Destructure the saved message
 
       let socketUname;
       let recipientUname;
       
-      if(sender === socket.uid && recipient === user._id) {
+      if(sender === socket.uid && recipient === user._id) { // Check if the sender is the socket owner and the recipient is the target socket user
         socketUname = socket.username
         recipientUname = user.username
-      } else if(sender === user._id && recipient === socket.id){
+      } else if(sender === user._id && recipient === socket.id){ // Check if the sender is the target socket user and the recipient is the socket owner
         socketUname = user.username
         recipientUname = socket.username
       }
@@ -45,9 +45,9 @@ const privateMessage = async (io, socket, data) => {
       }
 
       for (const recipientSocket of mapping.sockets) {
-        io.to(recipientSocket).emit("receiveMessage", messageToEmit);
+        io.to(recipientSocket).emit("receiveMessage", messageToEmit); // Emit the message to all the recipient sockets
       }
-      io.to(socket.id).emit("receiveMessage", messageToEmit);
+      io.to(socket.id).emit("receiveMessage", messageToEmit); // Finally emit the message to the socket owner.
     } else {
       console.log("No matching user-to-socket mapping found for", user._id);
     }

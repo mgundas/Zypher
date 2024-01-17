@@ -12,14 +12,13 @@ import { useLanguage } from "../contexts/LanguageContext";
 
 export const Navbar = ({
 	messages,
-	handleActiveChat,
 	status,
 }) => {
    // Context imports
 	const { langData, setLang, availableLangs } = useLanguage();
 	const config = useConfig();
 	const { userData } = useAuth();
-	const { recipientData, activeChat, setActiveChat } = useRecipient();
+	const { recipientData, activeChat, setRecipient } = useRecipient();
 
 
 	return (
@@ -27,10 +26,7 @@ export const Navbar = ({
 			<div className="navbar-start">
 				<div className="flex items-center">
 					<SenderList
-						setActiveChat={setActiveChat}
 						messages={messages}
-                  activeChat={activeChat}
-						handleActiveChat={handleActiveChat}
 					/>
 					{activeChat ? (
 						<div className="p-4 px-2 flex gap-3 items-center">
@@ -55,7 +51,7 @@ export const Navbar = ({
 			</div>
 			<div className="navbar-center hidden sm:block">
 				<button
-					onClick={() => setActiveChat("")}
+					onClick={() => setRecipient(null)}
 					className="btn btn-ghost text-xl"
 				>
 					{config.appName}

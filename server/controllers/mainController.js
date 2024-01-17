@@ -410,8 +410,7 @@ const handleMessage = async (req, res) => {
         senderUname = findRecipient.username
         recipientUname = findRequester.username
       } else {
-        senderUname = "poop"
-        recipientUname = "poopy"
+        console.log("An error occurred.");
       }
 
       // console.log(message.sender, findRequester._id, message.recipient, findRecipient._id);

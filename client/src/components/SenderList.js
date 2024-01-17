@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { getInitials } from "../helpers/getInitials";
 import { generateRandomColor } from "../helpers/generateRandomColor";
 import { useAuth } from "../contexts/AuthContext";
+import { useRecipient } from "../contexts/RecipientContext";
 
 export const SenderList = ({
-  handleActiveChat,
-  setActiveChat,
   messages
 }) => {
+  const { setRecipient } = useRecipient();
   const { userData } = useAuth();
   const [searchInput, setSearchInput] = useState("");
   const [senders, setSenders] = useState([])
@@ -37,7 +37,6 @@ export const SenderList = ({
           type="checkbox"
           className="drawer-toggle"
         />
-        {/* Page content here */}
         <label
           htmlFor="senderListDrawer"
           className="rounded-full flex items-center justify-center h-10 w-10 hover:bg-rtca-600/50 transition-all"
@@ -54,12 +53,12 @@ export const SenderList = ({
             <div className="p-5 font-medium text-center">Conversations</div>
             <div className="flex flex-1 flex-col">
               {senders ? (senders.map((sender, index) => {
-                console.log(senders);
                 const userData = sender.split(" ")
+                console.log(userData);
                 return (
                   <button
                     onClick={() => {
-                      handleActiveChat(userData[1]);
+                      setRecipient(userData[1]);
                       document.getElementById("senderListDrawer").checked = false;
                     }}
                     key={index}
@@ -107,7 +106,7 @@ export const SenderList = ({
               method="dialog"
               className="flex gap-2 p-4 grow items-center justify-center"
               onSubmit={(e) => {
-                setActiveChat(searchInput);
+                setRecipient(searchInput);
                 document.getElementById("senderListDrawer").checked = false;
               }}
             >

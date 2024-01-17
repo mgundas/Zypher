@@ -1,4 +1,3 @@
-const { instrument } = require("@socket.io/admin-ui");
 const {
   authenticationMiddleware,
 } = require("./controllers/socket.io/socketMiddleware");
@@ -17,22 +16,11 @@ const initializeIo = (io) => {
   // Clean-up function for stale sockets upon server restart
   cleanupStaleSockets(io);
 
-  instrument(io, {
-    auth: {
-      type: "basic",
-      username: "admin",
-      password: "$2b$10$heqvAkYMez.Va6Et2uXInOnkCT6/uQj1brkrbyG3LpopDklcq7ZOS", // "changeit" encrypted with bcrypt
-    },
-    mode: "development",
-  });
-
   // Socket.io middleware
   io.use((socket, next) => authenticationMiddleware(socket, next));
 
   // Socket.io event handlers
   io.on("connection", (socket) => {
-    console.log(socket.id, "joined as", socket.username);
-
     socket.on("messageSeen", (data) => {
       handleMessageSeen(io, socket, data);
     });

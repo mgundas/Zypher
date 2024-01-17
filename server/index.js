@@ -11,6 +11,8 @@ const app = express();
 
 // Module imports
 const { mongoose } = require("./database")
+const redisClient = require("./redis");
+
 const { configureSocket } = require("./socketConfig")
 const {httpServer, io} = configureSocket(app);
 const {initializeIo} = require("./io");

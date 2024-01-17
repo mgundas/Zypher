@@ -12,8 +12,7 @@ function App() {
   const { socket } = useSocket();
   const config = useConfig();
   const { loggedIn, userData } = useAuth();
-  const { setRecipient, recipientData, activeChat, setActiveChat } =
-    useRecipient();
+  const { recipientData, activeChat } = useRecipient();
 
   const notificationTimeoutRef = useRef(null);
   const checkInterval = useRef(null);
@@ -32,10 +31,6 @@ function App() {
   useEffect(() => {
     document.title = config.appName;
   }, [config.appName]);
-
-  const handleActiveChat = (recipient) => {
-    setRecipient(recipient);
-  };
 
   useEffect(() => {
     if (activeChat) {
@@ -66,7 +61,7 @@ function App() {
   useEffect(() => {
     if (socket) {
       const handleReceiveMessage = (data) => {
-        setMessages((prevMessages) => [...prevMessages, data]);
+        setMessages((prevMessages) => [...new Set(prevMessages), data]);
         if (data.sender !== userData.id) {
           document.title = "New message!";
         }
@@ -124,10 +119,7 @@ function App() {
       return (
         <div className="chat-screen">
           <Navbar
-            setActiveChat={setActiveChat}
             messages={messages}
-            handleActiveChat={handleActiveChat}
-            activeChat={activeChat}
             status={status}
           />
           {activeChat ? (
@@ -141,7 +133,7 @@ function App() {
               setMessages={setMessages}
             />
           ) : (
-            <MainWindow handleActiveChat={handleActiveChat} />
+            <MainWindow />
           )}
         </div>
       );

@@ -35,8 +35,11 @@ export const RecipientProvider = ({ children }) => {
         console.log("An error occured.", error);
       }
     };
-    if (recipient) {
+    if (recipient && recipient !== null) {
       fetchUser();
+    } else {
+      setRecipientData({});
+      setActiveChat(null)
     }
   }, [recipient, authToken, config.apiUri]);
 

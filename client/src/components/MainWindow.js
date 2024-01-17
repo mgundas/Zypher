@@ -4,10 +4,12 @@ import { useAuth } from "../contexts/AuthContext";
 import { generateRandomColor } from "../helpers/generateRandomColor";
 import { getInitials } from "../helpers/getInitials";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useRecipient } from "../contexts/RecipientContext";
 
-export const MainWindow = ({ handleActiveChat }) => {
+export const MainWindow = () => {
   const { socket } = useSocket();
   const { langData } = useLanguage();
+  const { setRecipient } = useRecipient();
 
   const [randomUsers, setRandomUsers] = useState([]);
   const { userData } = useAuth();
@@ -36,7 +38,7 @@ export const MainWindow = ({ handleActiveChat }) => {
             >
               <span className="h-3 w-3 rounded-full bg-green-600 absolute -top-0.5 -right-0.5 z-[1]"></span>
               <div
-                onClick={() => handleActiveChat(user._id)}
+                onClick={() => setRecipient(user._id)}
                 style={{
                   backgroundColor: generateRandomColor(user.username),
                 }}
