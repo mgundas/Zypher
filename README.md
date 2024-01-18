@@ -20,9 +20,10 @@ foo@bar:~$ npm start
 ```
 
 > [!IMPORTANT]
-> You need to have a redis and mongodb container installed to start the backend.
+> You need to have a `redis` (`redis-stack` is recommended for development) and `MongoDB` (preferably with `MongoDB Atlas` for development) container installed and connected to start the backend.
 
-## Tech used:
+## Used technologies:
+
 ### Backend:
 
 1. Express
