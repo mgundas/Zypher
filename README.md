@@ -19,6 +19,9 @@ foo@bar:~$ npm install
 foo@bar:~$ npm start
 ```
 
+> [!IMPORTANT]
+> You need to have a redis and mongodb container installed to start the backend.
+
 ## Tech used:
 ### Backend:
 
@@ -28,6 +31,7 @@ foo@bar:~$ npm start
 4. jsonwebtokens
 5. bcrypt
 6. Mongoose/MongoDB
+7. Redis
 
 ### Frontend:
 
@@ -35,3 +39,13 @@ foo@bar:~$ npm start
 2. socket.io-client
 4. Tailwind.css
 5. Flowbite
+6. Bootstrap Icons
+7. Axios
+
+### TODOS:
+- [x] Multi-language support
+- [ ] Light mode
+- [ ] Real-time updated conversations drawer
+- [ ] Notification system
+- [ ] Profile & Profile settings
+- [ ] Privacy options (public/private profile / do not show up on random profile retriever etc.)

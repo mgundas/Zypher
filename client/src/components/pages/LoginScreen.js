@@ -30,7 +30,7 @@ export const LoginScreen = () => {
   };
 
   return (
-    <div className="dark:text-white grid gap-5 mb-10 mt-10 md:mt-20 items-center">
+    <div className="dark:text-white grid gap-5 pt-10 md:pt-20 items-center">
       <h1 className="row-span-2 text-2xl text-center font-medium">
         {config.appName}
       </h1>
