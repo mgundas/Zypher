@@ -20,7 +20,11 @@ foo@bar:~$ npm start
 ```
 
 > [!IMPORTANT]
-> You need to have a `redis` (`redis-stack` is recommended for development) and `MongoDB` (preferably with `MongoDB Atlas` for development) container installed and connected to start the backend.
+> You need to have a `redis`[^1] and `MongoDB`[^2] container installed and connected to start the backend.
+
+
+[^1]: `redis-stack` is recommended for easier development
+[^2]: Preferably with `MongoDB Atlas` for easier development
 
 ## Used technologies:
 
