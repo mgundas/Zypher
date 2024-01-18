@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { useConfig } from "./ConfigContext";
 import { LoadingOverlay } from "../components/LoadingOverlay";
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -85,10 +86,18 @@ export function AuthProvider({ children }) {
           setAuthToken(newAccessToken);
           setRefreshToken(newRefreshToken);
         } else {
+          localStorage.setItem("accessToken", "");
+          localStorage.setItem("refreshToken", "");
+          setAuthToken("");
+          setRefreshToken("");
           setLoggedIn(false);
         }
       } catch (error) {
-        // Handle errors, such as network issues
+        localStorage.setItem("accessToken", "");
+        localStorage.setItem("refreshToken", "");
+        setAuthToken("");
+        setRefreshToken("");
+        setLoggedIn(false);
       }
     };
 
@@ -123,7 +132,31 @@ export function AuthProvider({ children }) {
     };
   }, [authToken, refreshToken, config.apiUri]);
 
-  // Your other authentication-related functions (login, logout, etc.)
+  const logOut = () => {
+    const requestBody = {
+      accessToken: authToken
+    }
+
+    axios.post(`${config.apiUri}/logout`, requestBody, {
+      headers: {
+        Authorization: `${refreshToken}`,
+      },
+    })
+    .then(response => {
+      if(response.status === 200){
+        localStorage.setItem("accessToken", "");
+        localStorage.setItem("refreshToken", "");
+        setAuthToken("");
+        setRefreshToken("");
+        setLoggedIn(false);
+      } else {
+        window.location.reload(false);
+      }
+    })
+    .catch(err => {
+      window.location.reload(false);
+    })
+  }
 
   return (
     <AuthContext.Provider
@@ -132,6 +165,7 @@ export function AuthProvider({ children }) {
         refreshToken,
         setAuthToken,
         setRefreshToken,
+        logOut,
         loggedIn,
         userData,
       }}

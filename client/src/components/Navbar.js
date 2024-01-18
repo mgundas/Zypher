@@ -17,7 +17,7 @@ export const Navbar = ({
    // Context imports
 	const { langData, setLang, availableLangs } = useLanguage();
 	const config = useConfig();
-	const { userData } = useAuth();
+	const { userData, logOut } = useAuth();
 	const { recipientData, activeChat, setRecipient } = useRecipient();
 
 
@@ -142,7 +142,7 @@ export const Navbar = ({
 							<button>{langData.content.navbar.settings}</button>
 						</li>
 						<li>
-							<button>{langData.content.navbar.logout}</button>
+							<button onClick={() => {logOut();}}>{langData.content.navbar.logout}</button>
 						</li>
 					</ul>
 				</div>

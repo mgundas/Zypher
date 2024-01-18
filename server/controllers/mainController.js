@@ -6,6 +6,11 @@ const RevokedToken = require("../Models/RevokedToken");
 const TokenUserMapping = require("../Models/TokenUserMapping");
 const Message = require("../Models/MessageModel");
 
+const {
+  addToBlacklist,
+  isTokenBlacklisted,
+} = require("../utils/redisUtils.js");
+
 async function revokeToken(token) {
   try {
     await RevokedToken.create({ token });
@@ -255,12 +260,13 @@ const handleVerifyAccessToken = async (req, res) => {
       });
     }
 
-    if (await isTokenRevoked(accessToken)) {
-      // Token is revoked, deny access
-      console.log("Access denied: Token is revoked.");
-      return res.status(200).json({
+    // Check if the token is blacklisted
+    const isBlacklisted = await isTokenBlacklisted(accessToken);
+
+    if (isBlacklisted) {
+      return res.status(401).json({
         success: false,
-        message: "access.token.revoked",
+        message: "access.token.blacklisted",
       });
     }
 
@@ -286,6 +292,7 @@ const handleVerifyAccessToken = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log(error);
     if (error.name === "TokenExpiredError") {
       return res.status(200).json({
         success: false,
@@ -319,7 +326,18 @@ const handleRefreshTokens = async (req, res) => {
         message: "refresh.token.not.valid",
       });
     }
+
     console.log("Refresh token is valid.");
+
+    // Check if the token is blacklisted
+    const isBlacklisted = await isTokenBlacklisted(refreshToken);
+
+    if (isBlacklisted) {
+      return res.status(401).json({
+        success: false,
+        message: "refresh.token.blacklisted",
+      });
+    }
 
     const uid = jwt.decode(refreshToken).uid;
     const findUser = await User.findById(uid);
@@ -368,10 +386,10 @@ const handleMessage = async (req, res) => {
 
     const findRequester = req.authUser
 
-//  const findRequester = await User.findById(requester);  // Just realized how stupid this piece code was. It literally enables EVERYONE to fetch messages between other people.
-//  if (!findRequester) {
-//    return res.status(400).json({ error: "sender.does.not.exist" });
-//  }
+    //  const findRequester = await User.findById(requester);  // Just realized how stupid this piece code was. It literally enables EVERYONE to fetch messages between other people.
+    //  if (!findRequester) {
+    //    return res.status(400).json({ error: "sender.does.not.exist" });
+    //  }
 
     const findRecipient = await User.findById(recipient);
     if (!findRecipient) {
@@ -405,10 +423,10 @@ const handleMessage = async (req, res) => {
       let recipientUname;
 
 
-      if(sender.toString() === requesterId.toString() && recipient.toString() === recipientId.toString()){
+      if (sender.toString() === requesterId.toString() && recipient.toString() === recipientId.toString()) {
         senderUname = findRequester.username
         recipientUname = findRecipient.username
-      } else if(sender.toString() === recipientId.toString() && recipient.toString() === requesterId.toString()){
+      } else if (sender.toString() === recipientId.toString() && recipient.toString() === requesterId.toString()) {
         senderUname = findRecipient.username
         recipientUname = findRequester.username
       } else {
@@ -465,7 +483,59 @@ const handleFetchRecipient = async (req, res) => {
 };
 
 const handleLogout = async (req, res) => {
-  // TODO: handle logout
+  try {
+    const {accessToken} = req.body;
+    const refreshToken = req.headers.authorization;
+
+    if (!accessToken){
+      return res.status(400).json({
+        success: false,
+        message: "no.access.token.provided",
+      });
+    }
+
+    if (!refreshToken){
+      return res.status(400).json({
+        success: false,
+        message: "no.refresh.token.provided",
+      });
+    }
+
+    const verifyRefToken = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET)
+    const verifyAccToken = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET)
+
+    if(!verifyAccToken || !verifyRefToken){
+      return res.status(400).json({
+        success: false,
+        message: "access.token.or.refresh.token.not.valid",
+      });
+    }
+
+    try {
+      addToBlacklist(refreshToken)
+      addToBlacklist(accessToken)
+
+      return res.status(200).json({
+        success: true,
+        message: "successfully.logged.out",
+      });
+
+    } catch (error) {
+      console.log(error.message);
+
+      return res.status(500).json({
+        success: false,
+        message: "server.error",
+      });
+    }
+  } catch (error) {
+    console.log(error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "server.error",
+    });  
+  }
 };
 
 module.exports = {
