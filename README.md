@@ -1,7 +1,10 @@
 
-# Zypher, Real Time Chat App.
+# Zypher, Yet another instant messaging app
 
-This app is nowhere near finished. I'm still working on this project and learning a ton while developing.
+Zypher is a simple messaging application where you can find and talk to people you know, or random people you can find using the randomize feature (only people with showing up on randomize option enabled).
+
+> [!NOTE]
+> This app is not  intended to be used in production. It's nowhere finished yet. The only purpose of this app is to learn more about coding, programming languages and popular technologies. The code has too many potential security and privacy issues. It's not recommended to use it in production.
 
 ## Scripts you can run:
 To start the frontend:
