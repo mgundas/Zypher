@@ -125,12 +125,8 @@ const handleLogin = async (req, res) => {
 
          const record = new TokenRecord({
             uid: user._id,
-            token: [
-               {
-                  refreshToken: refreshToken,
-                  userAgent: [reqData]
-               }
-            ]
+            refreshToken: refreshToken,
+            ...reqData
          })
          await record.save();
 
