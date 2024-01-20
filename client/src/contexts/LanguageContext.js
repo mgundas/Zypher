@@ -20,14 +20,6 @@ export const LanguageProvider = ({ children }) => {
 	}
 
 	useEffect(() => {
-	  console.log("fdgfdh");
-	
-	  return () => {
-	  }
-	}, [])
-	
-
-	useEffect(() => {
 		const fetchLangFile = async () => {
 			if (language) {
 				try {
