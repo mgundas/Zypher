@@ -10,7 +10,8 @@
             "no": "No",
             "ok": "Okay",
             "open": "Open",
-            "close": "Close"
+            "close": "Close",
+            "connecting": "Connecting"
         },
         "mainWindow": {
             "randomize": "Randomize"

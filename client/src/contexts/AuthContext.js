@@ -7,7 +7,6 @@ import React, {
   useState,
 } from "react";
 import { useConfig } from "./ConfigContext";
-import { LoadingOverlay } from "../components/LoadingOverlay";
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -26,17 +25,15 @@ export function AuthProvider({ children }) {
   );
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState({});
+  const [oVisible, setOVisible] = useState(true);
   const checkTimeout = useRef(null);
-  const loadingOverlay = useRef(null);
-
-  //const handleLogout = async () => {};
 
   const handleOffline = () => {
-    loadingOverlay.current.classList.remove("hidden");
+    setOVisible(true)
   };
 
   const handleOnline = () => {
-    loadingOverlay.current.classList.add("hidden");
+    setOVisible(false)
   };
 
   // Check the access token validity on component mount
@@ -108,7 +105,7 @@ export function AuthProvider({ children }) {
 
           return refreshTokens();
         }
-        loadingOverlay.current.classList.add("hidden");
+        setOVisible(false)
         setLoggedIn(true);
       });
     };
@@ -118,11 +115,10 @@ export function AuthProvider({ children }) {
       window.addEventListener("offline", handleOffline);
       checkVerification();
       checkTimeout.current = setInterval(() => {
-        console.log("checked");
         checkVerification();
       }, 60000);
     } else {
-      loadingOverlay.current.classList.add("hidden");
+      setOVisible(false);
       setLoggedIn(false);
     }
     return () => {
@@ -168,9 +164,9 @@ export function AuthProvider({ children }) {
         logOut,
         loggedIn,
         userData,
+        oVisible
       }}
     >
-      <LoadingOverlay reference={loadingOverlay} />
       {children}
     </AuthContext.Provider>
   );

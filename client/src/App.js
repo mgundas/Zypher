@@ -61,7 +61,7 @@ function App() {
   useEffect(() => {
     if (socket) {
       const handleReceiveMessage = (data) => {
-        setMessages((prevMessages) => [...new Set(prevMessages), data]);
+        setMessages((prevMessages) => [...new Set([...new Set(prevMessages), data])]);
         if (data.sender !== userData.id) {
           document.title = "New message!";
         }

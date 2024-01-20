@@ -10,7 +10,8 @@
             "no": "Hayır",
             "ok": "Tamam",
             "open": "Open",
-            "close": "Close"
+            "close": "Close",
+            "connecting": "Bağlanıyor"
         },
         "mainWindow": {
             "randomize": "Rastgele"

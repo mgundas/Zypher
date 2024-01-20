@@ -45,7 +45,7 @@ export const ChatWindow = ({
   }, [filteredMessages]);
 
   useEffect(() => {
-    const filtered = messages.filter((message) => {
+    const filtered = [...new Set(messages.filter((message) => {
       if (
         message.sender === recipientData.id &&
         message.recipient === userData.id
@@ -59,7 +59,7 @@ export const ChatWindow = ({
       } else {
         return null;
       }
-    });
+    }))];
     setFilteredMessages(filtered);
   }, [messages, userData.id, recipientData.id]);
 
@@ -78,7 +78,7 @@ export const ChatWindow = ({
       );
       const data = await response.json();
 
-      setMessages((prevMessages) => [...new Set(data.messages), ...new Set(prevMessages)]);
+      setMessages((prevMessages) => [...new Set([...data.messages, ...prevMessages])]);
       // setMessages((prevMessages) => [...data.messages, ...prevMessages]);
       setLoadedMessages((prevLoaded) => prevLoaded + data.messages.length);
       setTotalMessages(data.total);

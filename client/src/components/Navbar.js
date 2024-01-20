@@ -58,13 +58,13 @@ export const Navbar = ({
 				</button>
 			</div>
 			<div className="navbar-end gap-2">
-				<div className="dropdown dropdown-end">
+				<div className="dropdown dropdown-start md:dropdown-end">
 					<button tabIndex={0} className="btn btn-ghost btn-circle">
 						<i className="bi bi-translate text-lg"></i>
 					</button>
 					<div
 						tabIndex={0}
-						className="dropdown-content z-[1] card card-compact w-56 p-2 shadow bg-rtca-800 rounded-t-none"
+						className="dropdown-content z-[1] card card-compact w-44 p-2 shadow bg-rtca-800 rounded-t-none"
 					>
 						<div className="p-1 grid gap-2">
 							<h3 className="text-center text-md font-medium">{langData.content.navbar.languages}</h3>

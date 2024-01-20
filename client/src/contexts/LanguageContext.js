@@ -20,6 +20,14 @@ export const LanguageProvider = ({ children }) => {
 	}
 
 	useEffect(() => {
+	  console.log("fdgfdh");
+	
+	  return () => {
+	  }
+	}, [])
+	
+
+	useEffect(() => {
 		const fetchLangFile = async () => {
 			if (language) {
 				try {
@@ -31,9 +39,6 @@ export const LanguageProvider = ({ children }) => {
 			}
 		}
 		fetchLangFile()
-		return () => {
-
-		}
 	}, [language])
 
 
