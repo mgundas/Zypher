@@ -54,7 +54,9 @@ export function AuthProvider({ children }) {
                return false;
             } else {
             }
-            console.log("Token is verified.");
+            if (process.env.NODE_ENV === 'development') {
+               console.log(`Token verification: ${data.success}`);
+            }
 
             setUserData(data.user);
             return true;
@@ -64,16 +66,16 @@ export function AuthProvider({ children }) {
       };
 
       const refreshTokens = async () => {
-         console.log("Trying to refresh refresh-token");
          try {
             setOVisible(true);
-            axios.post(config.apiUri + "/refresh-tokens", {}, {
+            axios.post(config.apiUri + "/refresh-tokens", {
+               accessToken: authToken,
+            }, {
                headers: {
                   Authorization: `${refreshToken}`,
                },
             })
                .then(response => {
-                  console.log(response);
                   if (response.data.success === true) {
                      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =  response.data;
                      localStorage.setItem("accessToken", newAccessToken);
@@ -89,13 +91,17 @@ export function AuthProvider({ children }) {
                   }
                })
                .catch(err => {
-                  console.log(err.message);
+                  if (process.env.NODE_ENV === 'development') {
+                     console.error("An error occured within the AuthContext module.", err.message);
+                  }
                })
                .finally(() => {
                   setOVisible(false);
                })
-         } catch (error) {
-            console.log(error.message);
+         } catch (err) {
+            if (process.env.NODE_ENV === 'development') {
+               console.error("An error occured within the AuthContext module.", err.message);
+            }
             localStorage.setItem("accessToken", "");
             localStorage.setItem("refreshToken", "");
             setAuthToken("");

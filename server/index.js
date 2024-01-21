@@ -1,4 +1,5 @@
 // Misc imports
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 require("dotenv").config();
 // Express.js related imports
 const express = require("express");

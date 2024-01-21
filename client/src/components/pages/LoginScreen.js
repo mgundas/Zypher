@@ -34,14 +34,6 @@ export const LoginScreen = () => {
       <h1 className="row-span-2 text-2xl text-center font-medium">
         {config.appName}
       </h1>
-      {config.notice.visible ? (
-        <div className="justify-self-center border-l-4 mx-5 md:mx-0 flex-wrap gap-1 border-teal-900 dark:border-teal-600 text-white dark:text-rtca-50 p-3 transition-all rounded-md bg-teal-700 dark:bg-teal-900 flex">
-          <h1 className="font-medium">{config.notice.title}</h1>
-          <h2>{config.notice.message}</h2>
-        </div>
-      ) : (
-        <></>
-      )}
       <div ref={infoBoxRef} className="hidden">
         <svg
           xmlns="http://www.w3.org/2000/svg"

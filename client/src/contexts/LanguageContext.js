@@ -25,13 +25,19 @@ export const LanguageProvider = ({ children }) => {
 				try {
 					const data = await import(`../lang/${language}.json`)
 					setLangData(data);
-				} catch (error) {
-					console.log("An error occured while importing the language file.", error.message);
+				} catch (err) {
+					if (process.env.NODE_ENV === 'development') {
+						console.log("An error occured while importing the language file.", err.message);
+					}
+				}
+			} else {
+				if (process.env.NODE_ENV === 'development') {
+					console.error("An unknown error occured within the LanguageContext module.");
 				}
 			}
 		}
 		fetchLangFile()
-	}, [language])
+	}, [language]) // Everytime the language state changes, run the function.
 
 
 	return (

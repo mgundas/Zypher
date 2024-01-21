@@ -9,13 +9,8 @@ export const useConfig = () => {
 export const ConfigProvider = ({ children }) => {
   const config = {
     appName: "Zypher",
-    socketUri: "https://api.pyromaniacduck.cloud/",
-    apiUri: "https://api.pyromaniacduck.cloud/api/v1",
-    notice: {
-        visible: false,
-        title: "Welcome aboard!",
-        message: "Zypher is finally online!"
-    }
+    socketUri: process.env.REACT_APP_SOCKET_URI,
+    apiUri: process.env.REACT_APP_API_URI,
   };
 
   return (

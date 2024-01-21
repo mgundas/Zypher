@@ -15,7 +15,6 @@ export const SenderList = ({
   const [senders, setSenders] = useState([])
 
   useEffect(() => {
-    console.log(messages);
     setSenders([
       ...new Set(
         messages.map((message) => {

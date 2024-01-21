@@ -95,12 +95,12 @@ const handleLogin = async (req, res) => {
          const accessToken = jwt.sign(
             { uid: user._id },
             process.env.ACCESSTOKEN_SECRET,
-            { expiresIn: "45s" }
+            { expiresIn: "30m" }
          );
          const refreshToken = jwt.sign(
             { uid: user._id },
             process.env.REFRESHTOKEN_SECRET,
-            { expiresIn: "60s" }
+            { expiresIn: "10d" }
          );
 
          const ipAddress =
@@ -288,6 +288,7 @@ const handleVerifyAccessToken = async (req, res) => {
 const handleRefreshTokens = async (req, res) => {
    try {
       const refreshToken = req.headers.authorization;
+      const { accessToken } = req.body
 
       if (!refreshToken) {
          return res.status(200).json({
@@ -317,6 +318,9 @@ const handleRefreshTokens = async (req, res) => {
          });
       }
 
+      addToBlacklist(refreshToken)
+      addToBlacklist(accessToken)
+
       const uid = jwt.decode(refreshToken).uid;
       const findUser = await User.findById(uid);
 
@@ -337,6 +341,33 @@ const handleRefreshTokens = async (req, res) => {
          process.env.REFRESHTOKEN_SECRET,
          { expiresIn: "30d" }
       );
+
+      const ipAddress =
+         req.headers['x-forwarded-for'] || // For reverse proxies
+         req.connection.remoteAddress ||
+         req.socket.remoteAddress ||
+         null;
+
+      const parser = new UAParser();
+      const result = parser.setUA(req.headers["user-agent"]).getResult();
+      var geo = geoip.lookup(ipAddress);
+
+      const reqData = {
+         ip: ipAddress,
+         browser: result.browser.name,
+         os: result.os.name,
+         cpu: result.cpu.architecture,
+         country: geo.country,
+         timezone: geo.timezone,
+         city: geo.city
+      }
+
+      const record = new TokenRecord({
+         uid: findUser._id,
+         refreshToken: refreshToken,
+         ...reqData
+      })
+      await record.save();
 
       return res.status(200).json({
          success: true,
@@ -361,13 +392,7 @@ const handleRefreshTokens = async (req, res) => {
 const handleMessage = async (req, res) => {
    try {
       const { recipient, limit, skip } = req.query;
-
-      const findRequester = req.authUser
-
-      //  const findRequester = await User.findById(requester);  // Just realized how stupid this piece code was. It literally enables EVERYONE to fetch messages between other people.
-      //  if (!findRequester) {
-      //    return res.status(400).json({ error: "sender.does.not.exist" });
-      //  }
+      const findRequester = req.authUser // authUser comes from authentication middleware
 
       const findRecipient = await User.findById(recipient);
       if (!findRecipient) {

@@ -31,8 +31,10 @@ export const RecipientProvider = ({ children }) => {
         const data = await response.json();
         setRecipientData(data);
         setActiveChat(data.id)
-      } catch (error) {
-        console.log("An error occured.", error);
+      } catch (err) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`An error occured within the RecipientContext: ${err.message}`);
+       }
       }
     };
     if (recipient && recipient !== null) {

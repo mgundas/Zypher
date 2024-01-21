@@ -21,7 +21,9 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     try {
       if (!authToken) {
-        //console.error("Authentication token is missing.");
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`SocketContext: Auth token is missing.`);
+       }
         return;
       }
       // Create a new socket instance and connect it using the provided authentication token.
@@ -31,9 +33,9 @@ export const SocketProvider = ({ children }) => {
       setSocket(newSocket);
 
       return () => newSocket.close()
-    } catch (error) {
+    } catch (err) {
       if (process.env.NODE_ENV === 'development') {
-        console.error("Socket connection failed:", error);
+        console.error("Socket connection failed:", err);
       }
     }
   }, [authToken, config.socketUri]);
