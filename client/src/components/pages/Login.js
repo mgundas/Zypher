@@ -1,8 +1,10 @@
 import { useRef, useState } from "react";
 import { useConfig } from "../../contexts/ConfigContext";
 import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = ({ sendInfoMessage }) => {
+  const navigate = useNavigate();
   const timeoutRef = useRef(null)
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
@@ -49,6 +51,7 @@ const Login = ({ sendInfoMessage }) => {
               localStorage.setItem("refreshToken", data.refreshToken);
               setAuthToken(data.accessToken)
               setRefreshToken(data.refreshToken)
+              navigate("../", {replace: true})
             }, 2000)
           }
         })

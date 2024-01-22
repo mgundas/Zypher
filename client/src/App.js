@@ -1,4 +1,5 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, lazy, Suspense } from "react";
+import { BrowserRouter as Router, Route, Routes, Link, Outlet, useNavigate } from 'react-router-dom';
 import { useSocket } from "./contexts/SocketContext";
 import { useConfig } from "./contexts/ConfigContext";
 import { useAuth } from "./contexts/AuthContext";
@@ -9,6 +10,7 @@ import { LoginScreen } from "./components/pages/LoginScreen";
 import { useRecipient } from "./contexts/RecipientContext";
 
 function App() {
+  const navigate = useNavigate()
   const { socket } = useSocket();
   const config = useConfig();
   const { loggedIn, userData } = useAuth();
@@ -142,7 +144,39 @@ function App() {
     }
   };
 
-  return <>{renderContent()}</>;
+  const Home = () => {
+    if (loggedIn && socket) {
+      return (
+        <div className="chat-screen">
+          <Navbar
+            messages={messages}
+            status={status}
+          />
+          <Routes>
+            <Route exact path="/" element={<MainWindow />} />
+            <Route path="/chat" element={<ChatWindow
+              messages={messages}
+              activeChat={activeChat}
+              loading={loading}
+              loadedMessages={loadedMessages}
+              setLoadedMessages={setLoadedMessages}
+              setLoading={setLoading}
+              setMessages={setMessages}
+            />} />
+          </Routes>
+        </div>
+      )
+    } else {
+      navigate("/login", {replace: true})
+    }
+  }
+
+  return (
+    <Routes>
+      <Route path="/*" element={<Home />} />
+      <Route path="/login" element={<LoginScreen />} />
+    </Routes>
+  );
 }
 
 export default App;
