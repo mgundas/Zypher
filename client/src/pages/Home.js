@@ -1,5 +1,5 @@
-import { useRef, useEffect, useState } from "react";
-import { BrowserRouter as Route, Routes } from 'react-router-dom';
+import { useRef, useEffect, useState, lazy, Suspense } from "react";
+import { BrowserRouter as Router, Route, Routes, Link, Outlet, useNavigate } from 'react-router-dom';
 import { useSocket } from "../contexts/SocketContext";
 import { useConfig } from "../contexts/ConfigContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -9,7 +9,8 @@ import { MainWindow } from "../components/MainWindow";
 import { LoginScreen } from "../components/pages/LoginScreen";
 import { useRecipient } from "../contexts/RecipientContext";
 
-export const Home = () => {
+export default function Home() {
+   const navigate = useNavigate()
    const { socket } = useSocket();
    const config = useConfig();
    const { loggedIn, userData } = useAuth();
@@ -24,6 +25,17 @@ export const Home = () => {
    const [loadedMessages, setLoadedMessages] = useState(0);
 
    const [loading, setLoading] = useState(false);
+
+   useEffect(() => {
+     if(!loggedIn){
+      console.log("not logged in for some reason");
+      navigate("/login", {replace:true})
+     }
+   
+     return () => {
+     }
+   }, [loggedIn, navigate])
+   
 
    useEffect(() => {
       setStatus(isOnline ? "Online" : "Offline");
@@ -115,7 +127,7 @@ export const Home = () => {
       isOnline,
    ]);
 
-   /* const renderContent = () => {
+   const renderContent = () => {
       if (loggedIn && socket) {
          return (
             <div className="chat-screen">
@@ -139,16 +151,33 @@ export const Home = () => {
             </div>
          );
       } else {
-         return <LoginScreen />;
+         navigate("/login", {replace: true})
       }
-   }; */
+   };
 
-   return (
-      <>
-         jghjhgj
-         <Routes>
-            <Route path="home" element={<div className="text-white font-extrabold">Hey!</div>} />
-         </Routes>
-      </>
-   )
+   if (loggedIn && socket) {
+      return (
+         <div className="chat-screen">
+            <Navbar
+               messages={messages}
+               status={status}
+            />
+            <Routes>
+               <Route exact path="/" element={<MainWindow />} />
+               <Route path="/chat" element={
+               <ChatWindow
+                  messages={messages}
+                  activeChat={activeChat}
+                  loading={loading}
+                  loadedMessages={loadedMessages}
+                  setLoadedMessages={setLoadedMessages}
+                  setLoading={setLoading}
+                  setMessages={setMessages}
+               />} />
+            </Routes>
+         </div>
+      )
+   } else {
+      
+   }
 }

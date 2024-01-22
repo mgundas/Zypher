@@ -7,6 +7,7 @@ import React, {
    useState,
 } from "react";
 import { useConfig } from "./ConfigContext";
+import { useLoading } from "./LoadingContext"
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -16,7 +17,9 @@ export const useAuth = () => {
 };
 
 export function AuthProvider({ children }) {
+   const { setVisible } = useLoading();
    const config = useConfig();
+
    const [authToken, setAuthToken] = useState(
       localStorage.getItem("accessToken") || null
    );
@@ -25,19 +28,12 @@ export function AuthProvider({ children }) {
    );
    const [loggedIn, setLoggedIn] = useState(false);
    const [userData, setUserData] = useState({});
-   const [oVisible, setOVisible] = useState(true);
+
    const checkTimeout = useRef(null);
-
-   const handleOffline = () => {
-      setOVisible(true)
-   };
-
-   const handleOnline = () => {
-      setOVisible(false)
-   };
 
    // Check the access token validity on component mount
    useEffect(() => {
+
       const verifyAccessToken = async () => {
          try {
             const response = await fetch(`${config.apiUri}/verify-access-token`, {
@@ -67,7 +63,7 @@ export function AuthProvider({ children }) {
 
       const refreshTokens = async () => {
          try {
-            setOVisible(true);
+            setVisible(true);
             axios.post(config.apiUri + "/refresh-tokens", {
                accessToken: authToken,
             }, {
@@ -77,7 +73,7 @@ export function AuthProvider({ children }) {
             })
                .then(response => {
                   if (response.data.success === true) {
-                     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =  response.data;
+                     const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
                      localStorage.setItem("accessToken", newAccessToken);
                      localStorage.setItem("refreshToken", newRefreshToken);
                      setAuthToken(newAccessToken);
@@ -96,7 +92,7 @@ export function AuthProvider({ children }) {
                   }
                })
                .finally(() => {
-                  setOVisible(false);
+                  setVisible(false);
                })
          } catch (err) {
             if (process.env.NODE_ENV === 'development') {
@@ -117,28 +113,37 @@ export function AuthProvider({ children }) {
 
                return refreshTokens();
             }
-            setOVisible(false)
+            setVisible(false)
             setLoggedIn(true);
          });
       };
 
+
+      const handleOffline = () => {
+         setVisible(true)
+      };
+
+      const handleOnline = () => {
+         setVisible(false)
+      };
+
       if (authToken) {
-         window.addEventListener("online", handleOnline);
-         window.addEventListener("offline", handleOffline);
+         window.addEventListener("online", e => handleOnline(e));
+         window.addEventListener("offline", e => handleOffline(e));
          checkVerification();
          checkTimeout.current = setInterval(() => {
             checkVerification();
          }, 45000);
       } else {
-         setOVisible(false);
+         setVisible(false);
          setLoggedIn(false);
       }
       return () => {
          clearInterval(checkTimeout.current);
-         window.removeEventListener("online", handleOnline);
-         window.removeEventListener("offline", handleOffline);
+         window.removeEventListener("online", e => handleOnline(e));
+         window.removeEventListener("offline", e => handleOffline(e));
       };
-   }, [authToken, refreshToken, config.apiUri]);
+   }, [authToken, refreshToken, config.apiUri, setVisible]);
 
    const logOut = () => {
       const requestBody = {
@@ -175,8 +180,7 @@ export function AuthProvider({ children }) {
             setRefreshToken,
             logOut,
             loggedIn,
-            userData,
-            oVisible
+            userData
          }}
       >
          {children}

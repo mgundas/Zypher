@@ -32,6 +32,8 @@ export const SocketProvider = ({ children }) => {
       newSocket.connect();
       setSocket(newSocket);
 
+      console.log("Socket context mounted.");
+
       return () => newSocket.close()
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
@@ -39,8 +41,6 @@ export const SocketProvider = ({ children }) => {
       }
     }
   }, [authToken, config.socketUri]);
-
-  // console.log('Socket instance:', socket);
 
   return (
     <SocketContext.Provider value={{ socket }}>

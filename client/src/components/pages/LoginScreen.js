@@ -1,15 +1,26 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
 import { useConfig } from "../../contexts/ConfigContext";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const LoginScreen = () => {
   const config = useConfig();
+  const {loggedIn} = useAuth();
+  const navigate = useNavigate();
 
   const infoBoxRef = useRef(null);
   const infoTimeoutRef = useRef(null);
 
   const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    if(loggedIn){
+      console.log("bro ur logged in");
+      navigate("/", {replace: true})
+    }
+  }, [loggedIn, navigate])
 
   const sendInfoMessage = (message, type) => {
     const types = {

@@ -1,21 +1,26 @@
-import React, { useRef, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import React, { useRef, createContext, useEffect, useContext, useState } from "react";
 
-export const LoadingOverlay = ({ children }) => {
-  const { oVisible } = useAuth()
+const LoadingContext = createContext();
+
+export const useLoading = () => {
+  return useContext(LoadingContext)
+}
+
+export const LoadingProvider = ({ children }) => {
+  const [visible, setVisible] = useState(true)
 
   const overlayRef = useRef(null)
 
   useEffect(() => {
-    if (oVisible === true) {
+    if (visible === true) {
       overlayRef.current.classList.remove("hidden")
     } else {
       overlayRef.current.classList.add("hidden")
     }
-  }, [oVisible])
+  }, [visible])
 
   return (
-    <>
+    <LoadingContext.Provider value={{setVisible}}>
       <div
         ref={overlayRef}
         className="absolute w-screen h-screen bg-rtca-900/80 z-50 flex items-center justify-center select-none"
@@ -29,6 +34,6 @@ export const LoadingOverlay = ({ children }) => {
         </div>
       </div>
       {children}
-    </>
+    </LoadingContext.Provider>
   );
 };
