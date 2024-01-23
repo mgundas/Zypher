@@ -7,14 +7,18 @@ const initialState = {
    loggedIn: false,
 };
 
-const authSlice = createSlice({
+const authSlicer = createSlice({
    name: 'auth',
    initialState,
    reducers: {
       setAccessToken: (state, action) => {
+         if(action.payload === null) return localStorage.removeItem("accessToken")
+         localStorage.setItem("accessToken", action.payload);
          state.accessToken = action.payload;
       },
       setRefreshToken: (state, action) => {
+         if(action.payload === null) return localStorage.removeItem("refreshToken")
+         localStorage.setItem("refreshToken", action.payload);
          state.refreshToken = action.payload;
       },
       setLoggedIn: (state, action) => {
@@ -26,5 +30,5 @@ const authSlice = createSlice({
    },
 });
 
-export const { setAccessToken, setRefreshToken, setLoggedIn, setAuthLoading } = authSlice.actions;
-export default authSlice.reducer;  // Default export of the reducer
+export const { setAccessToken, setRefreshToken, setLoggedIn, setAuthLoading } = authSlicer.actions;
+export default authSlicer.reducer;  // Default export of the reducer

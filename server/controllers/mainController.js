@@ -223,6 +223,7 @@ const handleVerifyAccessToken = async (req, res) => {
       const accessToken = req.headers.authorization;
 
       if (!accessToken) {
+         console.log(accessToken);
          return res.status(400).json({
             success: false,
             message: "no.access.token.provided",

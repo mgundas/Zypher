@@ -7,7 +7,7 @@ export const useLoading = () => {
 }
 
 export const LoadingProvider = ({ children }) => {
-  const [visible, setVisible] = useState(true)
+  const [visible, setVisible] = useState(false)
 
   const overlayRef = useRef(null)
 

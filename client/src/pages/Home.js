@@ -10,7 +10,20 @@ import { useRecipient } from "../contexts/RecipientContext";
 import { useSelector } from 'react-redux';
 
 export default function Home() {
-   const navigate = useNavigate()
+   const { accessToken, refreshToken, isLoggedIn, authLoading } = useSelector(state => state.auth);
+   const { userData } = useSelector(state => state.user)
+   const navigate = useNavigate();
+   
+   useEffect(() => {
+     if(!authLoading){
+      if(!isLoggedIn){
+         console.log("bro ur not logged in wth!?!?!?");
+         navigate("/login", {replace: true})
+      }
+     }
+   }, [authLoading, isLoggedIn, navigate])
+   
+   /* const navigate = useNavigate()
    const { socket } = useSocket();
    const config = useConfig();
    const { loggedIn, userData, authLoading } = useAuth();
@@ -129,9 +142,9 @@ export default function Home() {
       config.appName,
       activeChat,
       isOnline,
-   ]);
+   ]); */
 
-   if (isLoggedIn && socket) {
+   if (true) {
       return (
          <div className="chat-screen">
             {/* <Navbar
@@ -139,9 +152,9 @@ export default function Home() {
                status={status}
             /> */}
             <Routes>
-               <Route exact path="/" element={<MainWindow />} />
+               <Route exact path="/" element={/* <MainWindow />  */ <div><p>{accessToken}</p><p>{refreshToken} </p><p>logged in:{String(isLoggedIn)}, loading:{String(authLoading)}</p> <p>{userData.username}</p></div>} />
                <Route path="/chat" element={
-                  <ChatWindow
+                  /* <ChatWindow
                      messages={messages}
                      activeChat={activeChat}
                      loading={loading}
@@ -149,7 +162,8 @@ export default function Home() {
                      setLoadedMessages={setLoadedMessages}
                      setLoading={setLoading}
                      setMessages={setMessages}
-                  />} />
+                  /> */
+                  <div>It's the chat, init?</div>} />
             </Routes>
          </div>
       )
