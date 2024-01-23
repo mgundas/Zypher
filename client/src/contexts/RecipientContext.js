@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useConfig } from "./ConfigContext";
-import { useAuth } from "./AuthContext";
 
 const RecipientContext = createContext();
 
@@ -10,7 +9,6 @@ export const useRecipient = () => {
 
 export const RecipientProvider = ({ children }) => {
   const config = useConfig();
-  const { authToken } = useAuth();
 
   const [recipient, setRecipient] = useState(null);
   const [activeChat, setActiveChat] = useState(null);
@@ -24,7 +22,7 @@ export const RecipientProvider = ({ children }) => {
           {
             method: "GET",
             headers: {
-              Authorization: `${authToken}`,
+              Authorization: ``,
             },
           }
         );
@@ -43,7 +41,7 @@ export const RecipientProvider = ({ children }) => {
       setRecipientData({});
       setActiveChat(null)
     }
-  }, [recipient, authToken, config.apiUri]);
+  }, [recipient, config.apiUri]);
 
   return (
     <RecipientContext.Provider value={{ recipientData, setRecipient, activeChat, setActiveChat }}>

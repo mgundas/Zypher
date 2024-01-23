@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { setTranslation } from '../redux/reducers/languageSlicer';
 
 const LanguageContext = createContext();
 
@@ -7,24 +9,15 @@ export const useLanguage = () => {
 };
 
 export const LanguageProvider = ({ children }) => {
-	const [language, setLanguage] = useState(localStorage.getItem("locale") || "en_US")
-	const [langData, setLangData] = useState({})
-	const availableLangs = new Map([
-		[0, ["en_US", "English"]],
-		[1, ["tr_TR", "Türkçe"]],
-	])
-
-	const setLang = (locale) => {
-		setLanguage(locale)
-		localStorage.setItem("locale", locale)
-	}
+	const { locale } = useSelector(state => state.translation)
+	const dispatch = useDispatch()
 
 	useEffect(() => {
 		const fetchLangFile = async () => {
-			if (language) {
+			if (locale) {
 				try {
-					const data = await import(`../lang/${language}.json`)
-					setLangData(data);
+					const data = await import(`../lang/${locale}.json`)
+					dispatch(setTranslation(data));
 				} catch (err) {
 					if (process.env.NODE_ENV === 'development') {
 						console.log("An error occured while importing the language file.", err.message);
@@ -37,11 +30,11 @@ export const LanguageProvider = ({ children }) => {
 			}
 		}
 		fetchLangFile()
-	}, [language]) // Everytime the language state changes, run the function.
+	}, [dispatch, locale]) // Everytime the language state changes, run the function.
 
 
 	return (
-		<LanguageContext.Provider value={{ setLang, availableLangs, langData }}>
+		<LanguageContext.Provider value={{}}>
 			{children}
 		</LanguageContext.Provider>
 	)

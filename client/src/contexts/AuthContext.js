@@ -1,10 +1,10 @@
 // AuthContext.js
 import React, {
    createContext,
+   useCallback,
    useContext,
    useEffect,
    useRef,
-   useState,
 } from "react";
 import { useConfig } from "./ConfigContext";
 import { useLoading } from "./LoadingContext"
@@ -20,56 +20,42 @@ export const useAuth = () => {
 };
 
 export function AuthProvider({ children }) {
+   // Hook definitions
    const config = useConfig()
    const { setVisible } = useLoading();
    const dispatch = useDispatch();
-   const checkInterval = 18000;
 
-   const { accessToken, refreshToken, isLoggedIn, authLoading } = useSelector(state => state.auth);
+   // State definitions
+   const { accessToken, refreshToken } = useSelector(state => state.auth);
    const intervalRef = useRef(null)
+   const checkInterval = 1000 * 60 * 30; // 30 minutes
 
-   /*    const handleLogin = () => {
-         dispatch(setAccessToken('your_access_token'));
-         dispatch(setRefreshToken('your_refresh_token'));
-         dispatch(setLoggedIn(true));
-      };
-   
-      const handleLogout = () => {
-         dispatch(setAccessToken(null));
-         dispatch(setRefreshToken(null));
-         dispatch(setLoggedIn(false));
-      }; */
-
-   const verifyAccessToken = async () => {
+   const verifyAccessToken = useCallback(async () => {
       const headers = {
          headers: {
             Authorization: `${accessToken}`
          }
       }
-      setVisible(true)
       dispatch(setAuthLoading(true))
 
       try {
          const response = await axios.post(`${config.apiUri}/verify-access-token`, {}, headers);
          if (response.data.success) {
-            console.log(response.data);
             // Implement user data storage logic
             dispatch(setUserData(response.data.user))
             dispatch(setLoggedIn(true))
             return true
          } else {
-            console.log(response.data);
             return false
          }
       } catch (err) {
          if (process.env.NODE_ENV === "development") console.log(`An error occured within the AuthContext, verifyAccessToken`, err.message);
       } finally {
-         setVisible(false)
          dispatch(setAuthLoading(false))
       }
-   }
+   }, [accessToken, config.apiUri, dispatch])
 
-   const refreshTokens = async () => {
+   const refreshTokens = useCallback(async () => {
       const headers = {
          headers: {
             Authorization: `${refreshToken}`
@@ -80,8 +66,6 @@ export function AuthProvider({ children }) {
 
       try {
          const response = await axios.post(`${config.apiUri}/refresh-tokens`, { accessToken: accessToken }, headers)
-
-         console.log(response);
          if (response.data.success) {
             dispatch(setAccessToken(response.data.accessToken));
             dispatch(setRefreshToken(response.data.refreshToken));
@@ -104,18 +88,43 @@ export function AuthProvider({ children }) {
          setVisible(false)
          dispatch(setAuthLoading(false))
       }
-   }
+   }, [accessToken, config.apiUri, dispatch, refreshToken, setVisible])
 
-   const handleVerification = async () => {
+   const handleLogout = useCallback(async () => {
+      try {
+         const headers = {
+            headers: {
+               Authorization: `${refreshToken}`
+            }
+         }
+         const body = {
+            accessToken: accessToken
+         }
+
+         const response = await axios.post(`${config.apiUri}/logout`, body, headers)
+
+         if (response.data.success) {
+            dispatch(setAccessToken(null));
+            dispatch(setRefreshToken(null));
+            dispatch(setLoggedIn(false));
+         } else {
+            if(process.env.NODE_ENV === "development") console.log("AuthContext: An error occurred while logging out", response.data.message);
+            window.location.reload();
+         }
+      } catch (err) {
+         if(process.env.NODE_ENV === "development") console.log("AuthContext: An error occurred while logging out", err.message);
+         window.location.reload();
+      }
+   }, [accessToken, config.apiUri, dispatch, refreshToken])
+
+   const handleVerification = useCallback(async () => {
       const isAccTokenValid = await verifyAccessToken();
-      console.log(isAccTokenValid);
       if (isAccTokenValid) {
          // dispatch(setLoggedIn(true))
          // If the access token is valid, start the interval to check the validity periodically.
          clearInterval(intervalRef.current)
          intervalRef.current = setInterval(async () => {
             const check = await verifyAccessToken();
-            console.log(check);
             if (check) {
                // dispatch(setLoggedIn(true))
             } else {
@@ -126,7 +135,7 @@ export function AuthProvider({ children }) {
       } else {
          refreshTokens();
       }
-   }
+   }, [checkInterval, dispatch, refreshTokens, verifyAccessToken])
 
    useEffect(() => {
       if (refreshToken && accessToken) {
@@ -138,14 +147,11 @@ export function AuthProvider({ children }) {
       return () => {
          clearInterval(intervalRef.current)
       }
-   }, [accessToken, refreshToken, dispatch])
+   }, [accessToken, refreshToken, dispatch, handleVerification])
 
 
    return (
-      <AuthContext.Provider
-         value={{
-         }}
-      >
+      <AuthContext.Provider value={handleLogout}>
          {children}
       </AuthContext.Provider>
    );

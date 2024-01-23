@@ -19,7 +19,7 @@
         "navbar": {
             "profile": "Profile",
             "settings": "Settings",
-            "logout": "Logout",
+            "logout": "Log out",
             "languages": "Languages",
             "notifications": "Notifications"
         },

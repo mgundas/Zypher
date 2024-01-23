@@ -1,12 +1,14 @@
 // store.js
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './reducers/authSlicer';  // Importing the default export
-import userReducer from './reducers/userSlicer'
+import authReducer from './reducers/authSlicer';
+import userReducer from './reducers/userSlicer';
+import languageReducer from './reducers/languageSlicer';
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
     user: userReducer,
+    translation: languageReducer,
   },
 });
 

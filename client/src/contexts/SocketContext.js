@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
 import { useConfig } from "./ConfigContext";
 import { useAuth } from "./AuthContext";
+import { useSelector } from 'react-redux'
 
 if (!io) {
   throw new Error("Socket.io client library not found. Make sure it's installed.");
@@ -16,31 +17,29 @@ export const useSocket = () => {
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const config = useConfig();
-  const { authToken } = useAuth();
+  const { accessToken } = useSelector(state => state.auth)
 
   useEffect(() => {
     try {
-      if (!authToken) {
+      if (!accessToken) {
         if (process.env.NODE_ENV === 'development') {
-          console.error(`SocketContext: Auth token is missing.`);
+          console.error(`SocketContext: Access token is missing.`);
        }
         return;
       }
       // Create a new socket instance and connect it using the provided authentication token.
       const newSocket = io(config.socketUri, { autoConnect: false });
-      newSocket.auth = { accessToken: authToken };
+      newSocket.auth = { accessToken: accessToken };
       newSocket.connect();
       setSocket(newSocket);
-
-      console.log("Socket context mounted.");
 
       return () => newSocket.close()
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
-        console.error("Socket connection failed:", err);
+        console.error("SocketContext: Connection failed:", err);
       }
     }
-  }, [authToken, config.socketUri]);
+  }, [accessToken, config.socketUri]);
 
   return (
     <SocketContext.Provider value={{ socket }}>

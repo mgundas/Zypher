@@ -1,14 +1,15 @@
 import { useRef, useState } from "react";
 import { useConfig } from "../../contexts/ConfigContext";
-import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { setAccessToken, setRefreshToken } from '../../redux/reducers/authSlicer';
 
 const Login = ({ sendInfoMessage }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const timeoutRef = useRef(null)
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
-  const {setAuthToken, setRefreshToken} = useAuth()
   const config = useConfig();
 
   const responses = new Map([
@@ -47,11 +48,9 @@ const Login = ({ sendInfoMessage }) => {
 
             clearTimeout(timeoutRef.current)
             timeoutRef.current = setTimeout(() => {
-              localStorage.setItem("accessToken", data.accessToken);
-              localStorage.setItem("refreshToken", data.refreshToken);
-              setAuthToken(data.accessToken)
-              setRefreshToken(data.refreshToken)
-              navigate("", {replace: true})
+              dispatch(setAccessToken(data.accessToken))
+              dispatch(setRefreshToken(data.refreshToken))
+              navigate("/", {replace: true})
             }, 2000)
           }
         })

@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import Login from "./Login";
-import Register from "./Register";
-import { useConfig } from "../../contexts/ConfigContext";
+import Login from "../components/login/Login";
+import Register from "../components/login/Register";
+import { useConfig } from "../contexts/ConfigContext";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useSelector } from 'react-redux';
+
 
 export const LoginScreen = () => {
   const config = useConfig();
-  const {loggedIn} = useAuth();
   const navigate = useNavigate();
+  const { authLoading, isLoggedIn } = useSelector(state => state.auth)
 
   const infoBoxRef = useRef(null);
   const infoTimeoutRef = useRef(null);
@@ -16,11 +17,12 @@ export const LoginScreen = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    if(loggedIn){
-      console.log("bro ur logged in");
-      navigate("/", {replace: true})
+    if(!authLoading) {
+      if(isLoggedIn) {
+        navigate("/", {replace: true})
+      }
     }
-  }, [loggedIn, navigate])
+  }, [navigate, authLoading, isLoggedIn]);
 
   const sendInfoMessage = (message, type) => {
     const types = {

@@ -8,7 +8,7 @@ import { SocketProvider } from "./contexts/SocketContext";
 import { RecipientProvider } from "./contexts/RecipientContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
 
-import { LoginScreen } from "./components/pages/LoginScreen";
+import { LoginScreen } from "./pages/LoginScreen";
 
 function App() {
   const LazyHome = lazy(() => import("./pages/Home"))
