@@ -10,7 +10,7 @@ import { useConfig } from "./ConfigContext";
 import { useLoading } from "./LoadingContext"
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAccessToken, setRefreshToken, setLoggedIn, setAuthLoading } from '../redux/reducers/authSlicer';
+import { setAccessToken, setRefreshToken, setLoggedIn, setAuthLoading, setConnected } from '../redux/reducers/authSlicer';
 import { setUserData } from "../redux/reducers/userSlicer";
 
 const AuthContext = createContext();
@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
    const dispatch = useDispatch();
 
    // State definitions
-   const { accessToken, refreshToken } = useSelector(state => state.auth);
+   const { accessToken, refreshToken, connected } = useSelector(state => state.auth);
    const intervalRef = useRef(null)
    const checkInterval = 1000 * 60 * 30; // 30 minutes
 
@@ -108,11 +108,11 @@ export function AuthProvider({ children }) {
             dispatch(setRefreshToken(null));
             dispatch(setLoggedIn(false));
          } else {
-            if(process.env.NODE_ENV === "development") console.log("AuthContext: An error occurred while logging out", response.data.message);
+            if (process.env.NODE_ENV === "development") console.log("AuthContext: An error occurred while logging out", response.data.message);
             window.location.reload();
          }
       } catch (err) {
-         if(process.env.NODE_ENV === "development") console.log("AuthContext: An error occurred while logging out", err.message);
+         if (process.env.NODE_ENV === "development") console.log("AuthContext: An error occurred while logging out", err.message);
          window.location.reload();
       }
    }, [accessToken, config.apiUri, dispatch, refreshToken])
@@ -144,14 +144,34 @@ export function AuthProvider({ children }) {
          dispatch(setLoggedIn(false))
       }
 
+
+      window.addEventListener('online', () => dispatch(setConnected(true)));
+      window.addEventListener('offline', () => dispatch(setConnected(false)));
+
       return () => {
+         window.removeEventListener('online', () => dispatch(setConnected(true)));
+         window.removeEventListener('offline', () => dispatch(setConnected(false)));
          clearInterval(intervalRef.current)
       }
    }, [accessToken, refreshToken, dispatch, handleVerification])
 
-
    return (
       <AuthContext.Provider value={handleLogout}>
+         {!connected ? (
+            <div
+               className="absolute w-screen h-screen bg-rtca-900 z-[51] flex items-center justify-center select-none"
+            >
+               <div
+                  role="status"
+                  className="flex flex-col gap-1 text-white items-center justify-center"
+               >
+                  <span className="loading loading-spinner text-info loading-lg"></span>
+                  <span className="font-medium">Trying to reconnect...</span>
+               </div>
+            </div>
+         ) : (
+            <></>
+         )}
          {children}
       </AuthContext.Provider>
    );

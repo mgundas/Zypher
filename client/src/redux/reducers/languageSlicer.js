@@ -3,10 +3,10 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
    locale: localStorage.getItem('locale') || "en_US",
    translation: {},
-   avalableLangs: Object.fromEntries(new Map([
+   availableLangs: [
 		[0, ["en_US", "English"]],
 		[1, ["tr_TR", "Türkçe"]],
-	])),
+	],
 };
 
 const languageSlicer = createSlice({

@@ -5,6 +5,7 @@ const initialState = {
    refreshToken: localStorage.getItem("refreshToken") || null,
    authLoading: false,
    loggedIn: false,
+   connected: true
 };
 
 const authSlicer = createSlice({
@@ -27,8 +28,11 @@ const authSlicer = createSlice({
       setAuthLoading: (state, action) => {
          state.authLoading = action.payload;
       },
+      setConnected: (state, action) => {
+         state.connected = action.payload;
+      },
    },
 });
 
-export const { setAccessToken, setRefreshToken, setLoggedIn, setAuthLoading } = authSlicer.actions;
+export const { setAccessToken, setRefreshToken, setLoggedIn, setAuthLoading, setConnected } = authSlicer.actions;
 export default authSlicer.reducer;  // Default export of the reducer

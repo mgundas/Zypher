@@ -50,7 +50,7 @@ function ToggleDarkMode() {
   return (
     <button
       ref={themeToggle}
-      className="btn btn-ghost btn-circle"
+      className="btn btn-ghost btn-circle hidden sm:flex"
     >
       <svg
         ref={darkIcon}
