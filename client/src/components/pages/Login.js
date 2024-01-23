@@ -51,7 +51,7 @@ const Login = ({ sendInfoMessage }) => {
               localStorage.setItem("refreshToken", data.refreshToken);
               setAuthToken(data.accessToken)
               setRefreshToken(data.refreshToken)
-              navigate("../", {replace: true})
+              navigate("", {replace: true})
             }, 2000)
           }
         })

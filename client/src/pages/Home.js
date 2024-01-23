@@ -1,20 +1,21 @@
-import { useRef, useEffect, useState, lazy, Suspense } from "react";
-import { BrowserRouter as Router, Route, Routes, Link, Outlet, useNavigate } from 'react-router-dom';
+import { useRef, useEffect, useState } from "react";
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useSocket } from "../contexts/SocketContext";
 import { useConfig } from "../contexts/ConfigContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Navbar } from "../components/Navbar";
 import { ChatWindow } from "../components/ChatWindow";
 import { MainWindow } from "../components/MainWindow";
-import { LoginScreen } from "../components/pages/LoginScreen";
 import { useRecipient } from "../contexts/RecipientContext";
+import { useSelector } from 'react-redux';
 
 export default function Home() {
    const navigate = useNavigate()
    const { socket } = useSocket();
    const config = useConfig();
-   const { loggedIn, userData } = useAuth();
+   const { loggedIn, userData, authLoading } = useAuth();
    const { recipientData, activeChat } = useRecipient();
+   const isLoggedIn = useSelector((state) => state.loggedIn.loggedIn);
 
    const notificationTimeoutRef = useRef(null);
    const checkInterval = useRef(null);
@@ -25,17 +26,20 @@ export default function Home() {
    const [loadedMessages, setLoadedMessages] = useState(0);
 
    const [loading, setLoading] = useState(false);
+   const timeoutRef = useRef(null)
 
    useEffect(() => {
-     if(!loggedIn){
-      console.log("not logged in for some reason");
-      navigate("/login", {replace:true})
-     }
-   
-     return () => {
-     }
-   }, [loggedIn, navigate])
-   
+      if (!authLoading) {
+         if (!isLoggedIn) {
+            console.log("not logged in for some reason", isLoggedIn);
+            navigate("/login", { replace: true })
+         }
+      }
+
+      return () => {
+      }
+   }, [isLoggedIn, authLoading, navigate])
+
 
    useEffect(() => {
       setStatus(isOnline ? "Online" : "Offline");
@@ -127,15 +131,16 @@ export default function Home() {
       isOnline,
    ]);
 
-   const renderContent = () => {
-      if (loggedIn && socket) {
-         return (
-            <div className="chat-screen">
-               <Navbar
-                  messages={messages}
-                  status={status}
-               />
-               {activeChat ? (
+   if (isLoggedIn && socket) {
+      return (
+         <div className="chat-screen">
+            {/* <Navbar
+               messages={messages}
+               status={status}
+            /> */}
+            <Routes>
+               <Route exact path="/" element={<MainWindow />} />
+               <Route path="/chat" element={
                   <ChatWindow
                      messages={messages}
                      activeChat={activeChat}
@@ -144,40 +149,11 @@ export default function Home() {
                      setLoadedMessages={setLoadedMessages}
                      setLoading={setLoading}
                      setMessages={setMessages}
-                  />
-               ) : (
-                  <MainWindow />
-               )}
-            </div>
-         );
-      } else {
-         navigate("/login", {replace: true})
-      }
-   };
-
-   if (loggedIn && socket) {
-      return (
-         <div className="chat-screen">
-            <Navbar
-               messages={messages}
-               status={status}
-            />
-            <Routes>
-               <Route exact path="/" element={<MainWindow />} />
-               <Route path="/chat" element={
-               <ChatWindow
-                  messages={messages}
-                  activeChat={activeChat}
-                  loading={loading}
-                  loadedMessages={loadedMessages}
-                  setLoadedMessages={setLoadedMessages}
-                  setLoading={setLoading}
-                  setMessages={setMessages}
-               />} />
+                  />} />
             </Routes>
          </div>
       )
    } else {
-      
+
    }
 }

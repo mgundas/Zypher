@@ -9,6 +9,8 @@ import React, {
 import { useConfig } from "./ConfigContext";
 import { useLoading } from "./LoadingContext"
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { updateLoggedIn } from '../redux/reducers/authSlice';
 
 const AuthContext = createContext();
 
@@ -19,6 +21,7 @@ export const useAuth = () => {
 export function AuthProvider({ children }) {
    const { setVisible } = useLoading();
    const config = useConfig();
+   const dispatch = useDispatch();
 
    const [authToken, setAuthToken] = useState(
       localStorage.getItem("accessToken") || null
@@ -26,7 +29,7 @@ export function AuthProvider({ children }) {
    const [refreshToken, setRefreshToken] = useState(
       localStorage.getItem("refreshToken") || null
    );
-   const [loggedIn, setLoggedIn] = useState(false);
+   const [authLoading, setAuthLoading] = useState(true);
    const [userData, setUserData] = useState({});
 
    const checkTimeout = useRef(null);
@@ -83,7 +86,8 @@ export function AuthProvider({ children }) {
                      localStorage.setItem("refreshToken", "");
                      setAuthToken("");
                      setRefreshToken("");
-                     setLoggedIn(false);
+                     dispatch(updateLoggedIn(false));
+                     setAuthLoading(false)
                   }
                })
                .catch(err => {
@@ -102,7 +106,8 @@ export function AuthProvider({ children }) {
             localStorage.setItem("refreshToken", "");
             setAuthToken("");
             setRefreshToken("");
-            setLoggedIn(false);
+            dispatch(updateLoggedIn(false));
+            setAuthLoading(false)
          }
       };
 
@@ -114,7 +119,8 @@ export function AuthProvider({ children }) {
                return refreshTokens();
             }
             setVisible(false)
-            setLoggedIn(true);
+            dispatch(updateLoggedIn(true), );
+            setAuthLoading(false)
          });
       };
 
@@ -136,7 +142,8 @@ export function AuthProvider({ children }) {
          }, 45000);
       } else {
          setVisible(false);
-         setLoggedIn(false);
+         dispatch(updateLoggedIn(false));
+         setAuthLoading(false)
       }
       return () => {
          clearInterval(checkTimeout.current);
@@ -161,7 +168,8 @@ export function AuthProvider({ children }) {
                localStorage.setItem("refreshToken", "");
                setAuthToken("");
                setRefreshToken("");
-               setLoggedIn(false);
+               dispatch(updateLoggedIn(false));
+               setAuthLoading(false)
             } else {
                window.location.reload(false);
             }
@@ -179,7 +187,7 @@ export function AuthProvider({ children }) {
             setAuthToken,
             setRefreshToken,
             logOut,
-            loggedIn,
+            authLoading,
             userData
          }}
       >
