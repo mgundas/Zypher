@@ -7,10 +7,11 @@ import ToggleDarkMode from '../ToggleDarkMode';
 import { LanguageButton } from './navbar/LanguageButton';
 import { NotificationButton } from './navbar/NotificationButton';
 import { ProfileButton } from './navbar/ProfileButton';
+import { useNavigate } from 'react-router-dom';
 
 export const Navbar = () => {
    const { translation } = useSelector(state => state.translation)
-
+   const navigate = useNavigate()
 
    return (
       <div className="navbar">
@@ -20,7 +21,7 @@ export const Navbar = () => {
             </div>
          </div>
          <div className="navbar-center hidden sm:block">
-            <button className="btn btn-ghost text-xl" >{translation.content.title}</button>
+            <button onClick={() => {navigate("/", {replace: true})}} className="btn btn-ghost text-xl" >{translation.content.title}</button>
          </div>
          <div className="navbar-end gap-2">
             <LanguageButton />

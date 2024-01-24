@@ -4,9 +4,19 @@ const initialState = {
    locale: localStorage.getItem('locale') || "en_US",
    translation: {},
    availableLangs: [
-		[0, ["en_US", "English"]],
-		[1, ["tr_TR", "Türkçe"]],
-	],
+      {
+         locale: "en_US",
+         language: "English"
+      },
+      {
+         locale: "tr_TR",
+         language: "Türkçe"
+      },
+      {
+         locale: "de_DE",
+         language: "Deutsch"
+      }
+   ]
 };
 
 const languageSlicer = createSlice({

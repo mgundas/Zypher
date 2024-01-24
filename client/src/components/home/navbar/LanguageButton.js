@@ -1,6 +1,6 @@
 import React from 'react'
 import { setLocale } from '../../../redux/reducers/languageSlicer';
-import { useSelector, useDispatch } from'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 export const LanguageButton = () => {
    const dispatch = useDispatch()
@@ -18,9 +18,9 @@ export const LanguageButton = () => {
             <div className="p-1 grid gap-2">
                <h3 className="text-center text-md font-medium">{translation.content.navbar.languages}</h3>
                <div className="overflow-y-auto overflow-x-hidden grid gap-1 max-h-[calc(100vh/2)]">
-                  {[...availableLangs].map((lang, index) => {
+                  {availableLangs.map((lang, index) => {
                      return (
-                        <button onClick={() => { dispatch(setLocale(lang[1][0])) }} className="btn btn-outline btn-accent" key={index}>{lang[1][1]}</button>
+                        <button onClick={() => { dispatch(setLocale(lang.locale)) }} className="btn btn-outline btn-accent" key={index}>{lang.language}</button>
                      )
                   })}
                </div>

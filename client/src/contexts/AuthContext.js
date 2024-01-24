@@ -165,7 +165,7 @@ export function AuthProvider({ children }) {
                   role="status"
                   className="flex flex-col gap-1 text-white items-center justify-center"
                >
-                  <span className="loading loading-spinner text-info loading-lg"></span>
+                  <span className="loading loading-spinner text-red-700 loading-lg"></span>
                   <span className="font-medium">Trying to reconnect...</span>
                </div>
             </div>
