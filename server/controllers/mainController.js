@@ -547,7 +547,7 @@ const handleDiscover = async (req, res) => {
    const size = Number(req.query.size) || 10;
    console.log(size);
    const randomOnlineEntries = await User.aggregate([
-     { $match: { isOnline: true } }, // Add a $match stage to filter by the condition
+     { $match: { isOnline: true, _id: { $ne: req.authUser._id } } }, // Add a $match stage to filter by the condition
      { $sample: { size: size } },
      { $project: { password: 0, salt: 0 } }
    ]);
