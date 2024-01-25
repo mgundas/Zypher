@@ -103,7 +103,7 @@ const handleLogin = async (req, res) => {
             { expiresIn: "10d" }
          );
 
-         const ipAddress =
+/*          const ipAddress =
             req.headers['x-forwarded-for'] || // For reverse proxies
             req.connection.remoteAddress ||
             req.socket.remoteAddress ||
@@ -128,7 +128,7 @@ const handleLogin = async (req, res) => {
             refreshToken: refreshToken,
             ...reqData
          })
-         await record.save();
+         await record.save(); */
 
          return res.status(200).json({
             success: true,
@@ -343,7 +343,7 @@ const handleRefreshTokens = async (req, res) => {
          { expiresIn: "30d" }
       );
 
-      const ipAddress =
+/*       const ipAddress =
          req.headers['x-forwarded-for'] || // For reverse proxies
          req.connection.remoteAddress ||
          req.socket.remoteAddress ||
@@ -368,7 +368,7 @@ const handleRefreshTokens = async (req, res) => {
          refreshToken: refreshToken,
          ...reqData
       })
-      await record.save();
+      await record.save(); */
 
       return res.status(200).json({
          success: true,
@@ -542,6 +542,19 @@ const handleLogout = async (req, res) => {
    }
 };
 
+const handleDiscover = async (req, res) => {
+
+   const size = Number(req.query.size) || 10;
+   console.log(size);
+   const randomOnlineEntries = await User.aggregate([
+     { $match: { isOnline: true } }, // Add a $match stage to filter by the condition
+     { $sample: { size: size } },
+     { $project: { password: 0, salt: 0 } }
+   ]);
+
+   return res.status(200).json(randomOnlineEntries)
+}
+
 module.exports = {
    handleLogin,
    handleRegister,
@@ -550,4 +563,5 @@ module.exports = {
    handleMessage,
    handleFetchRecipient,
    handleLogout,
+   handleDiscover
 };

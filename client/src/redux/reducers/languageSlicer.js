@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
    locale: localStorage.getItem('locale') || "en_US",
-   translation: {},
+   translation: await import("../../lang/en_US.json"),
    availableLangs: [
       {
          locale: "en_US",

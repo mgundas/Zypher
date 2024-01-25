@@ -17,11 +17,12 @@ export const Navbar = () => {
       <div className="navbar">
          <div className="navbar-start">
             <div className="flex items-center">
-               <p className='text-xs'>Chat person data goes here...</p>
+               <p className='text-xs'></p>
             </div>
          </div>
-         <div className="navbar-center hidden sm:block">
-            <button onClick={() => {navigate("/", {replace: true})}} className="btn btn-ghost text-xl" >{translation.content.title}</button>
+         <div className="navbar-center">
+            <button onClick={() => { navigate("/", { replace: true }) }} className="btn btn-ghost text-xl hidden sm:block" >{translation.content.title}</button>
+            <button onClick={() => { navigate("/", { replace: true }) }} className="btn btn-ghost text-xl block sm:hidden" ><i className="bi bi-house-fill"></i></button>
          </div>
          <div className="navbar-end gap-2">
             <LanguageButton />
