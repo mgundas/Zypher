@@ -85,3 +85,15 @@ body{
 .convo-modal-content-input{
     @apply p-2 px-3 rounded-full bg-rtca-700 text-white placeholder:text-white/75 outline-none
 }
+
+.online-alt:before {
+    @apply content-[""] absolute z-10 block rounded-full bg-green-500 outline outline-2 outline-rtca-800 w-[15%] h-[15%] top-[7%] right-[7%] 
+}
+
+.idle-alt:before {
+    @apply content-[""] absolute z-10 block rounded-full bg-yellow-500 outline outline-2 outline-rtca-800 w-[15%] h-[15%] top-[7%] right-[7%] 
+}
+
+.offline-alt:before {
+    @apply content-[""] absolute z-10 block rounded-full bg-rtca-700 outline outline-2 outline-rtca-800 w-[15%] h-[15%] top-[7%] right-[7%] 
+}

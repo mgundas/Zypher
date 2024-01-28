@@ -30,7 +30,7 @@ export const Chat = () => {
             className="flex-1 flex flex-col items-center overflow-y-auto overflow-x-hidden p-2 dark:text-white 
 relative"
          >
-            <div class="grid w-full gap-4 items-center p-2 px-3">
+            <div className="grid w-full gap-4 items-center p-2 px-3">
                <div className="chat self-end chat-end">
                   <div className="skeleton chat-bubble w-1/3 bg-rtca-900">
                   </div>

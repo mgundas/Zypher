@@ -16,8 +16,8 @@ export const Navbar = () => {
    const location = useLocation();
 
    return (
-      <div className="navbar">
-         <div className="navbar-start">
+      <div className="navbar justify-between">
+         <div className="navbar-start w-3/4 sm:w-1/2">
             <div className="flex items-center">
                <div className="drawer w-auto">
                   <input
@@ -69,9 +69,8 @@ export const Navbar = () => {
                {location.pathname.startsWith("/chat") ? (<ChatPerson />) : (<></>)}
             </div>
          </div>
-         <div className="navbar-center">
-            <button onClick={() => { window.history.pushState(null, '', location.pathname); navigate("/") }} className="btn btn-ghost text-xl hidden sm:block" >{translation.content.title}</button>
-            <button onClick={() => { window.history.pushState(null, '', location.pathname); navigate("/") }} className="btn btn-ghost btn-circle text-xl block sm:hidden" ><i className="bi bi-house-fill"></i></button>
+         <div className="navbar-center hidden sm:block">
+            <button onClick={() => { window.history.pushState(null, '', location.pathname); navigate("/") }} className="btn btn-ghost text-xl" >{translation.content.title}</button>
          </div>
          <div className="navbar-end gap-2">
             <LanguageButton />

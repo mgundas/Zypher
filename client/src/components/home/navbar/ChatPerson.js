@@ -6,8 +6,8 @@ import { useSelector } from "react-redux"
 export const ChatPerson = () => {
    const { recipientData } = useSelector((state) => state.chat)
    return (
-      <button className="p-4 px-2 flex gap-3 items-center">
-         <div className="avatar online z-0 placeholder">
+      <button className="flex gap-3 items-center">
+         <div className="avatar online-alt z-0 placeholder">
             <div
                style={{
                   backgroundColor: generateRandomColor(recipientData.username),
