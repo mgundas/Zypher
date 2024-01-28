@@ -1,6 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../Models/UserModel");
+const { isTokenBlacklisted } = require("../utils/redisUtils.js");
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -24,6 +25,16 @@ const authMiddleware = async (req, res, next) => {
       });
     }
 
+    // Check if the token is blacklisted
+    const isBlacklisted = await isTokenBlacklisted(accessToken);
+
+    if (isBlacklisted) {
+      return res.status(401).json({
+        success: false,
+        message: "access.token.blacklisted",
+      });
+    }
+
     const userData = jwt.decode(accessToken);
     const userExists = await User.findById(userData.uid);
 
@@ -40,6 +51,13 @@ const authMiddleware = async (req, res, next) => {
     next();
 
   } catch (error) {
+    if (error.message === "jwt expired"){
+      return res.status(401).json({
+        success: false,
+        message: "access.token.expired",
+      });
+    }
+    
     console.log("Error authenticating user:", error.message);
     return res.status(500).json({
       success: false,

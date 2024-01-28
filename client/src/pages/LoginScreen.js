@@ -17,9 +17,17 @@ export const LoginScreen = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    if(!authLoading) {
-      if(isLoggedIn) {
-        navigate("/", {replace: true})
+    document.title = 'Login - Zypher';
+    return () => {
+      document.title = 'Zypher';
+    };
+  }, [])
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (isLoggedIn) {
+        window.history.pushState(null, '', '/login');
+        navigate("/")
       }
     }
   }, [navigate, authLoading, isLoggedIn]);

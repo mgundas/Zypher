@@ -2,9 +2,11 @@ import React from 'react'
 import { getInitials } from "../../../helpers/getInitials"
 import { generateRandomColor, generateAltRandomColor } from "../../../helpers/generateRandomColor";
 import { useNavigate } from "react-router-dom"
+import { useSelector } from "react-redux"
 
-export const Profile = ({ user }) => {
+export const ProfileCard = ({ user }) => {
    const navigate = useNavigate()
+   const { translation } = useSelector(state => state.translation)
 
    const convertTime = (time) => {
       const date = new Date(time);
@@ -12,8 +14,7 @@ export const Profile = ({ user }) => {
       const month = date.getMonth() + 1; // Months are zero-based, so add 1
       const day = date.getDate();
 
-      return `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day
-         }`;
+      return `${year}/${month < 10 ? "0" + month : month}/${day < 10 ? "0" + day : day}`;
    };
 
    return (
@@ -41,9 +42,12 @@ export const Profile = ({ user }) => {
                   <div className='flex justify-between items-center'>
                      <div className='flex flex-col'>
                         <p className='font-bold'>@{user.username}</p>
-                        <p><span className='font-bold'>Joined at:</span> {convertTime(user.createdAt)}</p>
+                        <p><span className='font-bold'>{translation.content.discover.profileModal.joinedOn}</span> {convertTime(user.createdAt)}</p>
                      </div>
-                     <button onClick={() => { navigate(`/chat/${user.username}`) }} className='btn btn-primary'>Message</button>
+                     <button onClick={() => {
+                        window.history.pushState(null, '', '/discover');
+                        navigate(`/chat/${user.username}`)
+                     }} className='btn btn-primary'>{translation.content.discover.profileModal.message}</button>
                   </div>
                </div>
             </div>

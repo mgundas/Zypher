@@ -9,6 +9,7 @@ import { RecipientProvider } from "./contexts/RecipientContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
 
 import { LoginScreen } from "./pages/LoginScreen";
+import { Landing } from './pages/Landing';
 
 function App() {
   const LazyHome = lazy(() => import("./pages/Home"))
@@ -28,6 +29,7 @@ function App() {
                   </RecipientProvider>
                 </SocketProvider>
               } />
+              <Route path="/landing" element={<Landing />} />
               <Route path="/login" element={<LoginScreen />} />
             </Routes>
           </AuthProvider>

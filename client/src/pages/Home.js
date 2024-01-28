@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { Navbar } from "../components/home/Navbar";
 import { MainScreen } from "./MainScreen";
 import { Discover } from "./Discover";
+import { Chat } from "./Chat";
 
 export default function Home() {
    const { isLoggedIn, authLoading } = useSelector(state => state.auth);
@@ -13,7 +14,8 @@ export default function Home() {
    useEffect(() => {
       if (!authLoading) {
          if (!isLoggedIn) {
-            navigate("/login", { replace: true })
+            window.history.pushState(null, '', '/');
+            navigate("/landing", { replace: true })
          }
       }
    }, [authLoading, isLoggedIn, navigate])
@@ -25,8 +27,8 @@ export default function Home() {
             <Routes>
                <Route exact path="/" element={<MainScreen />} />
                <Route path="discover" element={<Discover />} />
-               <Route path="chat/:username" element={<div>It's the chat, init?</div>} />
-               <Route path="/:username" element={<div>It's the profile, init?</div>} />
+               <Route path="chat/:username" element={<Chat />} />
+               <Route path="/:username" element={<></>} />
             </Routes>
          </div>
       )

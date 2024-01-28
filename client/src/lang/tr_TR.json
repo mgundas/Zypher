@@ -23,15 +23,13 @@
             "languages": "Diller",
             "notifications": "Bildirimler"
         },
-        "recipientProfile": {
-            "joinedOn": "Katılma zamanı:",
-            "userId": "Kullanıcı ID:"
-        },
-        "conversationDrawer": {
-            "conversations": "Diyaloglar",
-            "newConvo": "Yeni Diyalog",
-            "startNewConvo": "Yeni bir diyalog başlat",
-            "searchUser": "Kullanıcı ara"
+        "discover": {
+            "newpeople": "Yeni insanlar keşfetmenin zamanı gelmedi mi? Hadi bakalım!",
+            "picks4u": "İşte senin için seçtiklerimiz.",
+            "profileModal": {
+                "joinedOn": "Katıldığı tarih:",
+                "message": "Mesaj"
+            }
         }
     }
 }

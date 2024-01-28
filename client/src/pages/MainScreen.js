@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 export const MainScreen = () => {
   const navigate = useNavigate()
@@ -9,7 +9,10 @@ export const MainScreen = () => {
       <div className='flex flex-col items-center gap-3'>
         <p className='text-lg text-center'>Hey there! Isn't it a nice day to chat someone?</p>
         <div className='flex'>
-          <button onClick={() => {navigate("/discover", {replace:true})}} className='btn btn-outline btn-success'>
+          <button onClick={() => {
+            window.history.pushState(null, '', '/');
+            navigate("/discover")
+          }} className='btn btn-outline btn-success'>
             Discover
           </button>
         </div>

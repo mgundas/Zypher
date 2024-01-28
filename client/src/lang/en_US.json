@@ -23,15 +23,13 @@
             "languages": "Languages",
             "notifications": "Notifications"
         },
-        "recipientProfile": {
-            "joinedOn": "Joined on:",
-            "userId": "User ID:"
-        },
-        "conversationDrawer": {
-            "conversations": "Conversations",
-            "newConvo": "New Conversation",
-            "startNewConvo": "Start a new conversation",
-            "searchUser": "Search user"
+        "discover": {
+            "newpeople": "Isn't it high time we discover new people? Let's go!",
+            "picks4u": "Here are top picks for you.",
+            "profileModal": {
+                "joinedOn": "Joined on:",
+                "message": "Message"
+            }
         }
     }
 }
