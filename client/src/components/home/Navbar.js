@@ -12,6 +12,7 @@ import { ChatPerson } from './navbar/ChatPerson';
 
 export const Navbar = () => {
    const { translation } = useSelector(state => state.translation)
+   const { recipientData } = useSelector(state => state.chat)
    const navigate = useNavigate()
    const location = useLocation();
 
@@ -66,7 +67,7 @@ export const Navbar = () => {
                   </div>
                </div>
                {/* If a conversation is active, attach the recipient info to the navbar */}
-               {location.pathname.startsWith("/chat") ? (<ChatPerson />) : (<></>)}
+               {location.pathname.startsWith("/chat") && recipientData.username !== "" ? (<ChatPerson />) : (<></>)}
             </div>
          </div>
          <div className="navbar-center hidden sm:block">

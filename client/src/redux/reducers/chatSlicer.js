@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+   idChat: "",
    recipientData: {username: ""},
    messages: [],
    messagesCount: 0,
@@ -12,6 +13,9 @@ const chatSlicer = createSlice({
    name: 'chat',
    initialState,
    reducers: {
+      setIdChat: (state, action) => {
+         state.idChat = action.payload; 
+      },
       setRecipientData: (state, action) => {
          state.recipientData = action.payload;
       },
@@ -30,5 +34,5 @@ const chatSlicer = createSlice({
    },
 });
 
-export const { setRecipientData, setMessages, setMessagesCount, setLoadedMessagesCount, setTotalMessagesCount } = chatSlicer.actions;
+export const { setRecipientData, setMessages, setMessagesCount, setLoadedMessagesCount, setTotalMessagesCount, setIdChat } = chatSlicer.actions;
 export default chatSlicer.reducer;  

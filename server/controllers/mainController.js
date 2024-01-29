@@ -6,6 +6,7 @@ const UAParser = require('ua-parser-js');
 const User = require("../Models/UserModel");
 const UserSocketMapping = require("../Models/UserSocketMapping");
 const TokenRecord = require("../Models/TokenRecord");
+const Chat = require("../Models/Chat");
 
 const {
    addToBlacklist,
@@ -481,11 +482,81 @@ const handleDiscover = async (req, res) => {
    }
 }
 
+const handleChat = async (req, res) => {
+   try {
+      const { username } = req.query;
+
+      const user = await User.findOne(
+         { username: username },
+         { password: 0, salt: 0 }
+      );
+
+      if (!user) {
+         return res.status(404).json({
+            success: false,
+            message: "user.does.not.exist"
+         })
+      }
+
+      const existingChat = await Chat.findOne({ participants: [user._id, req.authUser._id] })
+
+      if (!existingChat) {
+         const newChat = new Chat({
+            participants: [user._id, req.authUser._id],
+            messages: [],
+         });
+
+         await newChat.save();
+
+         return res.status(200).json({
+            success: true,
+            id: newChat._id
+         })
+      }
+
+      return res.status(200).json({
+         success: true,
+         user: user,
+         id: existingChat._id
+      })
+
+   } catch (err) {
+      if (process.env.NODE_ENV !== 'production') console.log(`Something went wrong in the handleChat function: ${err.message}`);
+      return res.status(500).json({
+         success: false,
+         message: "server.error"
+      })
+   }
+}
+
+const handleFetchMessages = async (req, res) => {
+   const { room, size, skip } = req.query
+
+   const skipCount = size * (skip - 1);
+
+   const chat = await Chat.findById(room)
+      .select({ messages: { $slice: [skipCount, size] }, _id: 0 });
+
+   if (chat) {
+      const reversedMessages = chat.messages.reverse();
+      return res.status(200).json({
+         success: true,
+         messages: reversedMessages
+      })
+   } else {
+      return res.status(404).json({
+         success: false,
+         message: "chat.not.found"
+      })
+   }
+}
+
 module.exports = {
    handleLogin,
    handleRegister,
    handleVerifyAccessToken,
    handleRefreshTokens,
    handleLogout,
-   handleDiscover
+   handleDiscover,
+   handleChat
 };
