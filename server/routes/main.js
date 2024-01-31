@@ -6,6 +6,7 @@ const {
   handleRefreshTokens,
   handleLogout,
   handleDiscover,
+  handleFetchMessages,
   handleChat,
 } = require("../controllers/mainController")
 const authMiddleware = require("../controllers/authMiddleware")
@@ -18,6 +19,7 @@ router.post("/verify-access-token", handleVerifyAccessToken)
 router.post("/refresh-tokens", handleRefreshTokens)
 router.get("/discover", authMiddleware, handleDiscover)
 router.get("/chat", authMiddleware, handleChat)
+router.get("/messages", authMiddleware, handleFetchMessages)
 router.post("/logout", handleLogout)
 
 module.exports = router;

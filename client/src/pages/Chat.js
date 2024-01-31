@@ -5,6 +5,9 @@
 // Implement seen feature
 // Implement online checker
 
+// Known issues:
+// username parameter is sometimes undefined for some reason even though the address includes the username parameter
+
 import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux"
@@ -26,6 +29,25 @@ export const Chat = () => {
    const [disabled, setDisabled] = useState(false)
    const [error, setError] = useState(false)
 
+   const fetchMessages = useCallback(async (room, size, skip) => {
+      try {
+         const messages = await axios.get(`${config.apiUri}/messages`,
+         {
+            headers: {
+               Authorization: accessToken,
+            },
+            params: {
+               room: room,
+               size: size,
+               skip: skip
+            }
+         })
+      } catch (err) {
+         
+      }
+
+   }, [])
+
    const fetchUserData = useCallback(async () => {
       try {
          const response = await axios.get(`${config.apiUri}/chat`, {
@@ -42,6 +64,8 @@ export const Chat = () => {
                username: response.data.user.username
             }))
             dispatch(setIdChat(response.data.id))
+
+            fetchMessages(response.data.id, 30, 0)
          } else {
             dispatch(setRecipientData({
                username: ""

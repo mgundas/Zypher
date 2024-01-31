@@ -8,7 +8,6 @@ import { SocketProvider } from "./contexts/SocketContext";
 import { RecipientProvider } from "./contexts/RecipientContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
 
-import { LoginScreen } from "./pages/LoginScreen";
 import { Landing } from './pages/Landing';
 
 function App() {
@@ -29,8 +28,7 @@ function App() {
                   </RecipientProvider>
                 </SocketProvider>
               } />
-              <Route path="/landing" element={<Landing />} />
-              <Route path="/login" element={<LoginScreen />} />
+              <Route path="/landing/*" element={<Landing />} />
             </Routes>
           </AuthProvider>
         </LoadingProvider>

@@ -11,7 +11,22 @@
             "ok": "Okay",
             "open": "Open",
             "close": "Close",
-            "connecting": "Connecting"
+            "connecting": "Connecting",
+            "username": "Username",
+            "password": "Password"
+        },
+        "landing": {
+            "signup": {
+                "signup": "Sign up",
+                "responseChart": {
+                    "missing.username.email.password": "Please enter the username, email and password.|warning",
+                    "empty.username.email.password": "Fields can't be empty.|warning",
+                    "invalid.email.username.password.format": "Invalid username, email or password format.|warning",
+                    "user.exists": "A user with this username or email exists.|error",
+                    "reg.successful": "Successfully signed up! Welcome.|success",
+                    "err.occurred": "An error occured.|error"
+                }
+            }
         },
         "mainWindow": {
             "randomize": "Randomize"

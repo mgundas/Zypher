@@ -530,24 +530,28 @@ const handleChat = async (req, res) => {
 }
 
 const handleFetchMessages = async (req, res) => {
-   const { room, size, skip } = req.query
+   try {
+      const { room, size, skip } = req.query
 
-   const skipCount = size * (skip - 1);
+      const skipCount = size * (skip - 1);
 
-   const chat = await Chat.findById(room)
-      .select({ messages: { $slice: [skipCount, size] }, _id: 0 });
+      const chat = await Chat.findById(room)
+         .select({ messages: { $slice: [skipCount, size] }, _id: 0 });
 
-   if (chat) {
-      const reversedMessages = chat.messages.reverse();
-      return res.status(200).json({
-         success: true,
-         messages: reversedMessages
-      })
-   } else {
-      return res.status(404).json({
-         success: false,
-         message: "chat.not.found"
-      })
+      if (chat) {
+         const reversedMessages = chat.messages.reverse();
+         return res.status(200).json({
+            success: true,
+            messages: reversedMessages
+         })
+      } else {
+         return res.status(404).json({
+            success: false,
+            message: "chat.not.found"
+         })
+      }
+   } catch (error) {
+      console.log("Something went wrong", error.message);
    }
 }
 
@@ -558,5 +562,6 @@ module.exports = {
    handleRefreshTokens,
    handleLogout,
    handleDiscover,
-   handleChat
+   handleChat,
+   handleFetchMessages,
 };

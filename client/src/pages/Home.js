@@ -31,6 +31,7 @@ export default function Home() {
                <Route path="chat/:username" element={<Chat />} />
                <Route path="profile/:username" element={<></>} />
                
+               {/* For all the routes that don't exist */}
                <Route path="*" element={<NotFound />} />
             </Routes>
          </div>
