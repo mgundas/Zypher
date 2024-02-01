@@ -24,6 +24,7 @@ export const Landing = () => {
    }, [navigate, authLoading, isLoggedIn]);
 
    const sendInfoMessage = (data) => {
+      const duration = 1000 * 3 // 3 seconds
       const [message, type] = data.split("|")
       const types = {
          success: "alert-success",
@@ -32,14 +33,16 @@ export const Landing = () => {
          info: "alert-info",
       };
 
-      infoBoxRef.current.className = `alert flex ${types[type]}`;
+      infoBoxRef.current.className = `alert flex sm:grid text-clip overflow-x-clip w-3/4 sm:w-full m-auto ${types[type]}`;
       setErrorMsg(message);
       infoBoxRef.current.classList.remove("hidden");
 
       clearTimeout(infoTimeoutRef.current);
       infoTimeoutRef.current = setTimeout(() => {
          infoBoxRef.current.classList.add("hidden");
-      }, 2000);
+         infoBoxRef.current.classList.remove("flex");
+         infoBoxRef.current.classList.remove("sm:grid");
+      }, duration);
    };
 
    useEffect(() => {
@@ -84,8 +87,8 @@ export const Landing = () => {
    return (
       <div className="hero min-h-screen">
          <div className="toast toast-bottom toast-center z-10">
-            <div ref={infoBoxRef} className="alert alert-warning">
-               <span><i className="bi bi-exclamation-octagon"></i>&nbsp;&nbsp;{errorMsg}</span>
+            <div ref={infoBoxRef} className="hidden" >
+               <span className='animate-marquee sm:animate-none'>{errorMsg}</span>
             </div>
          </div>
          <div className="hero-overlay bg-opacity-60" style={{ backgroundImage: "url(/landing-bg.png)" }}></div>
