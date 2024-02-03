@@ -45,20 +45,21 @@ export const Register = ({sendInfoMessage}) => {
             const data = await response.json();
 
             if (!response.ok) {
-               const infoData =  translation.content.landing.signup.responseChart[data.message] || ["An unknown error occurred. Please try again.", "failure"];
+               const infoData =  translation.content.landing.signup.responseChart[data.message] || `${translation.content.common.error}|failure`;
                sendInfoMessage(infoData);
             } else {
-               const infoData = translation.content.landing.signup.responseChart[data.message] || ["An unknown error occurred. Please try again.", "failure"];
+               const infoData = translation.content.landing.signup.responseChart[data.message] || `${translation.content.common.error}|failure`;
                sendInfoMessage(infoData);
                setEmailInput("");
                setPasswordInput("");
                setUsernameInput("");
             }
          } catch (err) {
-            sendInfoMessage("An error occurred. Please try again.", "failure");
-         }
+            if(process.env.NODE_ENV === 'development') console.error(`Something went wrong in /src/pages/Login.js. ${err.message}`);
+            sendInfoMessage(`${translation.content.common.error}|failure`);
+           }
       } else {
-         sendInfoMessage("Please enter the required information.", "warning");
+         sendInfoMessage(`${translation.content.common.error}|failure`);
       }
    };
 
