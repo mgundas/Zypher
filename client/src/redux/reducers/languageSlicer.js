@@ -1,23 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { availableLanguages } from '../../lang/availableLanguages'
 
 const initialState = {
    locale: localStorage.getItem('locale') || "en_US",
    translation: await import("../../lang/en_US.json"),
    // Add new languages here to make them available in the app
-   availableLangs: [
-      {
-         locale: "en_US",
-         language: "English"
-      },
-      {
-         locale: "tr_TR",
-         language: "Türkçe"
-      },
-      /* {
-         locale: "de_DE",
-         language: "Deutsch"
-      } */
-   ]
+   availableLangs: availableLanguages
 };
 
 const languageSlicer = createSlice({

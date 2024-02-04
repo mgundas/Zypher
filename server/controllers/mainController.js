@@ -6,6 +6,7 @@ const UAParser = require('ua-parser-js');
 const User = require("../Models/UserModel");
 const UserSocketMapping = require("../Models/UserSocketMapping");
 const TokenRecord = require("../Models/TokenRecord");
+const Changelog = require("../Models/Changelog");
 const Chat = require("../Models/Chat");
 
 const {
@@ -555,6 +556,18 @@ const handleFetchMessages = async (req, res) => {
    }
 }
 
+const handleChangelog = async (req, res) => {
+   try {
+      const changelog = await Changelog.find();
+      return res.status(200).json({
+         success: true,
+         changelog: changelog
+      })
+   } catch (error) {
+      console.log("Something went wrong", error.message);
+   }
+}
+
 module.exports = {
    handleLogin,
    handleRegister,
@@ -564,4 +577,5 @@ module.exports = {
    handleDiscover,
    handleChat,
    handleFetchMessages,
+   handleChangelog
 };

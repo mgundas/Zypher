@@ -64,11 +64,11 @@ export const Landing = () => {
       }, []);
 
       return (
-         <>
-            <div className="text-center text-neutral-content">
-               <div className="max-w-lg">
-                  <h1 className="mb-5 text-5xl font-bold">Welcome to Zypher</h1>
-                  <p className="mb-5">With Zypher, you can discover new people, find people you already know, chat and have fun!</p>
+         <div className="text-center text-neutral-content">
+            <div className="max-w-lg">
+               <h1 className="mb-5 text-5xl font-bold">Welcome to Zypher</h1>
+               <p className="mb-5">With Zypher, you can discover new people, find people you already know, chat and have fun!</p>
+               <div className='grid gap-2'>
                   <div className="flex items-center justify-center gap-2">
                      <button onClick={() => {
                         window.history.pushState(null, '', '/landing');
@@ -79,9 +79,15 @@ export const Landing = () => {
                         navigate("/landing/signup")
                      }} className="btn btn-primary">Sign up</button>
                   </div>
+                  <div className="flex items-center justify-center gap-2">
+                     <button onClick={() => {
+                        window.history.pushState(null, '', '/landing');
+                        navigate("/changelog")
+                     }} className="btn btn-accent">Changelog</button>
+                  </div>
                </div>
             </div>
-         </>
+         </div>
       )
    }
 
