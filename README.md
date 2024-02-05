@@ -52,7 +52,7 @@ foo@bar:~$ npm start
 
 ### TODOS:
 - [x] Multi-language support
-- [*] Light mode
+- [ ] Light mode
 - [ ] Real-time updated conversations drawer
 - [ ] Notification system
 - [ ] Profile & Profile settings
