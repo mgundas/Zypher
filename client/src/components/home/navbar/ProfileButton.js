@@ -25,12 +25,12 @@ export const ProfileButton = () => {
          </div>
          <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-rtca-800 rounded-box rounded-t-none w-52"
+            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-300 rounded-box rounded-t-none w-52"
          >
             <li>
                <button className="justify-between">
                   {translation.content.navbar.profile}
-                  <span className="badge bg-rtca-700 border-none">{translation.content.common.new}</span>
+                  <span className="badge bg-base-100 border-none">{translation.content.common.new}</span>
                </button>
             </li>
             <li>

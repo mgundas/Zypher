@@ -46,7 +46,7 @@ export const Chat = () => {
          
       }
 
-   }, [])
+   }, [accessToken, config.apiUri])
 
    const fetchUserData = useCallback(async () => {
       try {
@@ -86,7 +86,7 @@ export const Chat = () => {
             setError(true)
          }
       }
-   }, [accessToken, config.apiUri, username, dispatch])
+   }, [config.apiUri, accessToken, username, dispatch, fetchMessages])
 
    useEffect(() => {
       fetchUserData();
@@ -132,7 +132,7 @@ relative"
             <button
                disabled={disabled ? true : false}
                type="submit"
-               className="btn btn-md h-10 min-h-min btn-primary btn-circle"
+               className="btn btn-md h-10 w-10 min-h-min btn-primary"
             >
                <i className="bi bi-send text-xl"></i>
             </button>

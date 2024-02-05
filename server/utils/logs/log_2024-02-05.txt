@@ -1,0 +1,231 @@
+2024-02-05T00:24:40.792Z - Initializing app in NODE_ENV: development
+2024-02-05T00:25:04.108Z - -----------------------------------------------------
+2024-02-05T00:25:04.108Z - Initializing app in NODE_ENV: development
+2024-02-05T00:26:39.754Z - -----------------------------------------------------
+2024-02-05T00:26:39.754Z - Initializing app in NODE_ENV: development
+2024-02-05T00:26:39.800Z - Connected to Redis
+2024-02-05T00:26:39.811Z - Redis client is ready
+2024-02-05T00:27:14.266Z - ------------------------------------------ rebooted
+2024-02-05T00:27:14.267Z - Initializing app in NODE_ENV: development
+2024-02-05T00:27:14.318Z - Connected to Redis
+2024-02-05T00:27:14.330Z - Redis client is ready
+2024-02-05T00:28:06.926Z - ------------------------------------------ rebooted
+2024-02-05T00:28:06.926Z - Initializing app in NODE_ENV: development
+2024-02-05T00:28:06.976Z - Connected to Redis
+2024-02-05T00:28:06.990Z - DB connection successful
+2024-02-05T00:28:06.994Z - Redis client is ready
+2024-02-05T00:28:43.402Z - ------------------------------------------ rebooted
+2024-02-05T00:28:43.402Z - Initializing app in NODE_ENV: development
+2024-02-05T00:28:43.445Z - Connected to Redis
+2024-02-05T00:28:43.451Z - DB connection successful
+2024-02-05T00:28:43.454Z - Redis client is ready
+2024-02-05T00:28:51.898Z - ------------------------------------------ rebooted
+2024-02-05T00:28:51.898Z - Initializing app in NODE_ENV: development
+2024-02-05T00:28:51.942Z - Connected to Redis
+2024-02-05T00:28:51.948Z - DB connection successful
+2024-02-05T00:28:51.951Z - Redis client is ready
+2024-02-05T00:29:00.969Z - ------------------------------------------ rebooted
+2024-02-05T00:29:00.970Z - Initializing app in NODE_ENV: development
+2024-02-05T00:29:01.014Z - Connected to Redis
+2024-02-05T00:29:01.020Z - DB connection successful
+2024-02-05T00:29:01.023Z - Redis client is ready
+2024-02-05T00:29:16.951Z - ------------------------------------------ rebooted
+2024-02-05T00:29:16.951Z - Initializing app in NODE_ENV: development
+2024-02-05T00:29:16.997Z - Connected to Redis
+2024-02-05T00:29:17.005Z - DB connection successful
+2024-02-05T00:29:17.009Z - Redis client is ready
+2024-02-05T00:30:57.729Z - 
+/*------------------------------------------*/
+/*-----------Zypher is booting-------------*/
+/*------------------------------------------*/
+
+2024-02-05T00:30:57.729Z - Initializing app in NODE_ENV: development
+2024-02-05T00:30:57.773Z - Connected to Redis
+2024-02-05T00:30:57.780Z - DB connection successful
+2024-02-05T00:30:57.783Z - Redis client is ready
+2024-02-05T00:31:15.138Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+
+2024-02-05T00:31:15.138Z - Initializing app in NODE_ENV: development
+2024-02-05T00:31:15.184Z - Connected to Redis
+2024-02-05T00:31:15.191Z - DB connection successful
+2024-02-05T00:31:15.194Z - Redis client is ready
+2024-02-05T00:31:26.665Z - /*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:31:26.665Z - Initializing app in NODE_ENV: development
+2024-02-05T00:31:26.713Z - Connected to Redis
+2024-02-05T00:31:26.720Z - DB connection successful
+2024-02-05T00:31:26.722Z - Redis client is ready
+2024-02-05T00:31:34.734Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:31:34.734Z - Initializing app in NODE_ENV: development
+2024-02-05T00:31:34.780Z - Connected to Redis
+2024-02-05T00:31:34.787Z - DB connection successful
+2024-02-05T00:31:34.790Z - Redis client is ready
+2024-02-05T00:32:44.802Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:32:44.835Z - Stale sockets are cleaned up.
+2024-02-05T00:32:44.802Z - Initializing app in NODE_ENV: development
+2024-02-05T00:32:44.849Z - Connected to Redis
+2024-02-05T00:32:44.857Z - DB connection successful
+2024-02-05T00:32:44.859Z - Redis client is ready
+2024-02-05T00:36:22.699Z - [33m
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/[0m
+2024-02-05T00:36:22.699Z - Initializing app in NODE_ENV: development
+2024-02-05T00:36:22.731Z - Stale sockets are cleaned up.
+2024-02-05T00:36:22.744Z - Connected to Redis
+2024-02-05T00:36:22.752Z - DB connection successful
+2024-02-05T00:36:22.755Z - Redis client is ready
+2024-02-05T00:37:42.663Z - [33m
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/[34m
+2024-02-05T00:37:42.664Z - Initializing app in NODE_ENV: development
+2024-02-05T00:37:42.699Z - Stale sockets are cleaned up.
+2024-02-05T00:37:42.707Z - Connected to Redis
+2024-02-05T00:37:42.714Z - DB connection successful
+2024-02-05T00:37:42.717Z - Redis client is ready
+2024-02-05T00:38:30.848Z - Initializing app in NODE_ENV: development
+2024-02-05T00:38:30.892Z - Stale sockets are cleaned up.
+2024-02-05T00:38:30.847Z - [33m[40m
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/[34m
+2024-02-05T00:38:30.902Z - Connected to Redis
+2024-02-05T00:38:30.909Z - DB connection successful
+2024-02-05T00:38:30.912Z - Redis client is ready
+2024-02-05T00:38:38.866Z - [33m
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/[34m
+2024-02-05T00:38:38.866Z - Initializing app in NODE_ENV: development
+2024-02-05T00:38:38.897Z - Stale sockets are cleaned up.
+2024-02-05T00:38:38.913Z - Connected to Redis
+2024-02-05T00:38:38.923Z - DB connection successful
+2024-02-05T00:38:38.927Z - Redis client is ready
+2024-02-05T00:38:42.953Z - [33m
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/[34m
+2024-02-05T00:38:42.953Z - Initializing app in NODE_ENV: development
+2024-02-05T00:38:42.987Z - Stale sockets are cleaned up.
+2024-02-05T00:38:42.995Z - Connected to Redis
+2024-02-05T00:38:42.999Z - DB connection successful
+2024-02-05T00:38:43.003Z - Redis client is ready
+2024-02-05T00:38:49.210Z - [33m
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/[34m
+2024-02-05T00:38:49.211Z - Initializing app in NODE_ENV: development
+2024-02-05T00:38:49.241Z - Stale sockets are cleaned up.
+2024-02-05T00:38:49.256Z - Connected to Redis
+2024-02-05T00:38:49.264Z - DB connection successful
+2024-02-05T00:38:49.266Z - Redis client is ready
+2024-02-05T00:42:17.923Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:42:17.924Z - Initializing app in NODE_ENV: development
+2024-02-05T00:42:17.954Z - Stale sockets are cleaned up.
+2024-02-05T00:42:17.967Z - Connected to Redis
+2024-02-05T00:42:17.974Z - DB connection successful
+2024-02-05T00:42:17.977Z - Redis client is ready
+2024-02-05T00:42:19.297Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:42:19.297Z - Initializing app in NODE_ENV: development
+2024-02-05T00:42:19.333Z - Stale sockets are cleaned up.
+2024-02-05T00:42:19.342Z - Connected to Redis
+2024-02-05T00:42:19.349Z - DB connection successful
+2024-02-05T00:42:19.352Z - Redis client is ready
+2024-02-05T00:42:33.728Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:42:33.728Z - Initializing app in NODE_ENV: development
+2024-02-05T00:42:33.765Z - Stale sockets are cleaned up.
+2024-02-05T00:42:33.774Z - Connected to Redis
+2024-02-05T00:42:33.782Z - DB connection successful
+2024-02-05T00:42:33.784Z - Redis client is ready
+2024-02-05T00:42:47.084Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:42:47.116Z - Stale sockets are cleaned up.
+2024-02-05T00:42:47.084Z - Initializing app in NODE_ENV: development
+2024-02-05T00:42:47.130Z - Connected to Redis
+2024-02-05T00:42:47.138Z - DB connection successful
+2024-02-05T00:42:47.141Z - Redis client is ready
+2024-02-05T00:43:07.811Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:43:07.811Z - Initializing app in NODE_ENV: development
+2024-02-05T00:43:07.843Z - Stale sockets are cleaned up.
+2024-02-05T00:43:07.856Z - Connected to Redis
+2024-02-05T00:43:07.863Z - DB connection successful
+2024-02-05T00:43:07.866Z - Redis client is ready
+2024-02-05T00:43:29.690Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:43:29.691Z - Initializing app in NODE_ENV: development
+2024-02-05T00:43:29.721Z - Stale sockets are cleaned up.
+2024-02-05T00:43:29.735Z - Connected to Redis
+2024-02-05T00:43:29.742Z - DB connection successful
+2024-02-05T00:43:29.745Z - Redis client is ready
+2024-02-05T00:43:47.691Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:43:47.692Z - Initializing app in NODE_ENV: development
+2024-02-05T00:43:47.723Z - Stale sockets are cleaned up.
+2024-02-05T00:43:47.736Z - Connected to Redis
+2024-02-05T00:43:47.743Z - DB connection successful
+2024-02-05T00:43:47.746Z - Redis client is ready
+2024-02-05T00:44:13.692Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:44:13.693Z - Initializing app in NODE_ENV: development
+2024-02-05T00:44:13.724Z - Stale sockets are cleaned up.
+2024-02-05T00:44:13.737Z - Connected to Redis
+2024-02-05T00:44:13.743Z - DB connection successful
+2024-02-05T00:44:13.746Z - Redis client is ready
+2024-02-05T00:44:48.728Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:44:48.728Z - Initializing app in NODE_ENV: development
+2024-02-05T00:44:48.760Z - Stale sockets are cleaned up.
+2024-02-05T00:44:48.773Z - Connected to Redis
+2024-02-05T00:44:48.781Z - DB connection successful
+2024-02-05T00:44:48.784Z - Redis client is ready
+2024-02-05T00:44:54.952Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:44:54.990Z - Stale sockets are cleaned up.
+2024-02-05T00:44:54.953Z - Initializing app in NODE_ENV: development
+2024-02-05T00:44:54.999Z - Connected to Redis
+2024-02-05T00:44:55.005Z - DB connection successful
+2024-02-05T00:44:55.008Z - Redis client is ready
+2024-02-05T00:45:31.040Z - 
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/
+2024-02-05T00:45:31.040Z - Initializing app in NODE_ENV: development
+2024-02-05T00:45:31.073Z - Stale sockets are cleaned up.
+2024-02-05T00:45:31.081Z - Connected to Redis
+2024-02-05T00:45:31.086Z - DB connection successful
+2024-02-05T00:45:31.088Z - Redis client is ready

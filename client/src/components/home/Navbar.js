@@ -17,7 +17,7 @@ export const Navbar = () => {
    const location = useLocation();
 
    return (
-      <div className="navbar justify-between">
+      <div className="navbar justify-between bg-base-300">
          <div className="navbar-start w-3/4 sm:w-1/2">
             <div className="flex items-center">
                <div className="drawer w-auto">
@@ -38,17 +38,17 @@ export const Navbar = () => {
                         aria-label="close sidebar"
                         className="drawer-overlay"
                      ></label>
-                     <div className="w-80 flex flex-col min-h-full bg-rtca-900">
+                     <div className="w-80 flex flex-col min-h-full bg-base-300">
                         <div className="p-5 font-medium text-center">Convos</div>
                         <div className="flex flex-1 flex-col">
                            <button
-                              className="p-4 flex gap-2 items-center hover:bg-rtca-500/50 transition-all"
+                              className="btn items-center justify-start px-5 btn-block btn-square btn-ghost rounded-none h-16"
                            >
                               <div
                                  style={{
                                     backgroundColor: "green",
                                  }}
-                                 className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10"
+                                 className="p-2 mask mask-squircle select-none text-center font-medium h-10 w-10 flex items-center justify-center"
                               >
                                  S
                               </div>
@@ -59,7 +59,7 @@ export const Navbar = () => {
                            </button>
                         </div>
                         <button
-                           className="p-4 bg-green-800 hover:bg-green-500/50 transition-all"
+                           className="btn btn-square rounded-none btn-block h-14 btn-accent"
                         >
                            New
                         </button>

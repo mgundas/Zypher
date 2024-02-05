@@ -26,7 +26,7 @@ export const NotificationButton = () => {
          </button>
          <div
             tabIndex={0}
-            className="dropdown-content z-[1] card card-compact w-72 p-2 shadow bg-rtca-800 rounded-t-none"
+            className="dropdown-content z-[1] card card-compact w-72 p-2 shadow bg-base-300 rounded-t-none"
          >
             <div className="p-1 grid gap-">
                <h3 className="text-center text-lg font-medium">{translation.content.navbar.notifications}</h3>

@@ -1,5 +1,6 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { useSelector } from 'react-redux'
 
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { ConfigProvider } from "./contexts/ConfigContext";
@@ -13,6 +14,11 @@ import { Changelog } from './pages/Changelog';
 
 function App() {
   const LazyHome = lazy(() => import("./pages/Home"))
+  const { theme } = useSelector(state => state.globals)
+
+  useEffect(() => {
+    document.querySelector('html').setAttribute('data-theme', theme);
+  }, [theme]);
 
   return (
     <LanguageProvider>

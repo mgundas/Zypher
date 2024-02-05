@@ -1,5 +1,4 @@
 // Misc imports
-console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 require("dotenv").config();
 // Express.js related imports
 const express = require("express");
@@ -9,6 +8,14 @@ const cors = require("cors");
 const main = require("./routes/main");
 // Express server initialization
 const app = express();
+const logger = require("./utils/logger");
+
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+logger(`
+/*------------------------------------------*/
+/*------------Zypher is booting-------------*/
+/*------------------------------------------*/`, "cyan");
+logger(`Initializing app in NODE_ENV: ${process.env.NODE_ENV}`, "yellow");
 
 // Module imports
 const { mongoose } = require("./database")

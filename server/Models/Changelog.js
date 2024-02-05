@@ -18,6 +18,11 @@ const changelogSchema = new Schema({
       required: true,
       trim: true,
    },
+   completed: {
+      type: Boolean,
+      required: true,
+      default: false,
+   },
    createdAt: {
       type: Date,
       default: Date.now, // Set the default value to the current date and time

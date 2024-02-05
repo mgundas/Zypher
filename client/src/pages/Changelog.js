@@ -4,13 +4,17 @@ import { useConfig } from '../contexts/ConfigContext'
 import { DevInfo } from '../components/landing/DevInfo'
 import { useSelector } from 'react-redux';
 import { useLoading } from '../contexts/LoadingContext';
+import { useNavigate } from 'react-router-dom'
+
 
 export const Changelog = () => {
    const config = useConfig()
+   const navigate = useNavigate()
    const { translation } = useSelector(state => state.translation)
    const { setVisible } = useLoading()
 
    const [changelog, setChangelog] = useState([]);
+   const [remaining, setRemaining] = useState(0);
 
    useEffect(() => {
       document.title = `${translation.content.changelog.changelog} - ${translation.content.title}`;
@@ -23,24 +27,20 @@ export const Changelog = () => {
       try {
          setVisible(true)
          const response = await axios.get(`${config.apiUri}/changelog`)
-
-         if (response) {
-            setChangelog(response.data.changelog)
-            console.log(response.data)
-         } else {
-            setChangelog([{
-               title: "No changelog found",
-               commitCode: "x.x.x",
-               description: "No changelog found"
-            }])
-            if (process.env.NODE_ENV === "development") console.error(`An error occured while fetching changelog data.`);
-         }
+         setRemaining(response.data.more)
+         setChangelog(response.data.changelog)
       } catch (err) {
-         if (process.env.NODE_ENV === "development") console.error(`An error occured while fetching changelog data. ${err.message}`);
+         setRemaining(0)
+         setChangelog([{
+            title: translation.content.changelog.whoops,
+            commitCode: "0.0.0",
+            desc: translation.content.changelog.noChangelog
+         }])
+         if (process.env.NODE_ENV === "development") console.error(`An error occured while fetching changelog data.`);
       } finally {
          setVisible(false)
       }
-   }, [config.apiUri, setVisible])
+   }, [config.apiUri, setVisible, translation.content.changelog.noChangelog, translation.content.changelog.whoops])
 
    useEffect(() => {
       fetchChangelog()
@@ -51,39 +51,50 @@ export const Changelog = () => {
          <div className="hero flex-1 overflow-auto">
             <div className="hero-overlay bg-opacity-60" style={{ backgroundImage: "url(/landing-bg.png)" }}></div>
             <div className='hero-content flex-col'>
-               <h1 className="my-5 text-3xl font-bold text-center">{`${translation.content.title} ${translation.content.changelog.changelog}`}</h1>
+               <h1 className="sm:mt-5 text-3xl font-bold text-center">{translation.content.changelog.changelog}</h1>
+               <button 
+                  className="btn btn-primary"
+                  onClick={() => {
+                     window.history.pushState(null, '', '/changelog');
+                     navigate("/")
+                  }}
+               >
+                  Homepage
+               </button>
                <div className="text-center text-neutral-content">
                   <div className="max-w-2xl">
                      <ul className="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
-                        {changelog.map((changelog, index) => {
+                        {changelog.map((log, index) => {
                            return index % 2 === 0 ? (
                               <li key={index}>
+                                 {index === 0 ? (<></>) : (<hr />) /* if this is the latest log there shouldn't be a line above it */}
                                  <div className="timeline-middle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
+                                    {log.completed ? (<i className="bi bi-check-circle-fill"></i>) : (<i className="bi bi-circle-fill"></i>)}
                                  </div>
                                  <div className="timeline-start text-start md:text-end mb-10">
-                                    <time className="font-mono italic">v{changelog.commitCode}</time>
-                                    <div className="text-lg font-black">{changelog.title}</div>
-                                    {changelog.desc}
+                                    <time className="font-mono italic">v{log.commitCode}</time>
+                                    <div className="text-lg font-black">{log.title}</div>
+                                    {log.desc}
                                  </div>
-                                 <hr />
+                                 {index === changelog.length - 1 ? (<></>) : (<hr />) /* if this is the oldest log there shouldn't be a line below it */}
                               </li>
                            ) : (
                               <li key={index}>
                                  <hr />
                                  <div className="timeline-middle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
+                                    {log.completed ? (<i className="bi bi-check-circle-fill"></i>) : (<i className="bi bi-circle-fill"></i>)}
                                  </div>
                                  <div className="timeline-end text-start mb-10">
-                                    <time className="font-mono italic">v{changelog.commitCode}</time>
-                                    <div className="text-lg font-black">{changelog.title}</div>
-                                    {changelog.desc}                              </div>
-                                 <hr />
+                                    <time className="font-mono italic">v{log.commitCode}</time>
+                                    <div className="text-lg font-black">{log.title}</div>
+                                    {log.desc}
+                                 </div>
+                                 {index === changelog.length - 1 ? (<></>) : (<hr />) /* if this is the oldest log there shouldn't be a line below it */}
                               </li>
                            )
                         })}
                      </ul>
-                     <p className='text-lg font-black mt-5'>And many more...</p>
+                     {remaining === 0 ? (<></>) : (<p className='text-lg font-black mt-5'>And {remaining} more...</p>)}
                   </div>
                </div>
                <DevInfo />

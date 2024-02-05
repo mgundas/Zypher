@@ -17,7 +17,9 @@
             "error": "Error."
         },
         "changelog": {
-            "changelog": "Changelog"
+            "changelog": "Changelog",
+            "whoops": "Whoops",
+            "noChangelog": "An error occured while retrieving the changelogs."
         },
         "landing": {
             "warning": "While translating, please don't attempt to change things like |warning, |error or |success. They are dedicated for alert types.",
