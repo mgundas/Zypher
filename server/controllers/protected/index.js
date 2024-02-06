@@ -129,8 +129,34 @@ const handleFetchMessages = async (req, res) => {
    }
 }
 
+const handleProfile = async (req, res) => {
+   try {
+      const { username } = req.query;
+
+      const user = await User.findOne(
+         { username: username },
+         { password: 0, salt: 0 }
+      );
+
+      if (!user) {
+         return res.status(404).json({
+            success: false,
+            message: "user.does.not.exist"
+         })
+      }
+
+      return res.status(200).json({
+         success: true,
+         user: user
+      })
+   } catch (error) {
+      console.log("Something went wrong", error.message);
+   }
+}
+
 module.exports = {
    handleDiscover,
    handleChat,
    handleFetchMessages,
+   handleProfile,
 }

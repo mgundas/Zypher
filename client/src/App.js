@@ -3,10 +3,8 @@ import { Route, Routes } from 'react-router-dom';
 import { useSelector } from 'react-redux'
 
 import { LanguageProvider } from "./contexts/LanguageContext";
-import { ConfigProvider } from "./contexts/ConfigContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { SocketProvider } from "./contexts/SocketContext";
-import { RecipientProvider } from "./contexts/RecipientContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
 
 import { Landing } from './pages/Landing';
@@ -22,25 +20,21 @@ function App() {
 
   return (
     <LanguageProvider>
-      <ConfigProvider>
-        <LoadingProvider>
-          <AuthProvider>
-            <Routes>
-              <Route path="/*" element={
-                <SocketProvider>
-                  <RecipientProvider>
-                    <Suspense>
-                      <LazyHome />
-                    </Suspense>
-                  </RecipientProvider>
-                </SocketProvider>
-              } />
-              <Route path="/landing/*" element={<Landing />} />
-              <Route path="/changelog" element={<Changelog />} />
-            </Routes>
-          </AuthProvider>
-        </LoadingProvider>
-      </ConfigProvider>
+      <LoadingProvider>
+        <AuthProvider>
+          <Routes>
+            <Route path="/*" element={
+              <SocketProvider>
+                <Suspense>
+                  <LazyHome />
+                </Suspense>
+              </SocketProvider>
+            } />
+            <Route path="/landing/*" element={<Landing />} />
+            <Route path="/changelog" element={<Changelog />} />
+          </Routes>
+        </AuthProvider>
+      </LoadingProvider>
     </LanguageProvider>
   );
 }

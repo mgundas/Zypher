@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from "react";
-import { useConfig } from "../contexts/ConfigContext";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { setAccessToken, setRefreshToken } from '../redux/reducers/authSlicer';
@@ -8,12 +7,12 @@ export const Login = ({ sendInfoMessage }) => {
   const dispatch = useDispatch();
   const { authLoading, isLoggedIn } = useSelector(state => state.auth)
   const { translation } = useSelector(state => state.translation)
+  const { apiUri } = useSelector(state => state.globals)
   const navigate = useNavigate();
 
   const timeoutRef = useRef(null)
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
-  const config = useConfig();
 
   useEffect(() => {
     if (!authLoading) {
@@ -36,7 +35,7 @@ export const Login = ({ sendInfoMessage }) => {
 
     if (usernameInput.trim() !== "" && passwordInput.trim() !== "") {
 
-      await fetch(`${config.apiUri}/login`, {
+      await fetch(`${apiUri}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

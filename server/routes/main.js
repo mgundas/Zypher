@@ -9,6 +9,7 @@ const {
   handleFetchMessages,
   handleChat,
   handleChangelog,
+  handleProfile,
 } = require("../controllers/mainController")
 const authMiddleware = require("../controllers/authMiddleware")
 
@@ -25,6 +26,7 @@ router.post("/logout", handleLogout)
 router.get("/discover", authMiddleware, handleDiscover)
 router.get("/chat", authMiddleware, handleChat)
 router.get("/messages", authMiddleware, handleFetchMessages)
+router.get("/profile", authMiddleware, handleProfile)
 router.get("/changelog", handleChangelog)
 
 module.exports = router;

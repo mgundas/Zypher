@@ -6,7 +6,6 @@ import React, {
    useEffect,
    useRef,
 } from "react";
-import { useConfig } from "./ConfigContext";
 import { useLoading } from "./LoadingContext"
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,12 +20,12 @@ export const useAuth = () => {
 
 export function AuthProvider({ children }) {
    // Hook definitions
-   const config = useConfig()
    const { setVisible } = useLoading();
    const dispatch = useDispatch();
 
    // State definitions
    const { accessToken, refreshToken, connected } = useSelector(state => state.auth);
+   const { apiUri } = useSelector(state => state.globals);
    const intervalRef = useRef(null)
    const checkInterval = 1000 * 60 * 30; // 30 minutes
 
@@ -39,7 +38,7 @@ export function AuthProvider({ children }) {
       dispatch(setAuthLoading(true))
 
       try {
-         const response = await axios.post(`${config.apiUri}/verify-access-token`, {}, headers);
+         const response = await axios.post(`${apiUri}/verify-access-token`, {}, headers);
          if (response.data.success) {
             // Implement user data storage logic
             dispatch(setUserData(response.data.user))
@@ -53,7 +52,7 @@ export function AuthProvider({ children }) {
       } finally {
          dispatch(setAuthLoading(false))
       }
-   }, [accessToken, config.apiUri, dispatch])
+   }, [accessToken, apiUri, dispatch])
 
    const refreshTokens = useCallback(async () => {
       const headers = {
@@ -65,7 +64,7 @@ export function AuthProvider({ children }) {
       dispatch(setAuthLoading(true))
 
       try {
-         const response = await axios.post(`${config.apiUri}/refresh-tokens`, { accessToken: accessToken }, headers)
+         const response = await axios.post(`${apiUri}/refresh-tokens`, { accessToken: accessToken }, headers)
          if (response.data.success) {
             dispatch(setAccessToken(response.data.accessToken));
             dispatch(setRefreshToken(response.data.refreshToken));
@@ -88,7 +87,7 @@ export function AuthProvider({ children }) {
          setVisible(false)
          dispatch(setAuthLoading(false))
       }
-   }, [accessToken, config.apiUri, dispatch, refreshToken, setVisible])
+   }, [accessToken, apiUri, dispatch, refreshToken, setVisible])
 
    const handleLogout = useCallback(async () => {
       try {
@@ -101,7 +100,7 @@ export function AuthProvider({ children }) {
             accessToken: accessToken
          }
 
-         const response = await axios.post(`${config.apiUri}/logout`, body, headers)
+         const response = await axios.post(`${apiUri}/logout`, body, headers)
 
          if (response.data.success) {
             dispatch(setAccessToken(null));
@@ -115,7 +114,7 @@ export function AuthProvider({ children }) {
          if (process.env.NODE_ENV === "development") console.log("AuthContext: An error occurred while logging out", err.message);
          window.location.reload();
       }
-   }, [accessToken, config.apiUri, dispatch, refreshToken])
+   }, [accessToken, apiUri, dispatch, refreshToken])
 
    const handleVerification = useCallback(async () => {
       const isAccTokenValid = await verifyAccessToken();

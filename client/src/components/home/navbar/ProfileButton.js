@@ -6,11 +6,14 @@ import { getInitials } from "../../../helpers/getInitials";
 
 // context imports
 import { useAuth } from '../../../contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const ProfileButton = () => {
    const { userData } = useSelector(state => state.user)
-   const handleLogout = useAuth();
    const { translation } = useSelector(state => state.translation)
+   const handleLogout = useAuth();
+   const navigate = useNavigate();
+   const location = useLocation();
 
    return (
       <div className="dropdown dropdown-end">
@@ -25,10 +28,16 @@ export const ProfileButton = () => {
          </div>
          <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-300 rounded-box rounded-t-none w-52"
+            className="menu menu-sm dropdown-content mt-2 z-[1] p-2 shadow bg-base-300 rounded-box rounded-t-none w-52"
          >
             <li>
-               <button className="justify-between">
+               <button
+                  className="justify-between"
+                  onClick={() => {
+                     window.history.pushState(null, '', location.pathname);
+                     navigate(`/profile/${userData.username}`)
+                  }}
+               >
                   {translation.content.navbar.profile}
                   <span className="badge bg-base-100 border-none">{translation.content.common.new}</span>
                </button>

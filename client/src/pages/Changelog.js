@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import axios from 'axios'
-import { useConfig } from '../contexts/ConfigContext'
 import { DevInfo } from '../components/landing/DevInfo'
 import { useSelector } from 'react-redux';
 import { useLoading } from '../contexts/LoadingContext';
@@ -8,9 +7,9 @@ import { useNavigate } from 'react-router-dom'
 
 
 export const Changelog = () => {
-   const config = useConfig()
    const navigate = useNavigate()
    const { translation } = useSelector(state => state.translation)
+   const { apiUri } = useSelector(state => state.globals)
    const { setVisible } = useLoading()
 
    const [changelog, setChangelog] = useState([]);
@@ -26,7 +25,7 @@ export const Changelog = () => {
    const fetchChangelog = useCallback(async () => {
       try {
          setVisible(true)
-         const response = await axios.get(`${config.apiUri}/changelog`)
+         const response = await axios.get(`${apiUri}/changelog`)
          setRemaining(response.data.more)
          setChangelog(response.data.changelog)
       } catch (err) {
@@ -40,7 +39,7 @@ export const Changelog = () => {
       } finally {
          setVisible(false)
       }
-   }, [config.apiUri, setVisible, translation.content.changelog.noChangelog, translation.content.changelog.whoops])
+   }, [apiUri, setVisible, translation.content.changelog.noChangelog, translation.content.changelog.whoops])
 
    useEffect(() => {
       fetchChangelog()

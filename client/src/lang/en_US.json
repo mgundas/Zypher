@@ -44,7 +44,7 @@
                     "user.does.not.exist": "User does not exist.|failure",
                     "server.error": "Server error.|failure",
                     "incorrect.password": "Incorrect password.|failure",
-                    "success": "Sign in successful. Redirecting.|success"
+                    "success": "Sign in successful. Redirecting...|success"
                 }
             }
         },

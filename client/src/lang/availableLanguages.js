@@ -6,12 +6,12 @@ export const availableLanguages = [
       locale: "en_US",
       language: "English"
    },
-   {
+   /* {
       locale: "tr_TR",
       language: "Türkçe"
    },
    {
       locale: "de_DE",
       language: "Deutsch"
-   }
+   } */
 ]

@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useConfig } from "../contexts/ConfigContext";
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
 
 export const Register = ({sendInfoMessage}) => {
-   const config = useConfig();
    const { authLoading, isLoggedIn } = useSelector(state => state.auth)
    const { translation } = useSelector(state => state.translation)
+   const { apiUri } = useSelector(state => state.globals)
    const navigate = useNavigate();
 
    const [emailInput, setEmailInput] = useState("");
@@ -36,7 +35,7 @@ export const Register = ({sendInfoMessage}) => {
 
       if (usernameInput.trim() !== "" && passwordInput.trim() !== "" && emailInput.trim() !== "") {
          try {
-            const response = await fetch(`${config.apiUri}/register`, {
+            const response = await fetch(`${apiUri}/register`, {
                method: "POST",
                headers: {
                   "Content-Type": "application/json",

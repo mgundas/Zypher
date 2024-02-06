@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
-import { useConfig } from "../contexts/ConfigContext"
 import { useSelector } from "react-redux"
 import { ProfileCard } from '../components/home/discover/ProfileCard'
 
 export const Discover = () => {
-  const config = useConfig()
   const { accessToken } = useSelector(state => state.auth)
   const { translation } = useSelector(state => state.translation)
+  const { apiUri } = useSelector(state => state.globals)
 
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -23,7 +22,7 @@ export const Discover = () => {
           size: size
         }
       }
-      const response = await axios.get(`${config.apiUri}/discover`, params)
+      const response = await axios.get(`${apiUri}/discover`, params)
       setUsers(response.data)
 
     } catch (err) {
@@ -32,7 +31,7 @@ export const Discover = () => {
     } finally {
       setLoading(false)
     }
-  }, [accessToken, config.apiUri])
+  }, [accessToken, apiUri])
 
   useEffect(() => {
     fetchRandomUsers(30)

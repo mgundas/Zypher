@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
-import { useConfig } from "./ConfigContext";
 import { useSelector } from 'react-redux'
 
 if (!io) {
@@ -15,8 +14,8 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
-  const config = useConfig();
   const { accessToken } = useSelector(state => state.auth)
+  const { socketUri } = useSelector(state => state.globals)
 
   useEffect(() => {
     try {
@@ -25,7 +24,7 @@ export const SocketProvider = ({ children }) => {
         return;
       }
       // Create a new socket instance and connect it using the provided authentication token.
-      const newSocket = io(config.socketUri, { autoConnect: false });
+      const newSocket = io(socketUri, { autoConnect: false });
       newSocket.auth = { accessToken: accessToken };
       newSocket.connect();
       setSocket(newSocket);
@@ -34,7 +33,7 @@ export const SocketProvider = ({ children }) => {
     } catch (err) {
       if (process.env.NODE_ENV === 'development') console.error("SocketContext: Connection failed:", err);
     }
-  }, [accessToken, config.socketUri]);
+  }, [accessToken, socketUri]);
 
   return (
     <SocketContext.Provider value={{ socket }}>

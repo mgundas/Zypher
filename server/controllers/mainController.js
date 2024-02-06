@@ -14,6 +14,7 @@ const {
    handleDiscover,
    handleChat,
    handleFetchMessages,
+   handleProfile,
 } = require("./protected")
 
 
@@ -26,5 +27,6 @@ module.exports = {
    handleDiscover,
    handleChat,
    handleFetchMessages,
-   handleChangelog
+   handleChangelog,
+   handleProfile
 };

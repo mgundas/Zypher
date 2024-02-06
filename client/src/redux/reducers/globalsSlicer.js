@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-   theme: localStorage.getItem("theme") || "dark"
+   theme: localStorage.getItem("theme") || "dark", // Dark theme is default
+   socketUri: "http://localhost/",
+   apiUri: "http://localhost/api/v1",
 };
 
 const globalsSlicer = createSlice({

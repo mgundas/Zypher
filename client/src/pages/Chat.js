@@ -11,7 +11,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux"
-import { useConfig } from "../contexts/ConfigContext"
 import axios from "axios"
 import { setIdChat } from "../redux/reducers/chatSlicer"
 // import { useSelector } from 'react-redux';
@@ -19,9 +18,9 @@ import { setIdChat } from "../redux/reducers/chatSlicer"
 import { setRecipientData } from "../redux/reducers/chatSlicer"
 
 export const Chat = () => {
-   const config = useConfig()
    const { accessToken } = useSelector(state => state.auth)
    const { idChat } = useSelector(state => state.chat)
+   const { apiUri } = useSelector(state => state.globals)
    const { username } = useParams();
    const dispatch = useDispatch();
    // const navigate = useNavigate();
@@ -31,7 +30,7 @@ export const Chat = () => {
 
    const fetchMessages = useCallback(async (room, size, skip) => {
       try {
-         const messages = await axios.get(`${config.apiUri}/messages`,
+         const messages = await axios.get(`${apiUri}/messages`,
          {
             headers: {
                Authorization: accessToken,
@@ -46,11 +45,11 @@ export const Chat = () => {
          
       }
 
-   }, [accessToken, config.apiUri])
+   }, [accessToken, apiUri])
 
    const fetchUserData = useCallback(async () => {
       try {
-         const response = await axios.get(`${config.apiUri}/chat`, {
+         const response = await axios.get(`${apiUri}/chat`, {
             headers: {
                Authorization: accessToken,
             },
@@ -86,7 +85,7 @@ export const Chat = () => {
             setError(true)
          }
       }
-   }, [config.apiUri, accessToken, username, dispatch, fetchMessages])
+   }, [apiUri, accessToken, username, dispatch, fetchMessages])
 
    useEffect(() => {
       fetchUserData();
