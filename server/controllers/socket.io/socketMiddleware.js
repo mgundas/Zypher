@@ -1,8 +1,10 @@
 require("dotenv").config()
 const jwt = require("jsonwebtoken");
+const logger = require("../../utils/logger")
+const { isTokenBlacklisted } = require("../../utils/redisUtils.js");
+
 const User = require("../../Models/UserModel");
 const UserSocketMapping = require("../../Models/UserSocketMapping");
-const { isTokenBlacklisted } = require("../../utils/redisUtils.js");
 
 const authenticationMiddleware = async (socket, next) => {
   const accessToken = socket.handshake.auth.accessToken;
@@ -12,14 +14,12 @@ const authenticationMiddleware = async (socket, next) => {
     // Check if the access token provided by the socket is valid
     const isValid = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET);
     if (!isValid) {
-      if(process.env.NODE_ENV !== 'production') console.log("Authentication failed.", socket.id);
       return socket.disconnect();
     }
 
     // Check if the access token provided by the socket is blacklisted
     const isBlacklisted = await isTokenBlacklisted(accessToken);
-    if(isBlacklisted) {
-      if(process.env.NODE_ENV !== 'production') console.log("Token is blacklisted.", socket.id, accessToken);
+    if (isBlacklisted) {
       return socket.disconnect();
     }
 
@@ -39,6 +39,7 @@ const authenticationMiddleware = async (socket, next) => {
 
     // If the user-to-socket mapping exists, add this socket to the list
     if (findMapping) {
+
       const newLink = await UserSocketMapping.findOneAndUpdate(
         { uid },
         { $addToSet: { sockets: socket.id } },
@@ -46,12 +47,11 @@ const authenticationMiddleware = async (socket, next) => {
       );
       if (newLink) {
         // Update the user's isOnline attribute to true
-        const updateUser = await User.findOneAndUpdate({_id: user._id}, {isOnline: true})
-        if(process.env.NODE_ENV !== 'production') if(updateUser) console.log("User data updated.");
+        const updateUser = await User.findOneAndUpdate({ _id: user._id }, { isOnline: true })
       }
       return next(); // Authentication successful
     } else {
-
+      
       // If the user-to-socket mapping does not exist, create it
       const newMap = new UserSocketMapping({
         uid: user._id,
@@ -60,19 +60,17 @@ const authenticationMiddleware = async (socket, next) => {
       await newMap.save();
 
       // Update the user's isOnline attribute to true
-      const updateUser = await User.findOneAndUpdate({_id: user._id}, {isOnline: true})
-      if(process.env.NODE_ENV !== 'production') if(updateUser) console.log("User data updated.");
+      const updateUser = await User.findOneAndUpdate({ _id: user._id }, { isOnline: true })
 
       return next();
     }
   } catch (err) {
     // If an error occurs, disconnect the socket
-    if(process.env.NODE_ENV !== 'production') console.log(`Something went wrong while authenticating the socket ${socket.id}`);
+    logger(`Something went wrong while authenticating the socket ${socket.id}`, "red")
     return socket.disconnect();
   }
 };
 
-
 module.exports = {
-    authenticationMiddleware,
+  authenticationMiddleware,
 }

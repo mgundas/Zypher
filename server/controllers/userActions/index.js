@@ -15,8 +15,6 @@ const TokenRecord = require("../../Models/TokenRecord");
 
 const { addToBlacklist } = require("../../utils/redisUtils.js");
 
-
-
 const handleRegister = async (req, res) => {
    try {
       const { username, email, password } = req.body;

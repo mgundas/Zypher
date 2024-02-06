@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useConfig } from "../contexts/ConfigContext";
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'
@@ -12,6 +12,8 @@ export const Register = ({sendInfoMessage}) => {
    const [emailInput, setEmailInput] = useState("");
    const [usernameInput, setUsernameInput] = useState("");
    const [passwordInput, setPasswordInput] = useState("");
+
+   const timeoutRef = useRef(null)
 
    useEffect(() => {
       if (!authLoading) {
@@ -53,6 +55,11 @@ export const Register = ({sendInfoMessage}) => {
                setEmailInput("");
                setPasswordInput("");
                setUsernameInput("");
+               clearTimeout(timeoutRef.current);
+               timeoutRef.current = setTimeout(() => {
+                  window.history.pushState(null, '', '/landing/signup');
+                  navigate("/landing/signin")
+               }, 2000);
             }
          } catch (err) {
             if(process.env.NODE_ENV === 'development') console.error(`Something went wrong in /src/pages/Login.js. ${err.message}`);
@@ -60,6 +67,10 @@ export const Register = ({sendInfoMessage}) => {
            }
       } else {
          sendInfoMessage(`${translation.content.common.error}|failure`);
+      }
+
+      return () => {
+         clearTimeout(timeoutRef.current);
       }
    };
 

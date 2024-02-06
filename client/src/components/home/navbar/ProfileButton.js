@@ -19,7 +19,7 @@ export const ProfileButton = () => {
             style={{
                backgroundColor: generateRandomColor(userData.username),
             }}
-            className="relative idle-alt p-2 rounded-full select-none text-center font-medium h-10 w-10"
+            className="relative online-alt p-2 rounded-full select-none text-center font-medium h-10 w-10 text-white"
          >
             {getInitials(userData.username)}
          </div>

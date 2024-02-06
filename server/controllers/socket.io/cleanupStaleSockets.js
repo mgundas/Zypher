@@ -1,3 +1,4 @@
+const logger = require("../../utils/logger");
 const UserSocketMapping = require("../../Models/UserSocketMapping");
 const User = require("../../Models/UserModel")
 
@@ -18,8 +19,8 @@ const cleanupStaleSockets = async (io) => {
       // Set all users' isOnline field to false
       await User.updateMany({}, { $set: { isOnline: false } });
     }
-  } catch (error) {
-    console.error('Error cleaning up stale sockets:', error);
+  } catch (err) {
+    logger(`Error cleaning up stale sockets: ${err.message}`)
   }
 };
 
