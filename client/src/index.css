@@ -19,43 +19,19 @@
 */
 
 :root{
-    background-color: transparent;
-}
-
-body{
-    @apply bg-rtca-200 dark:bg-rtca-900 
-}
-
-.info-box{
-    @apply justify-self-center text-white dark:text-rtca-50 p-3 transition-all rounded-md
-}
-
-.sidebar{
-    @apply w-60 absolute flex flex-col dark:text-white h-screen dark:bg-rtca-800 text-rtca-600 bg-rtca-300 z-20 overflow-auto transition-all 
+    @apply bg-base-100
 }
 
 .chat-screen{
-    @apply h-screen flex flex-col bg-rtca-300 dark:bg-rtca-700
+    @apply h-screen flex flex-col
 }
 
 .time-divider{
     @apply flex w-full h-2 items-center justify-center p-2 text-sm text-rtca-300 before:bg-rtca-500 before:w-full before:h-0.5 after:bg-rtca-500 after:w-full after:h-0.5 after:mx-2 before:mx-2 select-none
 }
 
-.navbar{
-    @apply bg-rtca-400 dark:bg-rtca-800 dark:text-rtca-300 flex p-2 justify-between items-center h-16
-}
-
-.nav-button{
-    @apply rounded-full h-10 w-10 flex items-center justify-center hover:bg-rtca-700 transition-all
-}
-
 .chat-input{
-    @apply flex grow p-2 rounded-lg px-5 z-[1] border-none bg-rtca-300 dark:text-rtca-100 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all
-}
-
-.chat-send-button{
-    @apply bg-green-700 h-10 w-10 text-white rounded-lg hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all
+    @apply flex grow p-2 px-3 text-sm rounded-lg  z-[1] border-none bg-base-300 focus:ring-base-200 focus:ring-2 focus:outline-0 transition-all
 }
 
 .message-self{
@@ -84,4 +60,16 @@ body{
 
 .convo-modal-content-input{
     @apply p-2 px-3 rounded-full bg-rtca-700 text-white placeholder:text-white/75 outline-none
+}
+
+.online-alt:before {
+    @apply content-[""] absolute z-10 block rounded-full bg-green-500 outline outline-2 outline-base-300 w-[15%] h-[15%] top-[7%] right-[7%] 
+}
+
+.idle-alt:before {
+    @apply content-[""] absolute z-10 block rounded-full bg-yellow-500 outline outline-2 outline-base-300 w-[15%] h-[15%] top-[7%] right-[7%] 
+}
+
+.offline-alt:before {
+    @apply content-[""] absolute z-10 block rounded-full bg-rtca-700 outline outline-2 outline-base-300 w-[15%] h-[15%] top-[7%] right-[7%] 
 }

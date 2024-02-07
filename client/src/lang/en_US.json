@@ -11,7 +11,42 @@
             "ok": "Okay",
             "open": "Open",
             "close": "Close",
-            "connecting": "Connecting"
+            "connecting": "Connecting",
+            "username": "Username",
+            "password": "Password",
+            "error": "Error."
+        },
+        "changelog": {
+            "changelog": "Changelog",
+            "whoops": "Whoops",
+            "noChangelog": "An error occured while retrieving the changelogs."
+        },
+        "landing": {
+            "warning": "While translating, please don't attempt to change things like |warning, |error or |success. They are dedicated for alert types.",
+            "landing": "Welcome",
+            "signup": {
+                "signup": "Sign up",
+                "responseChart": {
+                    "missing.username.email.password": "Please enter the username, email and password.|warning",
+                    "empty.username.email.password": "Fields can't be empty.|warning",
+                    "invalid.email.username.password.format": "Invalid username, email or password format.|warning",
+                    "user.exists": "A user with this username or email exists.|error",
+                    "reg.successful": "Successfully signed up! Welcome.|success",
+                    "err.occurred": "An error occured.|error"
+                }
+            },
+            "signin": {
+                "signin": "Sign in",
+                "responseChart": {
+                    "missing.username.password": "Username or password field is missing.|failure",
+                    "empty.username.password": "Username and password cannot be empty.|failure",
+                    "invalid.username.password.format": "Invalid username or password format.|failure",
+                    "user.does.not.exist": "User does not exist.|failure",
+                    "server.error": "Server error.|failure",
+                    "incorrect.password": "Incorrect password.|failure",
+                    "success": "Sign in successful. Redirecting...|success"
+                }
+            }
         },
         "mainWindow": {
             "randomize": "Randomize"
@@ -19,19 +54,17 @@
         "navbar": {
             "profile": "Profile",
             "settings": "Settings",
-            "logout": "Logout",
+            "logout": "Log out",
             "languages": "Languages",
             "notifications": "Notifications"
         },
-        "recipientProfile": {
-            "joinedOn": "Joined on:",
-            "userId": "User ID:"
-        },
-        "conversationDrawer": {
-            "conversations": "Conversations",
-            "newConvo": "New Conversation",
-            "startNewConvo": "Start a new conversation",
-            "searchUser": "Search user"
+        "discover": {
+            "newpeople": "Isn't it high time we discover new people? Let's go!",
+            "picks4u": "Here are top picks for you.",
+            "profileModal": {
+                "joinedOn": "Joined on:",
+                "message": "Message"
+            }
         }
     }
 }

@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
-import { useConfig } from "./ConfigContext";
-import { useAuth } from "./AuthContext";
+import { useSelector } from 'react-redux'
 
 if (!io) {
-  throw new Error("Socket.io client library not found. Make sure it's installed.");
+  if(process.env.NODE_ENV === 'development') throw new Error("Socket.io client library not found. Make sure it's installed.");
 }
 
 const SocketContext = createContext();
@@ -15,32 +14,26 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
-  const config = useConfig();
-  const { authToken } = useAuth();
+  const { accessToken } = useSelector(state => state.auth)
+  const { socketUri } = useSelector(state => state.globals)
 
   useEffect(() => {
     try {
-      if (!authToken) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error(`SocketContext: Auth token is missing.`);
-       }
+      if (!accessToken) {
+        if (process.env.NODE_ENV === 'development') console.error(`SocketContext: Access token is missing.`);
         return;
       }
       // Create a new socket instance and connect it using the provided authentication token.
-      const newSocket = io(config.socketUri, { autoConnect: false });
-      newSocket.auth = { accessToken: authToken };
+      const newSocket = io(socketUri, { autoConnect: false });
+      newSocket.auth = { accessToken: accessToken };
       newSocket.connect();
       setSocket(newSocket);
 
       return () => newSocket.close()
     } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error("Socket connection failed:", err);
-      }
+      if (process.env.NODE_ENV === 'development') console.error("SocketContext: Connection failed:", err);
     }
-  }, [authToken, config.socketUri]);
-
-  // console.log('Socket instance:', socket);
+  }, [accessToken, socketUri]);
 
   return (
     <SocketContext.Provider value={{ socket }}>

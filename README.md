@@ -25,7 +25,6 @@ foo@bar:~$ npm start
 > [!IMPORTANT]
 > You need to have a `redis`[^1] and `MongoDB`[^2] container installed and connected to start the backend.
 
-
 [^1]: `redis-stack` is recommended for easier development
 [^2]: Preferably with `MongoDB Atlas` for easier development
 
@@ -46,9 +45,10 @@ foo@bar:~$ npm start
 1. React.js
 2. socket.io-client
 4. Tailwind.css
-5. Flowbite
+5. DaisyUI
 6. Bootstrap Icons
 7. Axios
+8. Redux
 
 ### TODOS:
 - [x] Multi-language support
@@ -56,4 +56,4 @@ foo@bar:~$ npm start
 - [ ] Real-time updated conversations drawer
 - [ ] Notification system
 - [ ] Profile & Profile settings
-- [ ] Privacy options (public/private profile / do not show up on random profile retriever etc.)
+- [ ] Privacy options (public/private profile / do not show up on discover page etc.)

@@ -1,13 +1,16 @@
 // AuthContext.js
 import React, {
    createContext,
+   useCallback,
    useContext,
    useEffect,
    useRef,
-   useState,
 } from "react";
-import { useConfig } from "./ConfigContext";
+import { useLoading } from "./LoadingContext"
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAccessToken, setRefreshToken, setLoggedIn, setAuthLoading, setConnected } from '../redux/reducers/authSlicer';
+import { setUserData } from "../redux/reducers/userSlicer";
 
 const AuthContext = createContext();
 
@@ -16,169 +19,158 @@ export const useAuth = () => {
 };
 
 export function AuthProvider({ children }) {
-   const config = useConfig();
-   const [authToken, setAuthToken] = useState(
-      localStorage.getItem("accessToken") || null
-   );
-   const [refreshToken, setRefreshToken] = useState(
-      localStorage.getItem("refreshToken") || null
-   );
-   const [loggedIn, setLoggedIn] = useState(false);
-   const [userData, setUserData] = useState({});
-   const [oVisible, setOVisible] = useState(true);
-   const checkTimeout = useRef(null);
+   // Hook definitions
+   const { setVisible } = useLoading();
+   const dispatch = useDispatch();
 
-   const handleOffline = () => {
-      setOVisible(true)
-   };
+   // State definitions
+   const { accessToken, refreshToken, connected } = useSelector(state => state.auth);
+   const { apiUri } = useSelector(state => state.globals);
+   const intervalRef = useRef(null)
+   const checkInterval = 1000 * 60 * 30; // 30 minutes
 
-   const handleOnline = () => {
-      setOVisible(false)
-   };
-
-   // Check the access token validity on component mount
-   useEffect(() => {
-      const verifyAccessToken = async () => {
-         try {
-            const response = await fetch(`${config.apiUri}/verify-access-token`, {
-               method: "POST",
-               headers: {
-                  Authorization: `${authToken}`,
-               },
-            });
-            const data = await response.json();
-            if (!response.ok) {
-               return false;
-            }
-            if (!data.success) {
-               return false;
-            } else {
-            }
-            if (process.env.NODE_ENV === 'development') {
-               console.log(`Token verification: ${data.success}`);
-            }
-
-            setUserData(data.user);
-            return true;
-         } catch (error) {
-            return false;
-         }
-      };
-
-      const refreshTokens = async () => {
-         try {
-            setOVisible(true);
-            axios.post(config.apiUri + "/refresh-tokens", {
-               accessToken: authToken,
-            }, {
-               headers: {
-                  Authorization: `${refreshToken}`,
-               },
-            })
-               .then(response => {
-                  if (response.data.success === true) {
-                     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =  response.data;
-                     localStorage.setItem("accessToken", newAccessToken);
-                     localStorage.setItem("refreshToken", newRefreshToken);
-                     setAuthToken(newAccessToken);
-                     setRefreshToken(newRefreshToken);
-                  } else {
-                     localStorage.setItem("accessToken", "");
-                     localStorage.setItem("refreshToken", "");
-                     setAuthToken("");
-                     setRefreshToken("");
-                     setLoggedIn(false);
-                  }
-               })
-               .catch(err => {
-                  if (process.env.NODE_ENV === 'development') {
-                     console.error("An error occured within the AuthContext module.", err.message);
-                  }
-               })
-               .finally(() => {
-                  setOVisible(false);
-               })
-         } catch (err) {
-            if (process.env.NODE_ENV === 'development') {
-               console.error("An error occured within the AuthContext module.", err.message);
-            }
-            localStorage.setItem("accessToken", "");
-            localStorage.setItem("refreshToken", "");
-            setAuthToken("");
-            setRefreshToken("");
-            setLoggedIn(false);
-         }
-      };
-
-      const checkVerification = () => {
-         verifyAccessToken().then((isValid) => {
-            if (!isValid) {
-               // Access token is invalid, attempt to refresh tokens
-
-               return refreshTokens();
-            }
-            setOVisible(false)
-            setLoggedIn(true);
-         });
-      };
-
-      if (authToken) {
-         window.addEventListener("online", handleOnline);
-         window.addEventListener("offline", handleOffline);
-         checkVerification();
-         checkTimeout.current = setInterval(() => {
-            checkVerification();
-         }, 45000);
-      } else {
-         setOVisible(false);
-         setLoggedIn(false);
-      }
-      return () => {
-         clearInterval(checkTimeout.current);
-         window.removeEventListener("online", handleOnline);
-         window.removeEventListener("offline", handleOffline);
-      };
-   }, [authToken, refreshToken, config.apiUri]);
-
-   const logOut = () => {
-      const requestBody = {
-         accessToken: authToken
-      }
-
-      axios.post(`${config.apiUri}/logout`, requestBody, {
+   const verifyAccessToken = useCallback(async () => {
+      const headers = {
          headers: {
-            Authorization: `${refreshToken}`,
-         },
-      })
-         .then(response => {
-            if (response.status === 200) {
-               localStorage.setItem("accessToken", "");
-               localStorage.setItem("refreshToken", "");
-               setAuthToken("");
-               setRefreshToken("");
-               setLoggedIn(false);
-            } else {
-               window.location.reload(false);
+            Authorization: `${accessToken}`
+         }
+      }
+      dispatch(setAuthLoading(true))
+
+      try {
+         const response = await axios.post(`${apiUri}/verify-access-token`, {}, headers);
+         if (response.data.success) {
+            // Implement user data storage logic
+            dispatch(setUserData(response.data.user))
+            dispatch(setLoggedIn(true))
+            return true
+         } else {
+            return false
+         }
+      } catch (err) {
+         if (process.env.NODE_ENV === "development") console.log(`An error occured within the AuthContext, verifyAccessToken`, err.message);
+      } finally {
+         dispatch(setAuthLoading(false))
+      }
+   }, [accessToken, apiUri, dispatch])
+
+   const refreshTokens = useCallback(async () => {
+      const headers = {
+         headers: {
+            Authorization: `${refreshToken}`
+         }
+      }
+      setVisible(true)
+      dispatch(setAuthLoading(true))
+
+      try {
+         const response = await axios.post(`${apiUri}/refresh-tokens`, { accessToken: accessToken }, headers)
+         if (response.data.success) {
+            dispatch(setAccessToken(response.data.accessToken));
+            dispatch(setRefreshToken(response.data.refreshToken));
+            dispatch(setLoggedIn(true));
+         } else {
+            dispatch(setAccessToken(null));
+            dispatch(setRefreshToken(null));
+            dispatch(setLoggedIn(false));
+         }
+      } catch (err) {
+         if (err.response && err.response.status === 401) {
+            dispatch(setAccessToken(null));
+            dispatch(setRefreshToken(null));
+            dispatch(setLoggedIn(false));
+         } else {
+            // Handle other errors
+            if (process.env.NODE_ENV === "development") console.log(`An error occurred within the AuthContext, verifyRefreshToken`, err.message);
+         }
+      } finally {
+         setVisible(false)
+         dispatch(setAuthLoading(false))
+      }
+   }, [accessToken, apiUri, dispatch, refreshToken, setVisible])
+
+   const handleLogout = useCallback(async () => {
+      try {
+         const headers = {
+            headers: {
+               Authorization: `${refreshToken}`
             }
-         })
-         .catch(err => {
-            window.location.reload(false);
-         })
-   }
+         }
+         const body = {
+            accessToken: accessToken
+         }
+
+         const response = await axios.post(`${apiUri}/logout`, body, headers)
+
+         if (response.data.success) {
+            dispatch(setAccessToken(null));
+            dispatch(setRefreshToken(null));
+            dispatch(setLoggedIn(false));
+         } else {
+            if (process.env.NODE_ENV === "development") console.log("AuthContext: An error occurred while logging out", response.data.message);
+            window.location.reload();
+         }
+      } catch (err) {
+         if (process.env.NODE_ENV === "development") console.log("AuthContext: An error occurred while logging out", err.message);
+         window.location.reload();
+      }
+   }, [accessToken, apiUri, dispatch, refreshToken])
+
+   const handleVerification = useCallback(async () => {
+      const isAccTokenValid = await verifyAccessToken();
+      if (isAccTokenValid) {
+         // dispatch(setLoggedIn(true))
+         // If the access token is valid, start the interval to check the validity periodically.
+         clearInterval(intervalRef.current)
+         intervalRef.current = setInterval(async () => {
+            const check = await verifyAccessToken();
+            if (check) {
+               // dispatch(setLoggedIn(true))
+            } else {
+               refreshTokens();
+            }
+         }, checkInterval) // Adjust the interval as needed.
+         dispatch(setLoggedIn(true))
+      } else {
+         refreshTokens();
+      }
+   }, [checkInterval, dispatch, refreshTokens, verifyAccessToken])
+
+   useEffect(() => {
+      if (refreshToken && accessToken) {
+         handleVerification();
+      } else {
+         dispatch(setLoggedIn(false))
+      }
+
+
+      window.addEventListener('online', () => dispatch(setConnected(true)));
+      window.addEventListener('offline', () => dispatch(setConnected(false)));
+
+      return () => {
+         window.removeEventListener('online', () => dispatch(setConnected(true)));
+         window.removeEventListener('offline', () => dispatch(setConnected(false)));
+         clearInterval(intervalRef.current)
+      }
+   }, [accessToken, refreshToken, dispatch, handleVerification])
 
    return (
-      <AuthContext.Provider
-         value={{
-            authToken,
-            refreshToken,
-            setAuthToken,
-            setRefreshToken,
-            logOut,
-            loggedIn,
-            userData,
-            oVisible
-         }}
-      >
+      <AuthContext.Provider value={handleLogout}>
+         {!connected ? (
+            <div
+               className="absolute w-screen h-screen bg-rtca-900 z-[51] flex items-center justify-center select-none"
+            >
+               <div
+                  role="status"
+                  className="flex flex-col gap-1 text-white items-center justify-center"
+               >
+                  <span className="loading loading-spinner text-red-700 loading-lg"></span>
+                  <span className="font-medium">Trying to reconnect...</span>
+               </div>
+            </div>
+         ) : (
+            <></>
+         )}
          {children}
       </AuthContext.Provider>
    );

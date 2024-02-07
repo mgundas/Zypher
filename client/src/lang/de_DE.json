@@ -1,0 +1,37 @@
+{
+   "locale": "de_DE",
+   "lang": "Deutsch",
+   "content": {
+       "title": "Zypher",
+       "description": "Zypher ist eine Instant-Messaging-App, mit der du fast jeden finden kannst!",
+       "common": {
+           "new": "Neu",
+           "yes": "Ja",
+           "no": "Nein",
+           "ok": "Okay",
+           "open": "Öffnen Sie",
+           "close": "Schließen Sie",
+           "connecting": "Verbinden Sie"
+       },
+       "mainWindow": {
+           "randomize": "Randomisieren"
+       },
+       "navbar": {
+           "profile": "Profil",
+           "settings": "Einstellungen",
+           "logout": "Abmelden",
+           "languages": "Sprachen",
+           "notifications": "Benachrichtigungen"
+       },
+       "recipientProfile": {
+           "joinedOn": "Verbunden am:",
+           "userId": "Benutzer-ID:"
+       },
+       "conversationDrawer": {
+           "conversations": "Konversationen",
+           "newConvo": "Neue Konversation",
+           "startNewConvo": "Ein neues Gespräch beginnen",
+           "searchUser": "Benutzer suchen"
+       }
+   }
+}

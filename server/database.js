@@ -1,13 +1,14 @@
 // Database related imports & initialization
 const mongoose = require("mongoose");
+const logger = require("./utils/logger");
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/registration-demo")
+  .connect("mongodb://127.0.0.1:27017/zypher-development")
   .then(() => {
-    console.log("DB connection successful");
+    logger("DB connection successful", "green")
   })
   .catch((err) => {
-    console.error("Something went wrong", err);
+    logger(`DB connection error: ${err}`, "red")
   });
 
 module.exports = { mongoose }

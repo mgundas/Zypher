@@ -1,102 +1,42 @@
+const logger = require("../../utils/logger");
 const User = require("../../Models/UserModel");
 const UserSocketMapping = require("../../Models/UserSocketMapping");
-const Message = require("../../Models/MessageModel");
+const Chat = require("../../Models/Chat");
 
-const privateMessage = async (io, socket, data) => {
+const handleSendMessage = async (io, socket, message) => {
   try {
-    data.timestamp = Date.now();
+    const room = await Chat.findById(message.room)
+    if(!room) return;
 
-    if (data.sender === data.recipient) return; // Make sure the sender is not sending a message to themselves
+    const isUserParticipant = room.participants.includes(socket.uid)
+    if(!isUserParticipant) return;
 
-    const user = await User.findOne({ username: data.recipient }); // Check if the recipient user exists
-    if (!user) return;
+    const newMessage = await Chat.findOneAndUpdate(
+      { _id: room },
+      { $push: { messages: {content: message.content, sender: message.sender} } },
+      { new: true, projection: { messages: { $slice: -1 } } } 
+    );
 
-    const mapping = await UserSocketMapping.findOne({ uid: user._id }); // Find the sockets the user is connected to
-    if (mapping) {
-      const newMessage = new Message({
-        sender: socket.uid,
-        recipient: user._id,
-        message: data.message,
-        timestamp: data.timestamp,
-      });
-      const savedMessage = await newMessage.save(); // Make sure to await the save operation
-      const { _id, recipient, sender, message, seen, timestamp } = savedMessage // Destructure the saved message
-
-      let socketUname;
-      let recipientUname;
-      
-      if(sender === socket.uid && recipient === user._id) { // Check if the sender is the socket owner and the recipient is the target socket user
-        socketUname = socket.username
-        recipientUname = user.username
-      } else if(sender === user._id && recipient === socket.id){ // Check if the sender is the target socket user and the recipient is the socket owner
-        socketUname = user.username
-        recipientUname = socket.username
+    for (participant of room.participants){
+      let sockets = new Set()
+      const mapping = await UserSocketMapping.find({uid: participant})
+      if(mapping){
+        sockets = new Set([...sockets, ...mapping[0].sockets])
+        for(socket of sockets){
+          io.to(socket).emit('message', newMessage.messages[0])
+        }
       }
-
-      const messageToEmit = {
-        _id: _id.toString(),
-        recipient: recipient.toString(),
-        recipientUname: user.username,
-        sender: sender.toString(),
-        senderUname: socket.username,
-        message: message,
-        seen: seen,
-        timestamp: timestamp,
-      }
-
-      for (const recipientSocket of mapping.sockets) {
-        io.to(recipientSocket).emit("receiveMessage", messageToEmit); // Emit the message to all the recipient sockets
-      }
-      io.to(socket.id).emit("receiveMessage", messageToEmit); // Finally emit the message to the socket owner.
-    } else {
-      console.log("No matching user-to-socket mapping found for", user._id);
     }
-  } catch (error) {
-    console.error("Error handling private message:", error);
+  } catch (err) {
+    logger(`Something went wrong while sending a message: ${err.message}`, "red")
+    return;
   }
-};
-
-const handleUserTyping = async (io, socket, data) => {
-  data.sender = socket.username;
-
-  if (data.sender === data.recipient) return;
-
-  const user = await User.findOne({ username: data.recipient });
-  if (!user) return;
-
-  const mapping = await UserSocketMapping.findOne({ uid: user._id });
-  if (mapping) {
-    for (const recipientSocket of mapping.sockets) {
-      io.to(recipientSocket).emit("user typing", data);
-    }
-  } else {
-    console.log("No matching user-to-socket mapping found for", user._id);
-  }
-};
-
-const handleUserStoppedTyping = async (io, socket, data) => {
-  data.sender = socket.username;
-
-  if (data.sender === data.recipient) return;
-
-  const user = await User.findOne({ username: data.recipient });
-  if (!user) return;
-
-  const mapping = await UserSocketMapping.findOne({ uid: user._id });
-  if (mapping) {
-    for (const recipientSocket of mapping.sockets) {
-      io.to(recipientSocket).emit("user stopped typing", data);
-    }
-  } else {
-    console.log("No matching user-to-socket mapping found for", user._id);
-  }
-};
+}
 
 const handleDisconnect = async (io, socket) => {
   try {
     // Find the user-to-socket mapping document for the given user ID
     const mapping = await UserSocketMapping.findOne({ uid: socket.uid });
-
     if (mapping) {
       // Remove the disconnected socket ID from the mapping
       const index = mapping.sockets.indexOf(socket.id);
@@ -105,81 +45,16 @@ const handleDisconnect = async (io, socket) => {
         await mapping.save();
         if(mapping.sockets.length <= 0) {
           const updateUser = await User.findOneAndUpdate({_id: socket.uid}, {isOnline: false})
-          if(updateUser) console.log("User data updated.");
+          if(!updateUser) logger(`Something went wrong while updating online status of the user: ${mapping.uid}`, "red")
         }
       }
     }
-    console.log("User-to-Socket Mapping Updated.");
-  } catch (error) {
-    console.error("Error:", error);
+  } catch (err) {
+    logger(`Something went wrong while safely disconnecting a user from io: ${err.message}`, "red")
   }
 };
-
-const handleMessageSeen = async (io, socket, data) => {
-  data.sender = socket.username;
-
-  if (data.sender === data.recipient) return;
-
-  const user = await User.findOne({ username: data.recipient });
-  if (!user) return;
-
-  const message = await Message.findOneAndUpdate(
-    { _id: data.id },
-    { seen: true }
-  );
-  if (!message) return;
-
-  const mapping = await UserSocketMapping.findOne({ uid: user._id });
-  if (mapping) {
-    for (const recipientSocket of mapping.sockets) {
-      io.to(recipientSocket).emit("seen", data);
-    }
-  } else {
-    console.log("No matching user-to-socket mapping found for", user._id);
-  }
-};
-
-const handleOnlineCheck = async (io, socket, data, cb) => {
-  try {
-    const user = await User.findOne({ username: data.username });
-    if (user) {
-      const mapping = await UserSocketMapping.findOne({ uid: user._id });
-      if (mapping) {
-        if (mapping.sockets.length > 0) {
-          return cb(true);
-        }
-        return cb(false);
-      } 
-      return cb(false);
-    }
-    return cb(false);
-
-  } catch (error) {
-    cb(false);
-  }
-};
-
-const handleGetRandomOnlineUsers = async (io, socket, data, cb) => {
-  try {
-    const size = data || 10;
-    const randomOnlineEntries = await User.aggregate([
-      { $match: { isOnline: true } }, // Add a $match stage to filter by the condition
-      { $sample: { size: size } },
-      { $project: { password: 0, salt: 0 } }
-    ]);
-
-    cb(randomOnlineEntries)
-  } catch (error) {
-    console.error('Error fetching random online entries:', error);
-  }
-}
 
 module.exports = {
-  privateMessage,
-  handleUserTyping,
-  handleUserStoppedTyping,
+  handleSendMessage,
   handleDisconnect,
-  handleMessageSeen,
-  handleOnlineCheck,
-  handleGetRandomOnlineUsers,
 };
