@@ -62,9 +62,7 @@ export const Profile = () => {
          <>
             <div className='h-40 w-full relative'>
                <div className='bg-base-100 h-40 w-full drop-shadow-2xl'></div>
-               <div className="absolute sm:-bottom-[40%] left-4 -bottom-[36%] avatar h-32 w-32 overflow-hidden rounded-full ring-2 ring-base-100 bg-base-300">
-
-               </div>
+               <div className="absolute sm:-bottom-[40%] left-4 -bottom-[36%] avatar h-32 w-32 overflow-hidden rounded-full ring-2 ring-base-100 bg-base-300"></div>
             </div>
             <div className='grid grid-cols-1 p-4 gap-2'>
                <div className='flex h-12 items-center justify-end gap-2'>

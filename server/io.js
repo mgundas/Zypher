@@ -2,6 +2,7 @@ const {
   authenticationMiddleware,
 } = require("./controllers/socket.io/socketMiddleware");
 const {
+  handleSendMessage,
   handleDisconnect,
 } = require("./controllers/socket.io/socketEventsController");
 const cleanupStaleSockets = require("./controllers/socket.io/cleanupStaleSockets");
@@ -17,6 +18,7 @@ const initializeIo = (io) => {
 
   // Socket.io event handlers
   io.on("connection", (socket) => {
+    socket.on("sendMessage", (message) => {handleSendMessage(io, socket, message)})
     socket.on("disconnect", () => handleDisconnect(io, socket));
   });
 };

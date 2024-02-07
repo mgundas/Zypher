@@ -1,6 +1,37 @@
 const logger = require("../../utils/logger");
 const User = require("../../Models/UserModel");
 const UserSocketMapping = require("../../Models/UserSocketMapping");
+const Chat = require("../../Models/Chat");
+
+const handleSendMessage = async (io, socket, message) => {
+  try {
+    const room = await Chat.findById(message.room)
+    if(!room) return;
+
+    const isUserParticipant = room.participants.includes(socket.uid)
+    if(!isUserParticipant) return;
+
+    const newMessage = await Chat.findOneAndUpdate(
+      { _id: room },
+      { $push: { messages: {content: message.content, sender: message.sender} } },
+      { new: true, projection: { messages: { $slice: -1 } } } 
+    );
+
+    for (participant of room.participants){
+      let sockets = new Set()
+      const mapping = await UserSocketMapping.find({uid: participant})
+      if(mapping){
+        sockets = new Set([...sockets, ...mapping[0].sockets])
+        for(socket of sockets){
+          io.to(socket).emit('message', newMessage.messages[0])
+        }
+      }
+    }
+  } catch (err) {
+    logger(`Something went wrong while sending a message: ${err.message}`, "red")
+    return;
+  }
+}
 
 const handleDisconnect = async (io, socket) => {
   try {
@@ -24,5 +55,6 @@ const handleDisconnect = async (io, socket) => {
 };
 
 module.exports = {
+  handleSendMessage,
   handleDisconnect,
 };

@@ -1,5 +1,6 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const User = require("../../Models/UserModel");
 const Chat = require("../../Models/Chat");
@@ -76,12 +77,26 @@ const handleChat = async (req, res) => {
          })
       }
 
-      const existingChat = await Chat.findOne({ participants: [user._id, req.authUser._id] })
+      const existingChat = await Chat.findOne({
+         $or: [
+            {participants: [user._id, req.authUser._id]},
+            {participants: [req.authUser._id, user._id]}
+         ]
+      })
 
       if (!existingChat) {
          const newChat = new Chat({
             participants: [user._id, req.authUser._id],
-            messages: [],
+            messages: [
+               {
+                  sender: user._id,
+                  content: crypto.randomBytes(16).toString("hex")
+               },
+               {
+                  sender: req.authUser._id,
+                  content: crypto.randomBytes(14).toString("hex")
+               }
+            ],
          });
          await newChat.save();
 
@@ -107,16 +122,24 @@ const handleChat = async (req, res) => {
 const handleFetchMessages = async (req, res) => {
    try {
       const { room, size, skip } = req.query
-      const skipCount = size * (skip - 1);
+      const skipCount = parseInt(size) * (parseInt(skip) - 1);
 
       const chat = await Chat.findById(room)
-         .select({ messages: { $slice: [skipCount, size] }, _id: 0 });
+         .select({ messages: { $slice: [skipCount, parseInt(size)] } })
+         .sort({ 'messages.timestamp': -1 });
+
+      // If the user making this request is not in the participants list, block them from fetching messages.
+      if (!chat.participants.includes(req.authUser._id)) {
+         return res.status(401).json({
+            success: false,
+            message: "you.are.not.in.this.chat"
+         })
+      }
 
       if (chat) {
-         const reversedMessages = chat.messages.reverse();
          return res.status(200).json({
             success: true,
-            messages: reversedMessages
+            messages: chat.messages
          })
       } else {
          return res.status(404).json({
