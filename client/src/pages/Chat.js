@@ -34,16 +34,22 @@ export const Chat = () => {
    const [loading, isLoading] = useState(true)
    const [error, setError] = useState(false)
    const [textInput, setTextInput] = useState("")
+   const [autoScroll, setAutoScroll] = useState(true)
+
 
    const chatBottom = useRef(null)
    const chatContainer = useRef(null)
+   const scrollButton = useRef(null)
 
    useEffect(() => {
       if (socket) {
          socket.on("message", (message) => {
-            dispatch(addMessageEnd(message))
-            dispatch(addTotalMessagesCount(1))
-            dispatch(addLoadedMessagesCount(1))
+            console.log(message)
+            if (message.to === idChat){
+               dispatch(addMessageEnd(message))
+               dispatch(addTotalMessagesCount(1))
+               dispatch(addLoadedMessagesCount(1))
+            }
          })
       }
 
@@ -52,7 +58,7 @@ export const Chat = () => {
             socket.off("message")
          }
       }
-   }, [dispatch, socket])
+   }, [dispatch, recipientData._id, socket])
 
    const fetchMessages = useCallback(async (room, size, skip) => {
       try {
@@ -139,7 +145,7 @@ export const Chat = () => {
    const handleLoadMore = async () => {
       if (loadedMessagesCount < totalMessagesCount) {
          const size = 20
-         const skip = Math.floor(loadedMessagesCount / size)
+         const skip = Math.floor(Math.abs(loadedMessagesCount - totalMessagesCount) / size)
          const fetchedMessages = await fetchMessages(idChat, size, skip)
          console.log(fetchedMessages);
          dispatch(addMessageStart(fetchedMessages.messages))
@@ -148,17 +154,36 @@ export const Chat = () => {
       }
    }
 
-   const handleChatScroll = (e) => {
-      /* //chatContainer.current.scrollTop = chatContainer.current.scrollHeight - chatContainer.current.clientHeight
+   useEffect(() => {
+      if (chatBottom.current) {
+         if (autoScroll) {
+            chatBottom.current.scrollIntoView({
+               behavior: "smooth",
+               block: "end"
+            })
+         }
+      }
+   }, [loadedMessagesCount, autoScroll])
+
+
+   const handleChatScroll = useCallback(() => {
+      //chatContainer.current.scrollTop = chatContainer.current.scrollHeight - chatContainer.current.clientHeight
       // Get the current scroll position
       const scrollPosition = chatContainer.current.scrollTop;
 
       // Calculate the percentage of scroll position
       const totalHeight = chatContainer.current.scrollHeight - chatContainer.current.clientHeight;
-      const scrollPercentage = Math.floor((scrollPosition / totalHeight) * 100);
 
-      console.log('Scroll position percentage:', scrollPercentage);*/
-   }
+      // console.log('Scroll position:', scrollPosition, "Total height:", totalHeight);
+
+      if (scrollPosition && scrollPosition > totalHeight - 1000) {
+         scrollButton.current.classList.add("hidden")
+         setAutoScroll(true)
+      } else {
+         scrollButton.current.classList.remove("hidden")
+         setAutoScroll(false)
+      }
+   }, [])
 
    return (
       <>
@@ -177,7 +202,7 @@ relative"
                   {error ? ("An error occured.") : ("User does not exist, yet.")}
                </div>
             ) : (<></>)}
-            <button onClick={handleLoadMore} className='btn btn-block rounded-none btn-ghost'>Load more...</button>
+            {loadedMessagesCount < totalMessagesCount ? (<button onClick={handleLoadMore} className='btn btn-block rounded-none btn-ghost'>Load more...</button>) : (<></>)}
             {loading ? (
                <div className="grid w-full gap-4 items-center p-2 px-3">
                   <div className="chat self-end chat-end">
@@ -217,7 +242,7 @@ relative"
                </div> 
                <div className="time-divider">Today</div> */}
             <div ref={chatBottom} className="opacity-0 content-none"></div>
-            <button onClick={() => {chatBottom.current.scrollIntoView({behavior: "smooth"})}} className="fixed bottom-16 py-1 px-2 bg-base-300 hover:bg-base-200 transition-all rounded-full"><i className="bi bi-chevron-double-down"></i></button>
+            <button ref={scrollButton} onClick={() => { chatBottom.current.scrollIntoView({ behavior: "smooth" }) }} className="fixed bottom-16 py-1 px-2 bg-base-300 hover:bg-base-200 transition-all rounded-full hidden"><i className="bi bi-chevron-double-down"></i></button>
          </div>
          <form className="p-2 bottom-0 md:relative flex gap-2 w-screen" onSubmit={handleSendMessage} >
             <input

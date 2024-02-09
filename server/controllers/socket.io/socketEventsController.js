@@ -6,24 +6,28 @@ const Chat = require("../../Models/Chat");
 const handleSendMessage = async (io, socket, message) => {
   try {
     const room = await Chat.findById(message.room)
-    if(!room) return;
+    if (!room) return;
 
     const isUserParticipant = room.participants.includes(socket.uid)
-    if(!isUserParticipant) return;
+    if (!isUserParticipant) return;
 
-    const newMessage = await Chat.findOneAndUpdate(
+    message.to = room._id
+
+    const update = await Chat.findOneAndUpdate(
       { _id: room },
-      { $push: { messages: {content: message.content, sender: message.sender} } },
-      { new: true, projection: { messages: { $slice: -1 } } } 
+      { $push: { messages: { content: message.content, sender: message.sender, to: message.to } } },
+      { new: true }
     );
 
-    for (participant of room.participants){
+    const newMessage = update.messages.reverse().slice(0, 1)[0]
+
+    for (participant of room.participants) {
       let sockets = new Set()
-      const mapping = await UserSocketMapping.find({uid: participant})
-      if(mapping){
+      const mapping = await UserSocketMapping.find({ uid: participant })
+      if (mapping) {
         sockets = new Set([...sockets, ...mapping[0].sockets])
-        for(socket of sockets){
-          io.to(socket).emit('message', newMessage.messages[0])
+        for (socket of sockets) {
+          io.to(socket).emit('message', newMessage)
         }
       }
     }
@@ -43,9 +47,9 @@ const handleDisconnect = async (io, socket) => {
       if (index !== -1) {
         mapping.sockets.splice(index, 1);
         await mapping.save();
-        if(mapping.sockets.length <= 0) {
-          const updateUser = await User.findOneAndUpdate({_id: socket.uid}, {isOnline: false})
-          if(!updateUser) logger(`Something went wrong while updating online status of the user: ${mapping.uid}`, "red")
+        if (mapping.sockets.length <= 0) {
+          const updateUser = await User.findOneAndUpdate({ _id: socket.uid }, { isOnline: false })
+          if (!updateUser) logger(`Something went wrong while updating online status of the user: ${mapping.uid}`, "red")
         }
       }
     }

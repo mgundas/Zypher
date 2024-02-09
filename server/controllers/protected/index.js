@@ -122,7 +122,7 @@ const handleChat = async (req, res) => {
 const handleFetchMessages = async (req, res) => {
    try {
       const { room, size, skip } = req.query
-      const skipCount = parseInt(size) * (parseInt(skip));
+      const skipCount = parseInt(size) * parseInt(skip);
 
       const totalMessages = await Chat.findById(room)
       const chat = await Chat.findOne({ _id: room })
