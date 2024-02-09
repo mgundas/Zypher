@@ -11,11 +11,9 @@ const handleSendMessage = async (io, socket, message) => {
     const isUserParticipant = room.participants.includes(socket.uid)
     if (!isUserParticipant) return;
 
-    message.to = room._id
-
     const update = await Chat.findOneAndUpdate(
       { _id: room },
-      { $push: { messages: { content: message.content, sender: message.sender, to: message.to } } },
+      { $push: { messages: { content: message.content, sender: message.sender }}},
       { new: true }
     );
 
@@ -27,7 +25,7 @@ const handleSendMessage = async (io, socket, message) => {
       if (mapping) {
         sockets = new Set([...sockets, ...mapping[0].sockets])
         for (socket of sockets) {
-          io.to(socket).emit('message', newMessage)
+          io.to(socket).emit(`message_${room._id}`, newMessage)
         }
       }
     }

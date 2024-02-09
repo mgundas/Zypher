@@ -43,22 +43,19 @@ export const Chat = () => {
 
    useEffect(() => {
       if (socket) {
-         socket.on("message", (message) => {
-            console.log(message)
-            if (message.to === idChat){
-               dispatch(addMessageEnd(message))
-               dispatch(addTotalMessagesCount(1))
-               dispatch(addLoadedMessagesCount(1))
-            }
+         socket.on(`message_${idChat}`, (message) => {
+            dispatch(addMessageEnd(message))
+            dispatch(addTotalMessagesCount(1))
+            dispatch(addLoadedMessagesCount(1))
          })
       }
 
       return () => {
          if (socket) {
-            socket.off("message")
+            socket.off(`message_${idChat}`)
          }
       }
-   }, [dispatch, recipientData._id, socket])
+   }, [dispatch, idChat, socket])
 
    const fetchMessages = useCallback(async (room, size, skip) => {
       try {
