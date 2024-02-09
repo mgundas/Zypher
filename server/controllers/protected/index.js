@@ -79,8 +79,8 @@ const handleChat = async (req, res) => {
 
       const existingChat = await Chat.findOne({
          $or: [
-            {participants: [user._id, req.authUser._id]},
-            {participants: [req.authUser._id, user._id]}
+            { participants: [user._id, req.authUser._id] },
+            { participants: [req.authUser._id, user._id] }
          ]
       })
 
@@ -122,14 +122,23 @@ const handleChat = async (req, res) => {
 const handleFetchMessages = async (req, res) => {
    try {
       const { room, size, skip } = req.query
-      const skipCount = parseInt(size) * (parseInt(skip) - 1);
+      const skipCount = parseInt(size) * (parseInt(skip));
 
-      const chat = await Chat.findById(room)
-         .select({ messages: { $slice: [skipCount, parseInt(size)] } })
-         .sort({ 'messages.timestamp': -1 });
+      const totalMessages = await Chat.findById(room)
+      const chat = await Chat.findOne({ _id: room })
+         .select('messages')
+         .exec();
+
+      // Perform slicing after fetching the document
+      if (chat && chat.messages) {
+         // First reverse the array so the newest message is on the top. Then slice it.
+         const slicedMessages = chat.messages.reverse().slice(skipCount, skipCount + parseInt(size));
+         //Then reverse it back to put the messages in their original order.
+         chat.messages = slicedMessages.reverse();
+      }
 
       // If the user making this request is not in the participants list, block them from fetching messages.
-      if (!chat.participants.includes(req.authUser._id)) {
+      if (!totalMessages.participants.includes(req.authUser._id)) {
          return res.status(401).json({
             success: false,
             message: "you.are.not.in.this.chat"
@@ -139,6 +148,7 @@ const handleFetchMessages = async (req, res) => {
       if (chat) {
          return res.status(200).json({
             success: true,
+            total: totalMessages.messages.length,
             messages: chat.messages
          })
       } else {

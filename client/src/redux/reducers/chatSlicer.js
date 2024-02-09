@@ -26,19 +26,25 @@ const chatSlicer = createSlice({
          state.recipientData = action.payload;
       },
       setMessages: (state, action) => {
-         state.messages = action.payload;
+         state.messages = [...new Set(action.payload)];
       },
-      setMessagesCount: (state, action) => {
-         state.messagesCount = action.payload;
+      addMessageEnd: (state, action) => {
+         state.messages = [...new Set([...state.messages, action.payload])];
       },
-      setLoadedMessagesCount: (state, action) => {
-         state.loadedMessagesCount = action.payload;
+      addMessageStart: (state, action) => {
+         state.messages = [...new Set([...action.payload, ...state.messages])];
+      },
+      addLoadedMessagesCount: (state, action) => {
+         state.loadedMessagesCount = state.loadedMessagesCount + action.payload;
       },
       setTotalMessagesCount: (state, action) => {
          state.totalMessagesCount = action.payload;
       },
+      addTotalMessagesCount: (state, action) => {
+         state.totalMessagesCount = state.totalMessagesCount + action.payload;
+      },
    },
 });
 
-export const { setRecipientData, setMessages, setMessagesCount, setLoadedMessagesCount, setTotalMessagesCount, setChatId } = chatSlicer.actions;
+export const { setRecipientData, setMessages, addMessageEnd, addMessageStart, addLoadedMessagesCount, setTotalMessagesCount, addTotalMessagesCount, setChatId } = chatSlicer.actions;
 export default chatSlicer.reducer;  
