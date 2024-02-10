@@ -87,16 +87,6 @@ const handleChat = async (req, res) => {
       if (!existingChat) {
          const newChat = new Chat({
             participants: [user._id, req.authUser._id],
-            messages: [
-               {
-                  sender: user._id,
-                  content: crypto.randomBytes(16).toString("hex")
-               },
-               {
-                  sender: req.authUser._id,
-                  content: crypto.randomBytes(14).toString("hex")
-               }
-            ],
          });
          await newChat.save();
 

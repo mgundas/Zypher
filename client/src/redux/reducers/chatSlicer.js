@@ -15,36 +15,51 @@ const initialState = {
    totalMessagesCount: 0,
 };
 
+function arrayUnique(array) {
+   var a = array.concat();
+   for (var i = 0; i < a.length; ++i) {
+      for (var j = i + 1; j < a.length; ++j) {
+         if (a[i] === a[j])
+            a.splice(j--, 1);
+      }
+   }
+
+   return a;
+}
+
 const chatSlicer = createSlice({
    name: 'chat',
    initialState,
    reducers: {
       setChatId: (state, action) => {
-         state.idChat = action.payload; 
+         state.idChat = action.payload;
       },
       setRecipientData: (state, action) => {
          state.recipientData = action.payload;
       },
       setMessages: (state, action) => {
-         state.messages = [...new Set(action.payload)];
+         const newMessagesArray = [...new Set(action.payload.messages)]
+         state.messages = newMessagesArray
+         state.loadedMessagesCount = newMessagesArray.length;
+         state.totalMessagesCount = action.payload.total
       },
       addMessageEnd: (state, action) => {
-         state.messages = [...new Set([...state.messages, action.payload])];
+         const newMessagesArray = [...new Set(arrayUnique([...state.messages, action.payload]))]
+         console.log(newMessagesArray)
+         state.messages = newMessagesArray;
+         state.loadedMessagesCount = newMessagesArray.length;
+         state.totalMessagesCount = action.payload.total
       },
       addMessageStart: (state, action) => {
-         state.messages = [...new Set([...action.payload, ...state.messages])];
-      },
-      addLoadedMessagesCount: (state, action) => {
-         state.loadedMessagesCount = state.loadedMessagesCount + action.payload;
-      },
-      setTotalMessagesCount: (state, action) => {
-         state.totalMessagesCount = action.payload;
-      },
-      addTotalMessagesCount: (state, action) => {
-         state.totalMessagesCount = state.totalMessagesCount + action.payload;
+         const unique = [...new Set(arrayUnique(action.payload.messages.concat(state.messages)))]
+         const newMessagesArray = unique
+         console.log(newMessagesArray)
+         state.messages = newMessagesArray;
+         state.loadedMessagesCount = newMessagesArray.length;
+         state.totalMessagesCount = action.payload.total
       },
    },
 });
 
-export const { setRecipientData, setMessages, addMessageEnd, addMessageStart, addLoadedMessagesCount, setTotalMessagesCount, addTotalMessagesCount, setChatId } = chatSlicer.actions;
+export const { setRecipientData, setMessages, addMessageEnd, addMessageStart, addLoadedMessagesCount, setTotalMessagesCount, setChatId } = chatSlicer.actions;
 export default chatSlicer.reducer;  

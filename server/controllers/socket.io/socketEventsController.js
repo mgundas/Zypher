@@ -12,23 +12,35 @@ const handleSendMessage = async (io, socket, message) => {
     if (!isUserParticipant) return;
 
     const update = await Chat.findOneAndUpdate(
-      { _id: room },
+      { _id: room._id },
       { $push: { messages: { content: message.content, sender: message.sender }}},
       { new: true }
     );
 
-    const newMessage = update.messages.reverse().slice(0, 1)[0]
+    const newMessage = update.messages[update.messages.length - 1]
+
+    const toSend = {
+      _id: newMessage._id,
+      content: newMessage.content,
+      sender: newMessage.sender,
+      seen: newMessage.seen,
+      timestamp: newMessage.timestamp,
+      total: update.messages.length
+    }
+
+    let sockets = new Set()
 
     for (participant of room.participants) {
-      let sockets = new Set()
       const mapping = await UserSocketMapping.find({ uid: participant })
       if (mapping) {
         sockets = new Set([...sockets, ...mapping[0].sockets])
-        for (socket of sockets) {
-          io.to(socket).emit(`message_${room._id}`, newMessage)
-        }
       }
     }
+
+    for (socket of sockets) {
+      io.to(socket).emit(`message_${room._id}`, toSend)
+    }
+
   } catch (err) {
     logger(`Something went wrong while sending a message: ${err.message}`, "red")
     return;

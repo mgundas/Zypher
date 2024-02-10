@@ -7,13 +7,14 @@
 
 // Known issues:
 // username parameter is sometimes undefined for some reason even though the address includes the username parameter
+// Duplicate messages (index 19-20) occur when a new message is added via the socket event.
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { useSocket } from "../contexts/SocketContext"
 import { useDispatch, useSelector } from "react-redux"
 import axios from "axios"
-import { setChatId, setMessages, addMessageEnd, addMessageStart, addLoadedMessagesCount, setTotalMessagesCount, addTotalMessagesCount } from "../redux/reducers/chatSlicer"
+import { setChatId, setMessages, addMessageEnd, addMessageStart } from "../redux/reducers/chatSlicer"
 // import { useSelector } from 'react-redux';
 import { convertTime } from "../helpers/timeConverter"
 
@@ -45,8 +46,6 @@ export const Chat = () => {
       if (socket) {
          socket.on(`message_${idChat}`, (message) => {
             dispatch(addMessageEnd(message))
-            dispatch(addTotalMessagesCount(1))
-            dispatch(addLoadedMessagesCount(1))
          })
       }
 
@@ -97,9 +96,7 @@ export const Chat = () => {
             dispatch(setChatId(response.data.id))
 
             const fetchedMessages = await fetchMessages(response.data.id, 20, 0)
-            dispatch(setTotalMessagesCount(fetchedMessages.total))
-            dispatch(addLoadedMessagesCount(fetchedMessages.messages.length))
-            dispatch(setMessages(fetchedMessages.messages))
+            dispatch(setMessages(fetchedMessages))
          } else {
             dispatch(setRecipientData({
                username: ""
@@ -142,12 +139,10 @@ export const Chat = () => {
    const handleLoadMore = async () => {
       if (loadedMessagesCount < totalMessagesCount) {
          const size = 20
-         const skip = Math.floor(Math.abs(loadedMessagesCount - totalMessagesCount) / size)
+         const totalLoadedPages = Math.floor(loadedMessagesCount / size);
+         const skip = totalLoadedPages
          const fetchedMessages = await fetchMessages(idChat, size, skip)
-         console.log(fetchedMessages);
-         dispatch(addMessageStart(fetchedMessages.messages))
-         dispatch(setTotalMessagesCount(fetchedMessages.total))
-         dispatch(addLoadedMessagesCount(fetchedMessages.messages.length))
+         dispatch(addMessageStart(fetchedMessages))
       }
    }
 
