@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-   idChat: "",
+   chatId: "",
    recipientData: {
       username: "",
       _id: "",
@@ -15,16 +15,9 @@ const initialState = {
    totalMessagesCount: 0,
 };
 
-function arrayUnique(array) {
-   var a = array.concat();
-   for (var i = 0; i < a.length; ++i) {
-      for (var j = i + 1; j < a.length; ++j) {
-         if (a[i] === a[j])
-            a.splice(j--, 1);
-      }
-   }
 
-   return a;
+function arrayUnique(array) {
+   return Array.from(new Set(array.map(JSON.stringify)), JSON.parse);
 }
 
 const chatSlicer = createSlice({
@@ -32,7 +25,7 @@ const chatSlicer = createSlice({
    initialState,
    reducers: {
       setChatId: (state, action) => {
-         state.idChat = action.payload;
+         state.chatId = action.payload;
       },
       setRecipientData: (state, action) => {
          state.recipientData = action.payload;
@@ -44,16 +37,13 @@ const chatSlicer = createSlice({
          state.totalMessagesCount = action.payload.total
       },
       addMessageEnd: (state, action) => {
-         const newMessagesArray = [...new Set(arrayUnique([...state.messages, action.payload]))]
-         console.log(newMessagesArray)
+         const newMessagesArray = [...new Set(arrayUnique(state.messages.concat(action.payload)))]
          state.messages = newMessagesArray;
          state.loadedMessagesCount = newMessagesArray.length;
          state.totalMessagesCount = action.payload.total
       },
       addMessageStart: (state, action) => {
-         const unique = [...new Set(arrayUnique(action.payload.messages.concat(state.messages)))]
-         const newMessagesArray = unique
-         console.log(newMessagesArray)
+         const newMessagesArray = [...new Set(arrayUnique(action.payload.messages.concat(state.messages)))]
          state.messages = newMessagesArray;
          state.loadedMessagesCount = newMessagesArray.length;
          state.totalMessagesCount = action.payload.total

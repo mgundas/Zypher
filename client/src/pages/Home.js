@@ -7,6 +7,7 @@ import { Discover } from "./Discover";
 import { Chat } from "./Chat";
 import { NotFound } from "./NotFound";
 import { Profile } from "./Profile";
+import { Upload } from "./Upload";
 
 export default function Home() {
    const { isLoggedIn, authLoading } = useSelector(state => state.auth);
@@ -31,6 +32,7 @@ export default function Home() {
                <Route path="discover" element={<Discover />} />
                <Route path="chat/:username" element={<Chat />} />
                <Route path="profile/:username" element={<Profile />} />
+               <Route path="settings" element={<Upload />} />
                
                {/* For all the routes that don't exist */}
                <Route path="*" element={<NotFound />} />

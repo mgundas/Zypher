@@ -1,11 +1,13 @@
 // Misc imports
 require("dotenv").config();
+const path = require('path');
 // Express.js related imports
 const express = require("express");
 const useragent = require("express-useragent");
 const cors = require("cors");
 // Express.js router imports
 const main = require("./routes/main");
+const upload = require("./routes/upload");
 // Express server initialization
 const app = express();
 const logger = require("./utils/logger");
@@ -39,10 +41,11 @@ app.use(
 
 //Express routers
 app.use("/api/v1/", main);
+app.use("/api/image/", upload);
 
 // 404 Not Found Middleware
 app.use((req, res, next) => {
-  res.status(404).send("404 - Not Found");
+  res.status(404).sendFile(path.join(__dirname, 'public/notFound.html'));
 });
 
 // Custom error middleware

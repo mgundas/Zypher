@@ -6,7 +6,7 @@ import { useSelector } from "react-redux"
 export const ChatPerson = () => {
    const { recipientData } = useSelector((state) => state.chat)
    return (
-      <button className="flex gap-3 items-center">
+      <button onClick={() => document.getElementById("modal-" + recipientData.username).showModal()} className="flex gap-3 items-center">
          <div className="avatar online-alt z-0 placeholder">
             <div
                style={{

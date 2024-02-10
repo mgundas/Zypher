@@ -19,6 +19,9 @@ import { setChatId, setMessages, addMessageEnd, addMessageStart } from "../redux
 import { convertTime } from "../helpers/timeConverter"
 
 import { setRecipientData } from "../redux/reducers/chatSlicer"
+import { ChatBubble } from '../components/chat/ChatBubble';
+import { DebugInfo } from '../components/chat/DebugInfo';
+import { ProfileModal } from '../components/home/discover/ProfileModal';
 
 export const Chat = () => {
    const { username } = useParams();
@@ -27,7 +30,7 @@ export const Chat = () => {
    // const navigate = useNavigate();
 
    const { accessToken } = useSelector(state => state.auth)
-   const { messages, recipientData, idChat, totalMessagesCount, loadedMessagesCount } = useSelector(state => state.chat)
+   const { messages, chatId, totalMessagesCount, loadedMessagesCount, recipientData } = useSelector(state => state.chat)
    const { userData } = useSelector(state => state.user)
    const { apiUri } = useSelector(state => state.globals)
 
@@ -44,17 +47,17 @@ export const Chat = () => {
 
    useEffect(() => {
       if (socket) {
-         socket.on(`message_${idChat}`, (message) => {
+         socket.on(`message_${chatId}`, (message) => {
             dispatch(addMessageEnd(message))
          })
       }
 
       return () => {
          if (socket) {
-            socket.off(`message_${idChat}`)
+            socket.off(`message_${chatId}`)
          }
       }
-   }, [dispatch, idChat, socket])
+   }, [dispatch, chatId, socket])
 
    const fetchMessages = useCallback(async (room, size, skip) => {
       try {
@@ -124,31 +127,36 @@ export const Chat = () => {
    }, [fetchUserData])
 
    const handleSendMessage = (e) => {
+      // Prevent the default form submission action
       e.preventDefault();
+
       if (textInput === "" || textInput.trim() === "") {
          return;
       }
       socket.emit("sendMessage", {
          content: textInput,
          sender: userData.id,
-         room: idChat
+         room: chatId
       })
       setTextInput("")
    }
 
    const handleLoadMore = async () => {
+      // Only load more messages if the loaded message count is less than the total message count.
       if (loadedMessagesCount < totalMessagesCount) {
          const size = 20
-         const totalLoadedPages = Math.floor(loadedMessagesCount / size);
-         const skip = totalLoadedPages
-         const fetchedMessages = await fetchMessages(idChat, size, skip)
+         const skip = Math.floor(loadedMessagesCount / size);
+         const fetchedMessages = await fetchMessages(chatId, size, skip)
          dispatch(addMessageStart(fetchedMessages))
       }
    }
 
    useEffect(() => {
+      // If the chatBottom.current is defined
       if (chatBottom.current) {
+         // If auto scroll is enabled
          if (autoScroll) {
+            // Scroll to the bottom whenever the loaded message count changes and the requirements are met
             chatBottom.current.scrollIntoView({
                behavior: "smooth",
                block: "end"
@@ -159,18 +167,16 @@ export const Chat = () => {
 
 
    const handleChatScroll = useCallback(() => {
-      //chatContainer.current.scrollTop = chatContainer.current.scrollHeight - chatContainer.current.clientHeight
       // Get the current scroll position
       const scrollPosition = chatContainer.current.scrollTop;
-
-      // Calculate the percentage of scroll position
+      // Get the total height of the chat container
       const totalHeight = chatContainer.current.scrollHeight - chatContainer.current.clientHeight;
 
-      // console.log('Scroll position:', scrollPosition, "Total height:", totalHeight);
-
+      // If the user is close to the bottom, then turn on auto scroll and hide the scroll to bottom button
       if (scrollPosition && scrollPosition > totalHeight - 1000) {
          scrollButton.current.classList.add("hidden")
          setAutoScroll(true)
+      // If the user is far from the bottom, turn off the auto scroll and show the scroll to bottom button
       } else {
          scrollButton.current.classList.remove("hidden")
          setAutoScroll(false)
@@ -179,10 +185,7 @@ export const Chat = () => {
 
    return (
       <>
-         <div className='fixed top-20 left-20 z-50 p-2 bg-accent/80 text-black rounded-lg'>
-            <p>Loaded messages: {loadedMessagesCount}</p>
-            <p>Total messages: {totalMessagesCount}</p>
-         </div>
+         <DebugInfo hidden={true} />
          <div
             ref={chatContainer}
             onScroll={handleChatScroll}
@@ -194,48 +197,26 @@ relative"
                   {error ? ("An error occured.") : ("User does not exist, yet.")}
                </div>
             ) : (<></>)}
-            {loadedMessagesCount < totalMessagesCount ? (<button onClick={handleLoadMore} className='btn btn-block rounded-none btn-ghost'>Load more...</button>) : (<></>)}
+
+            {loadedMessagesCount < totalMessagesCount ? (<button onClick={handleLoadMore} className='btn btn-block btn-sm btn-ghost'>Load more...</button>) : (<></>)}
+            
             {loading ? (
-               <div className="grid w-full gap-4 items-center p-2 px-3">
-                  <div className="chat self-end chat-end">
-                     <div className="skeleton chat-bubble w-1/3 bg-base-300">
-                     </div>
-                  </div>
-                  <div className="chat self-start chat-start">
-                     <div className="skeleton chat-bubble w-1/3 bg-base-300">
-                     </div>
-                  </div>
+               <div className="flex items-center justify-center my-2">
+                  <span className=' loading loading-spinner text-info'></span>
                </div>
             ) : (<></>)}
             {
                messages.map((message, key) => {
                   return (
-                     <div
-                        key={key}
-                        className={
-                           message.sender === userData.id ? "chat self-end chat-end" : "chat self-start chat-start "
-                        }
-                     >
-                        <div className="chat-header items-center pb-1">
-                           {message.sender === userData.id ? userData.username : recipientData.username}
-                           <time className="text-xs opacity-50 mx-1">{convertTime(message.timestamp)}</time>
-                        </div>
-                        <div className="chat-bubble max-w-full bg-base-300 text-base-content break-words">
-                           {message.content}
-                        </div>
-                        <div className="chat-footer opacity-50 hidden">Seen</div>
-                     </div>
+                     <ChatBubble message={message} key={key} />
                   )
-               })}
-            {/* 
-               
-               <div className="flex p-1 rounded-lg text-center px-2 items-center bg-teal-700 text-sm font-medium select-none">
-                  Please do not share your password or personal information.
-               </div> 
-               <div className="time-divider">Today</div> */}
+               })
+            }
+
             <div ref={chatBottom} className="opacity-0 content-none"></div>
             <button ref={scrollButton} onClick={() => { chatBottom.current.scrollIntoView({ behavior: "smooth" }) }} className="fixed bottom-16 py-1 px-2 bg-base-300 hover:bg-base-200 transition-all rounded-full hidden"><i className="bi bi-chevron-double-down"></i></button>
          </div>
+
          <form className="p-2 bottom-0 md:relative flex gap-2 w-screen" onSubmit={handleSendMessage} >
             <input
                onChange={e => setTextInput(e.target.value)}
@@ -253,6 +234,7 @@ relative"
                <i className="bi bi-send text-xl"></i>
             </button>
          </form>
+         <ProfileModal user={recipientData} />
       </>
    )
 }

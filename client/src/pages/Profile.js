@@ -2,9 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import axios from "axios"
+import { useNavigate } from "react-router-dom"
 
 export const Profile = () => {
    const { username } = useParams()
+   const navigate = useNavigate()
    const { apiUri } = useSelector(state => state.globals)
    const { accessToken } = useSelector(state => state.auth)
    const { locale } = useSelector(state => state.translation)
@@ -97,21 +99,26 @@ export const Profile = () => {
                   {fetchedUser.username === userData.username ? (
                      <button className='btn'><i className="bi bi-pencil-square"></i></button>
                   ) : (
-                     <button className='btn btn-accent'><i className="bi bi-chat-fill"></i></button>
+                     <button onClick={() => {
+                        window.history.pushState(null, '', `/profile/${fetchedUser.username}`)
+                        navigate(`/chat/${fetchedUser.username}`)
+                     }} className='btn btn-accent'><i className="bi bi-chat-fill"></i></button>
                   )}
                </div>
                <div className=' flex flex-col'>
-                  <h1 className='text-lg font-bold'>Mehmet Gündaş</h1>
+                  <h1 className='text-lg font-bold'>{String(fetchedUser.username).toUpperCase()}</h1>
                   <h1 className='text-sm text-gray-500'>@{fetchedUser.username}</h1>
                </div>
                <p className='flex gap-2 text-sm text-gray-500'><i className="bi bi-calendar3"></i>Joined {timeConverter(fetchedUser.createdAt)}</p>
                <div className='bg-base-200 p-4 rounded-xl grid grid-cols-1 gap-2'>
-                  <div className='flex gap-3 text-sm items-center'>
-                     <p><span className='text-base-content'>X</span> Following</p>
-                     <p><span className='text-base-content'>X</span> Followers</p>
-                  </div>
+                  {/* 
+                     <div className='flex gap-3 text-sm items-center'>
+                        <p><span className='text-base-content'>X</span> Following</p>
+                        <p><span className='text-base-content'>X</span> Followers</p>
+                     </div>
+                  */}
                   <div>
-                     Some info
+                     No info.
                   </div>
                </div>
             </div>
