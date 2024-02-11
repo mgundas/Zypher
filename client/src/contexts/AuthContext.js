@@ -40,7 +40,6 @@ export function AuthProvider({ children }) {
       try {
          const response = await axios.post(`${apiUri}/verify-access-token`, {}, headers);
          if (response.data.success) {
-            // Implement user data storage logic
             dispatch(setUserData(response.data.user))
             dispatch(setLoggedIn(true))
             return true

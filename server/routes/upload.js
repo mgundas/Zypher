@@ -4,6 +4,8 @@ const multer = require('multer');
 const mime = require('mime-types');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const User = require("../Models/UserModel");
+const logger  = require("../utils/logger")
 
 const router = express.Router();
 
@@ -40,14 +42,21 @@ const upload = multer({
 });
 
 // Upload route
-router.post('/upload', upload.single('file'), (req, res) => {
+router.post('/upload', authMiddleware, upload.single('file'), async (req, res) => {
    try {
-      // Your upload logic here
       const filename = req.file.filename;
 
-      // Assuming you store the image path in the user data (replace this with your actual user data structure)
+      // Save file name to user data
+      const update = await User.findByIdAndUpdate(req.authUser._id, {
+         profilePhoto: filename
+      }, { new: true })
 
-      // Save imagePath to user data (replace this with your actual user data update logic)
+      if(!update) {
+         return res.status(500).json({
+            success: false,
+            message: "server.error",
+         });
+      }
 
       // Respond with the filename or any other relevant information
       res.status(200).json({
@@ -55,7 +64,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
          filename: filename,
       });
    } catch (err) {
-      console.log(err.message)
+      logger(`Context: routes/upload.js Error: ${err.message}`, "red")
    }
 });
 
@@ -64,11 +73,7 @@ router.get('/uploads/:filename', (req, res) => {
    const filename = req.params.filename;
    const filePath = path.join(__dirname, 'uploads', filename);
 
-   // Implement logic to check if the user has permission to access this image
-   // For demonstration purposes, assume user has permission
-
    res.sendFile(filePath);
 });
-
 
 module.exports = router;

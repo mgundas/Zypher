@@ -58,6 +58,7 @@ const handleVerifyAccessToken = async (req, res) => {
             id: findUser._id,
             username: findUser.username,
             email: findUser.email,
+            profilePhoto: findUser.profilePhoto,
             createdAt: findUser.createdAt,
          },
       });

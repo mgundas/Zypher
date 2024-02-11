@@ -90,8 +90,8 @@ export const Profile = () => {
          <>
             <div className='h-40 w-full relative'>
                <img className='bg-green-800 h-40 w-full object-cover drop-shadow-2xl content' src='https://placehold.co/1920x1080' alt='cover' />
-               <div className="absolute sm:-bottom-[40%] left-4 -bottom-[36%] avatar h-32 w-32 overflow-hidden rounded-full ring-2 ring-base-100">
-                  <img src="https://placehold.co/500x500" alt="Profile" />
+               <div className="absolute sm:-bottom-[40%] left-4 -bottom-[36%] avatar h-32 w-32 overflow-hidden rounded-full ring-4 ring-base-100">
+                  <img src={ fetchedUser.username === userData.username && userData.profilePhoto ? `http://localhost/api/image/uploads/${userData.profilePhoto}`: 'https://placehold.co/500x500' } alt="Profile" />
                </div>
             </div>
             <div className='grid grid-cols-1 p-4 gap-2'>

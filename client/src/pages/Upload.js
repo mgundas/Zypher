@@ -1,8 +1,10 @@
 import React, { useRef } from 'react';
 import axios from "axios"
+import { useSelector } from "react-redux"
 
 export const Upload = () => {
   const fileInput = useRef();
+  const { accessToken } = useSelector(state => state.auth)
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -14,6 +16,7 @@ export const Upload = () => {
       const response = await axios.post('http://localhost/api/image/upload', formData, {
         headers: {
           'Content-Type':'multipart/form-data',
+          'Authorization': `${accessToken}`
         },
       });
 
