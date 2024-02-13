@@ -4,6 +4,7 @@ const initialState = {
    theme: localStorage.getItem("theme") || "dark", // Dark theme is default
    socketUri: "http://localhost/",
    apiUri: "http://localhost/api/v1",
+   imgApi: "http://localhost/api/image",
 };
 
 const globalsSlicer = createSlice({

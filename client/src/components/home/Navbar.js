@@ -28,7 +28,7 @@ export const Navbar = () => {
                   />
                   <label
                      htmlFor="senderListDrawer"
-                     className="btn btn-circle btn-ghost text-xl"
+                     className="btn btn-circle btn-ghost btn-sm text-xl mr-2"
                   >
                      <i className="bi bi-list"></i>
                   </label>

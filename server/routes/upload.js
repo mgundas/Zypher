@@ -65,6 +65,10 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
       });
    } catch (err) {
       logger(`Context: routes/upload.js Error: ${err.message}`, "red")
+      return res.status(500).json({
+         success: false,
+         message: "server.error",
+      });
    }
 });
 
