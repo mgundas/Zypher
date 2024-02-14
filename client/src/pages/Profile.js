@@ -17,6 +17,9 @@ export const Profile = () => {
    const [isEditing, setIsEditing] = useState(true)
    const [letterCounter, setLetterCounter] = useState(0)
 
+   const [titleInput, setTitleInput] = useState("")
+
+
    const loaderRef = useRef(null)
 
    useEffect(() => {
@@ -93,11 +96,12 @@ export const Profile = () => {
             <div className='h-40 w-full relative'>
                <img className='bg-green-800 h-40 w-full object-cover drop-shadow-2xl content' src='https://placehold.co/1920x1080' alt='cover' />
                <div className="absolute sm:-bottom-[40%] left-4 -bottom-[36%] object-cover avatar h-32 w-32 overflow-hidden rounded-full ring-4 ring-base-100">
-                  <img src={fetchedUser.username === userData.username && userData.profilePhoto ? `${imgApi}/uploads/${userData.profilePhoto}` : 'https://placehold.co/500x500'} alt="Profile" />
+                  <img className=" object-contain" src={fetchedUser.profilePhoto ? `${imgApi}/uploads/${fetchedUser.profilePhoto}` : `${imgApi}/uploads/5c6cde67-6143-4b94-b08c-0f8a897e1e5c.jpg`} alt="Profile" />
                </div>
-               <button className="absolute flex items-center justify-center sm:-bottom-[40%] bg-base-300/75 left-4 -bottom-[36%] h-32 w-32 overflow-hidden rounded-full ring-4 ring-base-100">
+               {isEditing ? 
+               <button className="absolute flex items-center justify-center sm:-bottom-[40%] bg-base-300/60 hover:bg-base-300/75 transition-all left-4 -bottom-[36%] h-32 w-32 overflow-hidden rounded-full ring-4 ring-base-100">
                   <i className="bi bi-camera text-white text-2xl"></i>
-               </button>
+               </button>:<></>}
             </div>
             <div className='grid grid-cols-1 p-4 gap-2'>
                <div className='flex h-12 items-center justify-end gap-2'>
@@ -114,9 +118,9 @@ export const Profile = () => {
                </div>
                <div className=' flex flex-col'>
                   {isEditing ? (
-                     <input type="text" value={String(fetchedUser.username).toUpperCase()} placeholder="Profile title" className="input my-1 input-bordered w-full" />
+                     <input type="text" onChange={e => {setTitleInput(e.target.value)}} value={titleInput} placeholder="Profile title" className="input my-1 input-bordered w-full" />
                   ) : (
-                     <h1 className='text-lg font-bold'>{String(fetchedUser.username).toUpperCase()}</h1>
+                     <h1 className='text-lg font-bold'>{String(fetchedUser.profileTitle)}</h1>
                   )}
                   <h1 className='text-sm text-gray-500'>@{fetchedUser.username}</h1>
                </div>
@@ -135,7 +139,7 @@ export const Profile = () => {
                               <span className="label-text">Your bio</span>
                               <span className={`label-text-alt ${letterCounter >= 125 ? `text-warning` : `text-base-content`}`}>{letterCounter}/150</span>
                            </div>
-                           <textarea onChange={e => {setLetterCounter(e.target.value.length)}} maxLength={150} className="textarea textarea-bordered h-24" placeholder="Bio"></textarea>
+                           <textarea onChange={e => {setLetterCounter(e.target.value.length)}} value={fetchedUser.bio} maxLength={150} className="textarea textarea-bordered h-24" placeholder="Bio"></textarea>
                            <div className="label">
                               <span className="label-text-alt"></span>
                            </div>

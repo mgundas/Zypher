@@ -18,7 +18,7 @@ export default function Home() {
       if (!authLoading) {
          if (!isLoggedIn) {
             window.history.pushState(null, '', '/');
-            navigate("/landing", { replace: true })
+            navigate("/landing")
          }
       }
    }, [authLoading, isLoggedIn, navigate])

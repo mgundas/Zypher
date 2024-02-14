@@ -27,6 +27,14 @@ const userSchema = new Schema({
   profilePhoto: {
     type: String,
   },
+  profileTitle: {
+    type: String,
+    trim: true,
+  },
+  bio: {
+    type: String,
+    trim: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now, // Set the default value to the current date and time

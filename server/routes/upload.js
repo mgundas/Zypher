@@ -5,13 +5,14 @@ const mime = require('mime-types');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const User = require("../Models/UserModel");
+const Upload = require("../Models/Upload");
 const logger  = require("../utils/logger")
 
 const router = express.Router();
 
 // Configure multer storage and file filter
 const storage = multer.diskStorage({
-   destination: path.join(__dirname, 'uploads/'), // Set your desired storage path
+   destination: path.join(__dirname, "..", 'uploads/'), // Set your desired storage path
    filename: (req, file, cb) => {
       const extension = file.originalname.split('.').pop();
       const filename = uuidv4() + '.' + extension;
@@ -51,7 +52,15 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
          profilePhoto: filename
       }, { new: true })
 
-      if(!update) {
+      const saveInfo = new Upload(
+         {
+            file: filename,
+            owner: req.authUser._id,
+         }
+      )
+      const saveUpload = await saveInfo.save()
+
+      if(!update || !saveUpload) {
          return res.status(500).json({
             success: false,
             message: "server.error",
@@ -75,7 +84,7 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
 // Serve uploaded images
 router.get('/uploads/:filename', (req, res) => {
    const filename = req.params.filename;
-   const filePath = path.join(__dirname, 'uploads', filename);
+   const filePath = path.join(__dirname, '..', 'uploads', filename);
 
    res.sendFile(filePath);
 });
