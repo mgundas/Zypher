@@ -6,15 +6,15 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const User = require("../Models/UserModel");
 const Upload = require("../Models/Upload");
-const logger  = require("../utils/logger")
+const logger = require("../utils/logger")
 
 const router = express.Router();
 
 // Configure multer storage and file filter
 const storage = multer.diskStorage({
-   destination: path.join(__dirname, "..", 'uploads/'), // Set your desired storage path
+   destination: path.join(__dirname, "..", 'uploads/'),
    filename: (req, file, cb) => {
-      const extension = file.originalname.split('.').pop();
+      const extension = path.extname(file.originalname).slice(1);
       const filename = uuidv4() + '.' + extension;
       cb(null, filename);
    },
@@ -23,12 +23,13 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
    const mimeType = mime.lookup(file.originalname);
 
-   if (!mimeType || !mimeType.startsWith('image/')) {
-      // Invalid or non-image file type
-      return cb(new Error('Invalid file type. Only images are allowed.'), false);
+   if (mimeType && mimeType.startsWith('image/') && (mimeType === 'image/jpeg' || mimeType === 'image/png')) {
+      // Valid image type (JPEG or PNG)
+      cb(null, true);
+   } else {
+      // Invalid image type
+      cb(new Error('Invalid image type. Only JPEG and PNG images are allowed.'), false);
    }
-
-   // You can add more checks based on mimeType if needed
 
    cb(null, true);
 };
@@ -60,7 +61,7 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
       )
       const saveUpload = await saveInfo.save()
 
-      if(!update || !saveUpload) {
+      if (!update || !saveUpload) {
          return res.status(500).json({
             success: false,
             message: "server.error",
