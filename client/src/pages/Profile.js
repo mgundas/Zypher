@@ -14,7 +14,7 @@ export const Profile = () => {
 
    const [fetchedUser, setUserData] = useState({})
    const [loading, setLoading] = useState(false)
-   const [isEditing, setIsEditing] = useState(true)
+   const [isEditing, setIsEditing] = useState(false)
    const [letterCounter, setLetterCounter] = useState(0)
 
    const [titleInput, setTitleInput] = useState("")

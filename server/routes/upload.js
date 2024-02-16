@@ -85,9 +85,27 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
 // Serve uploaded images
 router.get('/uploads/:filename', (req, res) => {
    const filename = req.params.filename;
-   const filePath = path.join(__dirname, '..', 'uploads', filename);
+   const safeFilename = path.basename(filename); // Extracts the file name and removes any path components
+   const filePath = path.join(__dirname, '..', 'uploads', safeFilename);
+
+   const contentType = getContentType(safeFilename);
+   res.set('Content-Type', contentType);
 
    res.sendFile(filePath);
 });
+
+function getContentType(filename) {
+   const extension = path.extname(filename).toLowerCase();
+   switch (extension) {
+       case '.jpg':
+       case '.jpeg':
+           return 'image/jpeg';
+       case '.png':
+           return 'image/png';
+       // Add more cases as needed
+       default:
+           return 'application/octet-stream'; // Default to binary data
+   }
+}
 
 module.exports = router;
