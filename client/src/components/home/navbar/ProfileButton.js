@@ -11,21 +11,29 @@ import { useNavigate, useLocation } from 'react-router-dom';
 export const ProfileButton = () => {
    const { userData } = useSelector(state => state.user)
    const { translation } = useSelector(state => state.translation)
+   const { imgApi } = useSelector(state => state.globals)
    const handleLogout = useAuth();
    const navigate = useNavigate();
    const location = useLocation();
 
    return (
       <div className="dropdown dropdown-end">
-         <div
-            tabIndex={0}
-            style={{
-               backgroundColor: generateRandomColor(userData.username),
-            }}
-            className="relative online-alt p-2 rounded-full select-none text-center font-medium h-10 w-10 text-white"
-         >
-            {getInitials(userData.username)}
-         </div>
+         {userData.profilePhoto.length > 0 ? (
+            <div tabIndex={0} className=' avatar rounded-full overflow-hidden h-10 w-10 flex'>
+               <img className="object-contain" src={`${imgApi}/uploads/${userData.profilePhoto}?size=100x100`} alt="Profile" />
+            </div>
+         ) : (
+            <div
+               tabIndex={0}
+               style={{
+                  backgroundColor: generateRandomColor(userData.username),
+               }}
+               className="relative online-alt p-2 rounded-full select-none text-center font-medium h-10 w-10 text-white"
+            >
+               {getInitials(userData.username)}
+            </div>
+         )}
+
          <ul
             tabIndex={0}
             className="menu menu-sm dropdown-content mt-2 z-[1] p-2 shadow bg-base-300 rounded-box rounded-t-none w-52"

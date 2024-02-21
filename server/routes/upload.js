@@ -2,6 +2,7 @@ const express = require("express");
 const authMiddleware = require("../controllers/authMiddleware");
 const multer = require('multer');
 const mime = require('mime-types');
+const sharp = require('sharp');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const User = require("../Models/UserModel");
@@ -83,28 +84,53 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
 });
 
 // Serve uploaded images
-router.get('/uploads/:filename', (req, res) => {
-   const filename = req.params.filename;
-   const safeFilename = path.basename(filename); // Extracts the file name and removes any path components
-   const filePath = path.join(__dirname, '..', 'uploads', safeFilename);
+router.get('/uploads/:filename', async (req, res) => {
+   try {
+      const { size } = req.query
+      const filename = req.params.filename;
+      const safeFilename = path.basename(filename); // Extracts the file name and removes any path components
+      const filePath = path.join(__dirname, '..', 'uploads', safeFilename);
 
-   const contentType = getContentType(safeFilename);
-   res.set('Content-Type', contentType);
+      const contentType = getContentType(safeFilename);
+      res.set('Content-Type', contentType);
 
-   res.sendFile(filePath);
+      if (size) {
+         const height = size.split("x")[0];
+         const width = size.split("x")[1];
+
+         const metadata = await sharp(filePath).metadata();
+         if (Number(height) / Number(width) === 1 && Number(width) <= metadata.width && Number(height) <= metadata.height ) {
+            const resizedBuffer = await resizeImage(filePath, Number(width), Number(height));
+            // You can save the resized image or send it as a response
+            res.send(resizedBuffer);
+         } else {
+            res.sendFile(filePath);
+         }
+      } else {
+         res.sendFile(filePath);
+      }
+   } catch (err) {
+      logger(`An error occurred in routes/upload.js: ${err.message}`, "red")
+   }
 });
+
+function resizeImage(buffer, width, height) {
+   return sharp(buffer)
+      .resize(width, height)
+      .toBuffer();
+}
 
 function getContentType(filename) {
    const extension = path.extname(filename).toLowerCase();
    switch (extension) {
-       case '.jpg':
-       case '.jpeg':
-           return 'image/jpeg';
-       case '.png':
-           return 'image/png';
-       // Add more cases as needed
-       default:
-           return 'application/octet-stream'; // Default to binary data
+      case '.jpg':
+      case '.jpeg':
+         return 'image/jpeg';
+      case '.png':
+         return 'image/png';
+      // Add more cases as needed
+      default:
+         return 'application/octet-stream'; // Default to binary data
    }
 }
 

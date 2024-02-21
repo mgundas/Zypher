@@ -60,7 +60,7 @@ export const Login = ({ sendInfoMessage }) => {
               dispatch(setAccessToken(data.accessToken))
               dispatch(setRefreshToken(data.refreshToken))
               window.history.pushState(null, '', '/landing/signin');
-              navigate("/", { replace: true })
+              navigate("/")
             }, 2000)
           }
         })
@@ -98,37 +98,15 @@ export const Login = ({ sendInfoMessage }) => {
           </div>
         </form>
       </div>
+      <button 
+        className="btn btn-ghost"
+        onClick={() => {
+          window.history.pushState(null, '', '/landing/signin');
+          navigate("/landing")
+        }}
+      >
+        Back to homepage
+      </button>
     </div>
   );
 };
-
-/*
-    <form className="flex flex-col gap-2" onSubmit={handleConnect}>
-      <h1 className="text-lg text-center">Login</h1>
-      <input
-        maxLength={15}
-        value={usernameInput}
-        onChange={(e) => {
-          setUsernameInput(e.target.value);
-        }}
-        className="flex grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
-        placeholder="Username"
-      />
-      <input
-        maxLength={15}
-        value={passwordInput}
-        type="password"
-        onChange={(e) => {
-          setPasswordInput(e.target.value);
-        }}
-        className="flex border-none grow p-2 rounded-md z-[1] bg-rtca-300 dark:placeholder:text-rtca-300/75 placeholder:text-rtca-700 dark:bg-rtca-800 focus:ring-4 dark:focus:ring-rtca-500/50 focus:ring-rtca-400/50 focus:outline-0 transition-all"
-        placeholder="Password"
-      />
-      <button
-        onClick={handleConnect}
-        className="bg-green-700 text-white p-2 rounded-md hover:bg-green-800 active:bg-green-900 focus:outline-0 focus:ring-4 focus:ring-green-800/50 transition-all"
-      >
-        Join
-      </button>
-    </form>
-*/

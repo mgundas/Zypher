@@ -18,7 +18,7 @@ export const Profile = () => {
    const [letterCounter, setLetterCounter] = useState(0)
 
    const [titleInput, setTitleInput] = useState("")
-
+   const [bioInput, setBioInput] = useState("")
 
    const loaderRef = useRef(null)
 
@@ -51,7 +51,12 @@ export const Profile = () => {
                username: username
             }
          })
-         if (response.data.success) setUserData(response.data.user)
+         if (response.data.success){
+            setUserData(response.data.user)
+            setTitleInput(response.data.user.profileTitle)
+            setBioInput(response.data.user.bio)
+            setLetterCounter(response.data.user.bio.length)
+         }
 
       } catch (err) {
          if (err.response.status !== 404) if (process.env.NODE_ENV === "development") console.error(`An error occured while fetching profile, ${err.message}`);
@@ -139,12 +144,15 @@ export const Profile = () => {
                               <span className="label-text">Your bio</span>
                               <span className={`label-text-alt ${letterCounter >= 125 ? `text-warning` : `text-base-content`}`}>{letterCounter}/150</span>
                            </div>
-                           <textarea onChange={e => {setLetterCounter(e.target.value.length)}} value={fetchedUser.bio} maxLength={150} className="textarea textarea-bordered h-24" placeholder="Bio"></textarea>
+                           <textarea onChange={e => {
+                              setLetterCounter(e.target.value.length) 
+                              setBioInput(e.target.value)
+                           }} value={bioInput} maxLength={150} className="textarea textarea-bordered h-24" placeholder="Bio"></textarea>
                            <div className="label">
                               <span className="label-text-alt"></span>
                            </div>
                         </label>
-                     ) : (<>No info.</>)}
+                     ) : fetchedUser.bio}
                   </div>
                </div>
             </div>
