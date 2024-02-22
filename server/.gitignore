@@ -11,7 +11,7 @@
 # logs and uploads
 /utils/logs
 /uploads/*
-!/uploads/
+!uploads/
 
 # production
 /build
