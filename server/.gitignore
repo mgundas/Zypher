@@ -10,8 +10,7 @@
 
 # logs
 /utils/logs
-/routes/uploads
-/uploads
+/uploads/*
 
 # production
 /build
