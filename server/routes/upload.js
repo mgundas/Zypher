@@ -54,12 +54,11 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
          profilePhoto: filename
       }, { new: true })
 
-      const saveInfo = new Upload(
-         {
-            file: filename,
-            owner: req.authUser._id,
-         }
-      )
+      const saveInfo = new Upload({
+         file: filename,
+         owner: req.authUser._id,
+      })
+      
       const saveUpload = await saveInfo.save()
 
       if (!update || !saveUpload) {
@@ -99,7 +98,7 @@ router.get('/uploads/:filename', async (req, res) => {
          const width = size.split("x")[1];
 
          const metadata = await sharp(filePath).metadata();
-         if (Number(height) / Number(width) === 1 && Number(width) <= metadata.width && Number(height) <= metadata.height ) {
+         if (Number(height) / Number(width) === 1 && Number(width) <= metadata.width && Number(height) <= metadata.height) {
             const resizedBuffer = await resizeImage(filePath, Number(width), Number(height));
             // You can save the resized image or send it as a response
             res.send(resizedBuffer);
