@@ -9,7 +9,8 @@
 /coverage
 
 # logs and uploads
-/utils/logs
+/logs/*
+!logs/
 /uploads/*
 !uploads/
 

@@ -8,12 +8,31 @@ const path = require('path');
 const User = require("../Models/UserModel");
 const Upload = require("../Models/Upload");
 const logger = require("../utils/logger")
+const fs = require('fs').promises;
 
 const router = express.Router();
 
+const destinationPath = path.join(__dirname, '..', 'uploads/');
+
+async function ensureDirectoryExists(directory) {
+   try {
+     await fs.access(directory);
+   } catch (error) {
+     if (error.code === 'ENOENT') {
+       // Directory doesn't exist, create it
+       await fs.mkdir(directory, { recursive: true });
+     } else {
+       // Handle other errors
+       throw error;
+     }
+   }
+ }
+
+ ensureDirectoryExists(destinationPath);
+
 // Configure multer storage and file filter
 const storage = multer.diskStorage({
-   destination: path.join(__dirname, "..", 'uploads/'),
+   destination: destinationPath,
    filename: (req, file, cb) => {
       const extension = path.extname(file.originalname).slice(1);
       const filename = uuidv4() + '.' + extension;
@@ -58,7 +77,7 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
          file: filename,
          owner: req.authUser._id,
       })
-      
+
       const saveUpload = await saveInfo.save()
 
       if (!update || !saveUpload) {

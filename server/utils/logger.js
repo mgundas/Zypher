@@ -32,13 +32,31 @@ const getColor = (fg) => {
    return `${fgc}`
 }
 
+const destinationPath = path.join(__dirname, '..', 'logs/');
+
+async function ensureDirectoryExists(directory) {
+  try {
+    await fs.access(directory);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      // Directory doesn't exist, create it
+      await fs.mkdir(directory, { recursive: true });
+    } else {
+      // Handle other errors
+      throw error;
+    }
+  }
+}
+
+ensureDirectoryExists(destinationPath);
+
 async function logger(log, color = "white") {
    try {
       const currentDate = new Date();
       const formattedDate = currentDate.toISOString().slice(0, 10); // Get YYYY-MM-DD format
 
       const logFileName = `log_${formattedDate}.txt`;
-      const logFilePath = path.join(__dirname, 'logs', logFileName); // Adjust the directory as needed
+      const logFilePath = path.join(__dirname, "..", 'logs', logFileName); // Adjust the directory as needed
 
       const logMessage = `${currentDate.toISOString()} - ${log}\n`;
 
