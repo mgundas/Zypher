@@ -46,11 +46,11 @@ export const Login = ({ sendInfoMessage }) => {
           const data = await response.json();
 
           if (!response.ok) {
-            const infoData =  translation.content.landing.signin.responseChart[data.message] || `${translation.content.common.error}|failure`;
+            const infoData = translation.content.landing.signin.responseChart[data.message] || `${translation.content.common.error}|failure`;
             sendInfoMessage(infoData);
           } else {
             if (!data.success) {
-              const infoData =  translation.content.landing.signin.responseChart[data.message] || `${translation.content.common.error}|failure`;
+              const infoData = translation.content.landing.signin.responseChart[data.message] || `${translation.content.common.error}|failure`;
               return sendInfoMessage(infoData);
             }
             sendInfoMessage(translation.content.landing.signin.responseChart["success"]);
@@ -65,7 +65,7 @@ export const Login = ({ sendInfoMessage }) => {
           }
         })
         .catch((err) => {
-          if(process.env.NODE_ENV === 'development') console.error(`Something went wrong in /src/pages/Login.js. ${err.message}`);
+          if (process.env.NODE_ENV === 'development') console.error(`Something went wrong in /src/pages/Login.js. ${err.message}`);
           sendInfoMessage(`${translation.content.common.error}|failure`);
         });
     } else {
@@ -93,20 +93,21 @@ export const Login = ({ sendInfoMessage }) => {
             </label>
             <input onChange={(e) => setPasswordInput(e.target.value)} value={passwordInput} type="password" placeholder="Password" className="input input-bordered" required />
           </div>
-          <div className="form-control mt-6">
+          <div className="form-control mt-6 gap-2">
             <button className="btn btn-primary">Sign In</button>
+            <button
+              className="btn btn-primary"
+              onClick={(e) => {
+                e.preventDefault();
+                window.history.pushState(null, '', '/landing/signin');
+                navigate("/landing")
+              }}
+            >
+              Back to homepage
+            </button>
           </div>
         </form>
       </div>
-      <button 
-        className="btn btn-ghost"
-        onClick={() => {
-          window.history.pushState(null, '', '/landing/signin');
-          navigate("/landing")
-        }}
-      >
-        Back to homepage
-      </button>
     </div>
   );
 };

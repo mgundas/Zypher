@@ -1,14 +1,23 @@
+const dotenv = require('dotenv').config();
 const express = require("express");
 const authMiddleware = require("../controllers/authMiddleware");
 const multer = require('multer');
 const mime = require('mime-types');
-const sharp = require('sharp');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const User = require("../Models/UserModel");
 const Upload = require("../Models/Upload");
 const logger = require("../utils/logger")
 const fs = require('fs').promises;
+
+// Check if ENABLE_SHARP is set to true in the .env file
+const enableSharp = process.env.ENABLE_SHARP === 'true';
+
+let sharp;
+if (enableSharp) {
+  // Import sharp only if ENABLE_SHARP is true
+  sharp = require('sharp');
+}
 
 const router = express.Router();
 
@@ -112,7 +121,7 @@ router.get('/uploads/:filename', async (req, res) => {
       const contentType = getContentType(safeFilename);
       res.set('Content-Type', contentType);
 
-      if (size) {
+      if (size && enableSharp) {
          const height = size.split("x")[0];
          const width = size.split("x")[1];
 

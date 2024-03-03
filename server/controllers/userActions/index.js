@@ -17,9 +17,9 @@ const { addToBlacklist } = require("../../utils/redisUtils.js");
 
 const handleRegister = async (req, res) => {
    try {
-      const { username, email, password } = req.body;
+      const { username, name, email, password } = req.body;
 
-      if (!username || !email || !password) {
+      if (!username || !email || !password || !name) {
          return res.status(400).json({
             success: false,
             message: "missing.username.email.password",
@@ -29,6 +29,7 @@ const handleRegister = async (req, res) => {
       if (
          email.trim() === "" ||
          username.trim() === "" ||
+         name.trim() === "" ||
          password.trim() === ""
       ) {
          return res.status(400).json({
@@ -62,8 +63,11 @@ const handleRegister = async (req, res) => {
 
       const newUser = new User({
          username: username,
+         profileTitle: name,
          email: email,
          password: password,
+         profilePhoto: "",
+         bio: "Hey there gorgeous! I'm using Zypher.",
       });
 
       await newUser.save();

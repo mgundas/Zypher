@@ -53,6 +53,8 @@ async function ensureDirectoryExists(directory) {
 
 ensureDirectoryExists(destinationPath);
 
+ // EJueog8ItUIaZSBP
+ 
 async function logger(log, color = "white") {
   try {
     const currentDate = new Date();

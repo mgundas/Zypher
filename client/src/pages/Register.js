@@ -11,6 +11,7 @@ export const Register = ({ sendInfoMessage }) => {
    const [emailInput, setEmailInput] = useState("");
    const [usernameInput, setUsernameInput] = useState("");
    const [passwordInput, setPasswordInput] = useState("");
+   const [nameInput, setNameInput] = useState("");
 
    const timeoutRef = useRef(null)
 
@@ -33,14 +34,14 @@ export const Register = ({ sendInfoMessage }) => {
    const handleRegister = async (e) => {
       e.preventDefault();
 
-      if (usernameInput.trim() !== "" && passwordInput.trim() !== "" && emailInput.trim() !== "") {
+      if (usernameInput.trim() !== "" && passwordInput.trim() !== "" && emailInput.trim() !== "" && nameInput.trim() !== "") {
          try {
             const response = await fetch(`${apiUri}/register`, {
                method: "POST",
                headers: {
                   "Content-Type": "application/json",
                },
-               body: JSON.stringify({ username: usernameInput, password: passwordInput, email: emailInput }),
+               body: JSON.stringify({ username: usernameInput, password: passwordInput, email: emailInput, name: nameInput }),
             });
 
             const data = await response.json();
@@ -54,6 +55,7 @@ export const Register = ({ sendInfoMessage }) => {
                setEmailInput("");
                setPasswordInput("");
                setUsernameInput("");
+               setNameInput("");
                clearTimeout(timeoutRef.current);
                timeoutRef.current = setTimeout(() => {
                   window.history.pushState(null, '', '/landing/signup');
@@ -83,6 +85,12 @@ export const Register = ({ sendInfoMessage }) => {
             <form className="card-body p-4 sm:p-8" onSubmit={handleRegister}>
                <div className="form-control">
                   <label className="label">
+                     <span className="label-text">Name</span>
+                  </label>
+                  <input onChange={(e) => setNameInput(e.target.value)} value={nameInput} type="text" minLength={6} maxLength={24} placeholder="Name" className="input input-bordered" required />
+               </div>
+               <div className="form-control">
+                  <label className="label">
                      <span className="label-text">Username</span>
                   </label>
                   <input onChange={(e) => setUsernameInput(e.target.value)} value={usernameInput} type="text" minLength={6} maxLength={12} placeholder="Username" className="input input-bordered" required />
@@ -99,20 +107,21 @@ export const Register = ({ sendInfoMessage }) => {
                   </label>
                   <input onChange={(e) => setPasswordInput(e.target.value)} value={passwordInput} type="password" placeholder="Password" className="input input-bordered" required />
                </div>
-               <div className="form-control mt-6">
+               <div className="form-control mt-6 gap-2">
                   <button className="btn btn-primary">Sign Up</button>
+                  <button
+                     className="btn btn-primary"
+                     onClick={(e) => {
+                        e.preventDefault();
+                        window.history.pushState(null, '', '/landing/signin');
+                        navigate("/landing")
+                     }}
+                  >
+                     Back to homepage
+                  </button>
                </div>
             </form>
          </div>
-         <button
-            className="btn btn-ghost"
-            onClick={() => {
-               window.history.pushState(null, '', '/landing/signin');
-               navigate("/landing")
-            }}
-         >
-            Back to homepage
-         </button>
       </div>
    )
 }
