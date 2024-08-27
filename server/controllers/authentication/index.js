@@ -1,140 +1,192 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const geoip = require('geoip-lite');
-const UAParser = require('ua-parser-js');
+const geoip = require("geoip-lite");
+const UAParser = require("ua-parser-js");
 const User = require("../../Models/UserModel");
+const mg = require("../../mailgun");
+const crypto = require("crypto");
 
 const {
-   addToBlacklist,
-   isTokenBlacklisted,
+  addToBlacklist,
+  isTokenBlacklisted,
 } = require("../../utils/redisUtils.js");
 
-const handleVerifyAccessToken = async (req, res) => {
-   try {
-      const accessToken = req.headers.authorization;
+function generateRandomSixDigitNumber() {
+  const randomBytes = crypto.randomBytes(3); // Generate 3 random bytes (24 bits)
+  const randomNumber = randomBytes.readUIntBE(0, 3); // Convert the bytes to an integer
+  const sixDigitNumber = (randomNumber % 900000) + 100000; // Ensure it's a 6-digit number
+  return sixDigitNumber;
+}
 
-      if (!accessToken) {
-         console.log(accessToken);
-         return res.status(400).json({
-            success: false,
-            message: "no.access.token.provided",
-         });
-      }
+const handleSendCodeEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-      const isValid = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET);
-
-      if (!isValid) {
-         return res.status(200).json({
-            success: false,
-            message: "access.token.not.valid",
-         });
-      }
-
-      // Check if the token is blacklisted
-      const isBlacklisted = await isTokenBlacklisted(accessToken);
-
-      if (isBlacklisted) {
-         return res.status(401).json({
-            success: false,
-            message: "access.token.blacklisted",
-         });
-      }
-
-      // console.log("Access token is valid.");
-
-      const uid = jwt.decode(accessToken).uid;
-      const findUser = await User.findById(uid);
-
-      if (!findUser) {
-         return res.status(200).json({
-            success: false,
-            message: "user.does.not.exist",
-         });
-      }
-
-      return res.status(200).json({
-         success: true,
-         user: {
-            id: findUser._id,
-            username: findUser.username,
-            email: findUser.email,
-            createdAt: findUser.createdAt,
-         },
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "missing.email",
       });
-   } catch (error) {
-      console.log(error);
-      if (error.name === "TokenExpiredError") {
-         return res.status(200).json({
-            success: false,
-            message: "access.token.expired",
-         });
-      } else {
-         return res.status(500).json({
-            success: false,
-            message: "server.error",
-         });
+    }
+
+    const code = generateRandomSixDigitNumber();
+
+    const setCode = await User.findOneAndUpdate(
+      {
+        email: email,
+      },
+      {
+        vcode: code,
       }
-   }
+    );
+
+    if(!setCode) {
+      return res.status(400).json({
+         success: false,
+         message: "user.does.not.exist",
+       });
+    }
+    mg.messages
+      .create("mail.pyromaniacduck.cloud", {
+        from: "Zypher <auth@mail.pyromaniacduck.cloud>",
+        to: [email],
+        subject: "Your test code: " + code + "",
+        text: "Your test code: " + code + "",
+        html: "<h1>Your test code: " + code + "</h1>",
+      })
+      .then((msg) => console.log(msg))
+      .catch((err) => console.error(err));
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const handleVerifyAccessToken = async (req, res) => {
+  try {
+    const accessToken = req.headers.authorization;
+
+    if (!accessToken) {
+      console.log(accessToken);
+      return res.status(400).json({
+        success: false,
+        message: "no.access.token.provided",
+      });
+    }
+
+    const isValid = jwt.verify(accessToken, process.env.ACCESSTOKEN_SECRET);
+
+    if (!isValid) {
+      return res.status(200).json({
+        success: false,
+        message: "access.token.not.valid",
+      });
+    }
+
+    // Check if the token is blacklisted
+    const isBlacklisted = await isTokenBlacklisted(accessToken);
+
+    if (isBlacklisted) {
+      return res.status(401).json({
+        success: false,
+        message: "access.token.blacklisted",
+      });
+    }
+
+    // console.log("Access token is valid.");
+
+    const uid = jwt.decode(accessToken).uid;
+    const findUser = await User.findById(uid);
+
+    if (!findUser) {
+      return res.status(200).json({
+        success: false,
+        message: "user.does.not.exist",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        id: findUser._id,
+        username: findUser.username,
+        email: findUser.email,
+        createdAt: findUser.createdAt,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    if (error.name === "TokenExpiredError") {
+      return res.status(200).json({
+        success: false,
+        message: "access.token.expired",
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: "server.error",
+      });
+    }
+  }
 };
 
 const handleRefreshTokens = async (req, res) => {
-   try {
-      const refreshToken = req.headers.authorization;
-      const { accessToken } = req.body
+  try {
+    const refreshToken = req.headers.authorization;
+    const { accessToken } = req.body;
 
-      if (!refreshToken) {
-         return res.status(200).json({
-            success: false,
-            message: "no.refresh.token.provided",
-         });
-      }
+    if (!refreshToken) {
+      return res.status(200).json({
+        success: false,
+        message: "no.refresh.token.provided",
+      });
+    }
 
-      const isValid = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
+    const isValid = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
 
-      if (!isValid) {
-         return res.status(200).json({
-            success: false,
-            message: "refresh.token.not.valid",
-         });
-      }
+    if (!isValid) {
+      return res.status(200).json({
+        success: false,
+        message: "refresh.token.not.valid",
+      });
+    }
 
-      console.log("Refresh token is valid.");
+    console.log("Refresh token is valid.");
 
-      // Check if the token is blacklisted
-      const isBlacklisted = await isTokenBlacklisted(refreshToken);
+    // Check if the token is blacklisted
+    const isBlacklisted = await isTokenBlacklisted(refreshToken);
 
-      if (isBlacklisted) {
-         return res.status(401).json({
-            success: false,
-            message: "refresh.token.blacklisted",
-         });
-      }
+    if (isBlacklisted) {
+      return res.status(401).json({
+        success: false,
+        message: "refresh.token.blacklisted",
+      });
+    }
 
-      addToBlacklist(refreshToken)
-      addToBlacklist(accessToken)
+    addToBlacklist(refreshToken);
+    addToBlacklist(accessToken);
 
-      const uid = jwt.decode(refreshToken).uid;
-      const findUser = await User.findById(uid);
+    const uid = jwt.decode(refreshToken).uid;
+    const findUser = await User.findById(uid);
 
-      if (!findUser) {
-         return res.status(200).json({
-            success: false,
-            message: "user.does.not.exist",
-         });
-      }
+    if (!findUser) {
+      return res.status(200).json({
+        success: false,
+        message: "user.does.not.exist",
+      });
+    }
 
-      const newAccessToken = jwt.sign(
-         { uid: findUser._id },
-         process.env.ACCESSTOKEN_SECRET,
-         { expiresIn: "1h" }
-      );
-      const newRefreshToken = jwt.sign(
-         { uid: findUser._id },
-         process.env.REFRESHTOKEN_SECRET,
-         { expiresIn: "30d" }
-      );
+    const newAccessToken = jwt.sign(
+      { uid: findUser._id },
+      process.env.ACCESSTOKEN_SECRET,
+      { expiresIn: "1h" }
+    );
+    const newRefreshToken = jwt.sign(
+      { uid: findUser._id },
+      process.env.REFRESHTOKEN_SECRET,
+      { expiresIn: "30d" }
+    );
 
-      /*       const ipAddress =
+    /*       const ipAddress =
                req.headers['x-forwarded-for'] || // For reverse proxies
                req.connection.remoteAddress ||
                req.socket.remoteAddress ||
@@ -161,27 +213,28 @@ const handleRefreshTokens = async (req, res) => {
             })
             await record.save(); */
 
+    return res.status(200).json({
+      success: true,
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
       return res.status(200).json({
-         success: true,
-         accessToken: newAccessToken,
-         refreshToken: newRefreshToken,
+        success: false,
+        message: "refresh.token.expired",
       });
-   } catch (error) {
-      if (error.name === "TokenExpiredError") {
-         return res.status(200).json({
-            success: false,
-            message: "refresh.token.expired",
-         });
-      } else {
-         return res.status(500).json({
-            success: false,
-            message: "server.error",
-         });
-      }
-   }
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: "server.error",
+      });
+    }
+  }
 };
 
 module.exports = {
-   handleRefreshTokens,
-   handleVerifyAccessToken
-}
+  handleRefreshTokens,
+  handleVerifyAccessToken,
+  handleSendCodeEmail,
+};

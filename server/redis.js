@@ -2,8 +2,9 @@ const IORedis = require('ioredis');
 const logger = require("./utils/logger");
 
 const redisClient = new IORedis({
-  host: '127.0.0.1',
-  port: 6379,
+  host: 'redis-13400.c300.eu-central-1-1.ec2.redns.redis-cloud.com',
+  port: 13400,
+  password: "7tGO4egH8eTY93nSrporpIUSDPonPTjp"
 });
 
 // Check if the connection to Redis is successful
@@ -24,6 +25,7 @@ redisClient.on('ready', () => {
 // Add an additional event listener for the 'reconnecting' event
 redisClient.on('reconnecting', () => {
     logger('Redis client is reconnecting', "yellow")
+
 });
 
 module.exports = redisClient

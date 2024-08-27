@@ -9,15 +9,20 @@ const {
   handleFetchMessages,
   handleChat,
   handleChangelog,
+  handleSendCodeEmail
 } = require("../controllers/mainController")
 const authMiddleware = require("../controllers/authMiddleware")
 
 const router = express.Router();
 
+// POST
 router.post("/register", handleRegister);
 router.post("/login", handleLogin);
 router.post("/verify-access-token", handleVerifyAccessToken)
 router.post("/refresh-tokens", handleRefreshTokens)
+router.post("/verification-code", handleSendCodeEmail)
+
+// GET
 router.get("/discover", authMiddleware, handleDiscover)
 router.get("/chat", authMiddleware, handleChat)
 router.get("/messages", authMiddleware, handleFetchMessages)

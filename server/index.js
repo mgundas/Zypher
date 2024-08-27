@@ -6,6 +6,8 @@ const useragent = require("express-useragent");
 const cors = require("cors");
 // Express.js router imports
 const main = require("./routes/main");
+// Mailgun imports
+const mg = require("./mailgun");
 // Express server initialization
 const app = express();
 const logger = require("./utils/logger");

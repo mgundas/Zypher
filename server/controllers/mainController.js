@@ -11,7 +11,8 @@ const Chat = require("../Models/Chat");
 
 const {
    handleRefreshTokens,
-   handleVerifyAccessToken
+   handleVerifyAccessToken,
+   handleSendCodeEmail
 } = require("./authentication")
 
 const {
@@ -172,5 +173,6 @@ module.exports = {
    handleDiscover,
    handleChat,
    handleFetchMessages,
-   handleChangelog
+   handleChangelog,
+   handleSendCodeEmail
 };

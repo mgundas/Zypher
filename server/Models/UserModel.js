@@ -28,6 +28,7 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now, // Set the default value to the current date and time
   },
+  vcode: Number,
 });
 
 // Hash the password before saving to the database

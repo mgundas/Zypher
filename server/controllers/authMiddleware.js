@@ -2,6 +2,7 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const User = require("../Models/UserModel");
 const { isTokenBlacklisted } = require("../utils/redisUtils.js");
+const logger = require("../utils/logger.js")
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -57,8 +58,7 @@ const authMiddleware = async (req, res, next) => {
         message: "access.token.expired",
       });
     }
-    
-    console.log("Error authenticating user:", error.message);
+    logger(`Error authenticating user: ${error.message}`, "red")
     return res.status(500).json({
       success: false,
       message: "server.error",
